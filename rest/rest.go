@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-const Port = 42069
+const Port = 8080
 
 func StartService() {
 	registerEndpoints(handlers)
