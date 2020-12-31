@@ -1,7 +1,4 @@
-# huginn - a REST backend
-
-[![Build Status](https://travis-ci.com/refundable-tgm/huginn.svg?branch=master)](https://travis-ci.com/refundable-tgm/huginn)
-[![Coverage Status](https://coveralls.io/repos/github/refundable-tgm/huginn/badge.svg?branch=master)](https://coveralls.io/github/refundable-tgm/huginn?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/refundable-tgm/huginn)](https://goreportcard.com/report/github.com/refundable-tgm/huginn)
+huginn - a REST backend [![Huginn](https://github.com/refundable-tgm/huginn/workflows/Huginn/badge.svg)](https://github.com/refundable-tgm/huginn/actions) [![codecov](https://codecov.io/gh/refundable-tgm/huginn/branch/master/graph/badge.svg?token=CKU7R0YUPC)](https://codecov.io/gh/refundable-tgm/huginn) [![Go Report Card](https://goreportcard.com/badge/github.com/refundable-tgm/huginn)](https://goreportcard.com/report/github.com/refundable-tgm/huginn)
+=====
 
 tba
