@@ -4,14 +4,14 @@ import "net/http"
 
 type endpoint struct {
 	path string
-	handler func(writer http.ResponseWriter, r *http.Request)
+	handler func(writer http.ResponseWriter, request *http.Request)
 }
 
 var handlers = []endpoint {
 	{
-		//tba
-	},
-	{
-		//tba
+		"/login",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Login"))
+		},
 	},
 }
