@@ -89,8 +89,8 @@ const (
 
 // An Application filed by a teacher represents the core group of data in this Application
 type Application struct {
-	// A generated uid of this application
-	uid string
+	// A generated uuid of this application
+	uuid string
 	// The name on how this Application should be referenced by
 	name string
 	// The kind of this Application (for more see the Enum for the kinds of Application)
@@ -123,8 +123,6 @@ type Application struct {
 
 // Details an Application has if it is of the kind of SchoolEvent
 type SchoolEventDetails struct {
-	// The uid of the Application this further details belong to
-	uid string
 	// The participating classes
 	classes []string
 	// The amount of male students
@@ -159,8 +157,6 @@ type SchoolEventTeacherDetails struct {
 
 // Details an Application has if it is of the kind of Training
 type TrainingDetails struct {
-	// The uid of the Application this further details belong to
-	uid string
 	// The kind of Training
 	kind int
 	// if its miscellaneous a reasoning for the Training
@@ -173,8 +169,6 @@ type TrainingDetails struct {
 
 // Details an Application has if it isnt a Training or SchoolEvent
 type OtherReasonDetails struct {
-	// The uid of the Application this further details belong to
-	uid string
 	// The kind of other Reason this Application is filed
 	kind int
 	// The title if the other reason is a ServiceMandate
@@ -187,8 +181,6 @@ type OtherReasonDetails struct {
 
 // A BusinessTripApplication represents one Business Trip Application belonging to an Application for each teacher
 type BusinessTripApplication struct {
-	// The uid of the Application this BusinessTripApplication belongs to
-	uid string
 	// The id (counting upwards) of this BusinessTripApplication regarding to the uid
 	id int
 	// The staffnr of the regarding teacher
@@ -243,8 +235,6 @@ type BusinessTripApplication struct {
 
 // A TravelInvoice represents one Travel Invoice belonging to an Application for each teacher
 type TravelInvoice struct {
-	// The uid of the Application this BusinessTripApplication belongs to
-	uid string
 	// The id (counting upwards) of this TravelInvoice regarding to the uid
 	id int
 	// The time the trip begins
