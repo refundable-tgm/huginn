@@ -109,6 +109,8 @@ type Application struct {
 	startAddress string
 	// The Destination Address of this Application
 	destinationAddress string
+	// The timestamp this application was changed last
+	lastChanged time.Time
 	// Further Details if this is of the kind SchoolEvent, if not this will be empty
 	SchoolEventDetails
 	// Further Details if this is of the kind Training, if not this will be empty
