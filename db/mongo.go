@@ -16,7 +16,7 @@ import (
 const TeacherCollection = "Teacher"
 
 // The name of the collection in which the Application data is stored in
-const ApplicationCollection = "Collection"
+const ApplicationCollection = "Application"
 
 // Containing data used for the mongo db connection
 type MongoDatabaseConnector struct {
@@ -90,6 +90,21 @@ func (m MongoDatabaseConnector) GetApplication(uuid string) (application Applica
 		return
 	}
 	return application
+}
+
+// Returns all applications contained in the collection
+func (m MongoDatabaseConnector) GetAllApplications() (applications []Application) {
+	collection := m.client.Database(m.database).Collection(ApplicationCollection)
+	cursor, err := collection.Find(m.context, bson.M{})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if err = cursor.All(m.context, &applications); err != nil {
+		log.Println(err)
+		return
+	}
+	return
 }
 
 // Returns all active applications in the system
