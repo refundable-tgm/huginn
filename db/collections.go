@@ -339,6 +339,8 @@ type Row struct {
 
 // Further information of a Teacher (which isnt saved in the LDAP-instance)
 type Teacher struct {
+	// the uuid of this Teacher
+	uuid string
 	// the short name of the Teacher
 	short string
 	// the longname (firstname + sirname) of the Teacher

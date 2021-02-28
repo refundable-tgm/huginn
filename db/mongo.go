@@ -135,28 +135,88 @@ func (m MongoDatabaseConnector) GetActiveApplications() (applications []Applicat
 	return applications
 }
 
-func (m MongoDatabaseConnector) UpdateApplication() (ok bool) {
-	return false
+// Updates one application with the matching uuid and updates it with the data in the update Application
+// returns true whether one Application was modified, false if an error occured or no Application was modified
+func (m MongoDatabaseConnector) UpdateApplication(uuid string, update Application) bool {
+	update.uuid = uuid
+	collection := m.client.Database(m.database).Collection(ApplicationCollection)
+	result, err := collection.ReplaceOne(m.context, bson.M{"uuid":uuid}, update)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return result.ModifiedCount == 1
 }
 
-func (m MongoDatabaseConnector) DeleteApplication(uuid string) (ok bool) {
-	return false
+// Deletes one application described by the given uuid
+// returns true if a document was deleted, false if none or an error occured
+func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
+	collection := m.client.Database(m.database).Collection(ApplicationCollection)
+	result, err := collection.DeleteOne(m.context, bson.M{"uuid":uuid})
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return result.DeletedCount == 1
 }
 
-func (m MongoDatabaseConnector) CreateTeacher() (ok bool) {
-	return false
+// Creates a new application in the system
+func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
+	teacher.uuid = uuid.New().String()
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	insert, err := collection.InsertOne(m.context, teacher)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	log.Println("Inserted a new teacher with the UUID: ", teacher.uuid,
+		"; the shortname: ", teacher.short, "; under the ID: ", insert.InsertedID)
+	return true
 }
 
-func (m MongoDatabaseConnector) GetTeacher() (teacher Teacher) {
-	return Teacher{}
+// Returns a teacher found by a given short name
+func (m MongoDatabaseConnector) GetTeacherByShort(short string) (teacher Teacher) {
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if err := collection.FindOne(m.context, bson.M{"short": short}).Decode(&teacher); err != nil {
+		log.Println(err)
+		return
+	}
+	return teacher
 }
 
-func (m MongoDatabaseConnector) UpdateTeacher() (ok bool) {
-	return false
+// Returns a teacher found by a given UUID
+func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) {
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&teacher); err != nil {
+		log.Println(err)
+		return
+	}
+	return teacher
 }
 
-func (m MongoDatabaseConnector) DeleteTeacher() (ok bool) {
-	return false
+// Updates one Teacher with the matching uuid and updates it with the data in the update Teacher
+// returns true whether one TEacher was modified, false if an error occured or no Teacher was modified
+func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool {
+	update.uuid = uuid
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	result, err := collection.ReplaceOne(m.context, bson.M{"uuid":uuid}, update)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return result.ModifiedCount == 1
+}
+
+// Deletes one teacher described by a given short name
+// returns true if a document was deleted, false if none or an error occured
+func (m MongoDatabaseConnector) DeleteTeacher(uuid string) (ok bool) {
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	result, err := collection.DeleteOne(m.context, bson.M{"uuid":uuid})
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return result.DeletedCount == 1
 }
 
 // Constructs the URI out of the given information of the docker secrets
