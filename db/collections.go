@@ -347,6 +347,8 @@ type Teacher struct {
 	Longname string
 	// whether this Teacher as av rights
 	AV bool
+	// whether this Teacher as administration rights
+	Administration bool
 	// whether this Teacher as pek rights
 	PEK bool
 }
