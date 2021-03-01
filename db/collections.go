@@ -90,263 +90,263 @@ const (
 // An Application filed by a teacher represents the core group of data in this Application
 type Application struct {
 	// A generated uuid of this application
-	uuid string
+	UUID string
 	// The name on how this Application should be referenced by
-	name string
+	Name string
 	// The kind of this Application (for more see the Enum for the kinds of Application)
-	kind int
+	Kind int
 	// The Reasoning of this Application (there is none if this isn't of the type Miscellaneous)
-	miscellaneousReason string
+	MiscellaneousReason string
 	// The Progress of this Application in filing (for more see the Enum for the Progress)
-	progress int
+	Progress int
 	// the time the underlying event of this Application starts
-	startTime time.Time
+	StartTime time.Time
 	// the time the underlying event of this Application ends
-	endTime time.Time
+	EndTime time.Time
 	// Other Notes regarding this Application
-	notes string
+	Notes string
 	// The starting address of this Application
-	startAddress string
+	StartAddress string
 	// The Destination Address of this Application
-	destinationAddress string
+	DestinationAddress string
 	// The timestamp this application was changed last
-	lastChanged time.Time
+	LastChanged time.Time
 	// Further Details if this is of the kind SchoolEvent, if not this will be empty
-	SchoolEventDetails
+	SchoolEventDetails SchoolEventDetails
 	// Further Details if this is of the kind Training, if not this will be empty
-	TrainingDetails
+	TrainingDetails TrainingDetails
 	// Further Details if this is of the kind of any other, if not this will be empty
-	OtherReasonDetails
+	OtherReasonDetails OtherReasonDetails
 	// The regarding BusinessTripApplication for each teacher
-	businessTripApplications []BusinessTripApplication
+	BusinessTripApplications []BusinessTripApplication
 	// The regarding TravelInvoice for each teacher
-	travelInvoices []TravelInvoice
+	TravelInvoices []TravelInvoice
 }
 
 // Details an Application has if it is of the kind of SchoolEvent
 type SchoolEventDetails struct {
 	// The participating classes
-	classes []string
+	Classes []string
 	// The amount of male students
-	amountMaleStudents int
+	AmountMaleStudents int
 	// The amount of female students
-	amountFemaleStudents int
+	AmountFemaleStudents int
 	// The duration of the event in days
-	durationInDays int
+	DurationInDays int
 	// Details of each teacher participating in the SchoolEvent
-	teachers []SchoolEventTeacherDetails
+	Teachers []SchoolEventTeacherDetails
 }
 
 // The details of each teacher participating in a SchoolEvent
 type SchoolEventTeacherDetails struct {
 	// The full name of a teacher
-	name string
+	Name string
 	// The short name (abbrevation) of a teacher
-	shortname string
+	Shortname string
 	// The teacher will be attending the SchoolEvent from
-	attendanceFrom time.Time
+	AttendanceFrom time.Time
 	// The teacher will be attend the SchoolEvent till
-	attendanceTill time.Time
+	AttendanceTill time.Time
 	// The group number
-	group int
+	Group int
 	// Where the teacher starts their travel from
-	startAddress string
+	StartAddress string
 	// Where the teacher will meet with the group to travel together
-	meetingPoint string
+	MeetingPoint string
 	// The role of each teacher (Leader or Companion)
-	role int
+	Role int
 }
 
 // Details an Application has if it is of the kind of Training
 type TrainingDetails struct {
 	// The kind of Training
-	kind int
+	Kind int
 	// if its miscellaneous a reasoning for the Training
-	miscellaneousReason string
+	MiscellaneousReason string
 	// the personnell number of the teacher
-	ph int
+	PH int
 	// The company who organizes the Training
-	organizer string
+	Organizer string
 }
 
 // Details an Application has if it isnt a Training or SchoolEvent
 type OtherReasonDetails struct {
 	// The kind of other Reason this Application is filed
-	kind int
+	Kind int
 	// The title if the other reason is a ServiceMandate
-	serviceMandateTitle string
+	ServiceMandateTitle string
 	// the gz number if the other reason is a ServiceMandate
-	serviceMandateGZ int
+	ServiceMandateGZ int
 	// the reasoning if the other reason is of kind Miscellaneous
-	miscellaneousReason string
+	MiscellaneousReason string
 }
 
 // A BusinessTripApplication represents one Business Trip Application belonging to an Application for each teacher
 type BusinessTripApplication struct {
 	// The id (counting upwards) of this BusinessTripApplication regarding to the uid
-	id int
+	ID int
 	// The staffnr of the regarding teacher
-	staffnr int
+	Staffnr int
 	// The time the trip begins
-	tripBeginTime time.Time
+	TripBeginTime time.Time
 	// The time the trip ends
-	tripEndTime time.Time
+	TripEndTime time.Time
 	// The time the service begins
-	serviceBeginTime time.Time
+	ServiceBeginTime time.Time
 	// The time the service ends
-	serviceEndTime time.Time
+	ServiceEndTime time.Time
 	// The trip goal (address)
-	tripGoal string
+	TripGoal string
 	// The purpose of travelling
-	travelPurpose string
+	TravelPurpose string
 	// The travel mode (see the regarding Enum for this)
-	travelMode int
+	TravelMode int
 	// The starting point (see the regarding Enum: OwnApartment or Office
-	startingPoint int
+	StartingPoint int
 	// The end point (see the regarding Enum: OwnApartment or Office)
-	endPoint int
+	EndPoint int
 	// The reasoing behind the trip application
-	reasoning string
+	Reasoning string
 	// The name of other participants of this trip
-	otherParticipants []string
+	OtherParticipants []string
 	// the confirmation of the first bonus mile clause
-	bonusMileConfirmation1 bool
+	BonusMileConfirmation1 bool
 	// the confirmation of the second bonus mile clause
-	bonusMileConfirmation2 bool
+	BonusMileConfirmation2 bool
 	// whether the travel costs are payed by someone else
-	travelCostsPayedBySomeone bool
+	TravelCostsPayedBySomeone bool
 	// whether the staying costs are payed by someone else
-	stayingCostsPayedBySomeone bool
+	StayingCostsPayedBySomeone bool
 	// if some costs are payed by someone else by whom
-	payedByWhom string
+	PayedByWhom string
 	// other costs which appeared
-	otherCosts float32
+	OtherCosts float32
 	// the total estimated costs
-	estimatedCosts float32
+	EstimatedCosts float32
 	// the date this application is filed
-	dateApplicationFiled time.Time
+	DateApplicationFiled time.Time
 	// the date this application is approved
-	dateApplicationApproved time.Time
+	DateApplicationApproved time.Time
 	// the referee checking this application
-	referee string
+	Referee string
 	// whether a business card was emitted outwards
-	businessCardEmittedOutward bool
+	BusinessCardEmittedOutward bool
 	// whether a business card was emitted on the return
-	businessCardEmittedReturn bool
+	BusinessCardEmittedReturn bool
 }
 
 // A TravelInvoice represents one Travel Invoice belonging to an Application for each teacher
 type TravelInvoice struct {
 	// The id (counting upwards) of this TravelInvoice regarding to the uid
-	id int
+	ID int
 	// The time the trip begins
-	tripBeginTime time.Time
+	TripBeginTime time.Time
 	// The time the trip ends
-	tripEndTime time.Time
+	TripEndTime time.Time
 	// The personell number of the teacher
-	staffnr int
+	Staffnr int
 	// the starting point of the trip
-	startingPoint string
+	StartingPoint string
 	// the end point of the trip
-	endPoint string
+	EndPoint string
 	// the clerk maintaining and checking this application
-	clerk string
+	Clerk string
 	// the reviewer reviewing the approval of this application
-	reviewer string
+	Reviewer string
 	// the travel mode (see the regarding enum)
-	travelMode int
+	TravelMode int
 	// the zi number
-	zi int
+	ZI int
 	// the date this application was filed
-	filingDate time.Time
+	FilingDate time.Time
 	// the date this application was approved
-	approvalDate time.Time
+	ApprovalDate time.Time
 	// the mode how daily charges are handled
-	dailyChargesMode int
+	DailyChargesMode int
 	// the amount the daily charges should be shortened
-	shortenedAmount int
+	ShortenedAmount int
 	// the mode how nightly charges are handled
-	nightlyChargesMode int
+	NightlyChargesMode int
 	// the amount of breakfasts
-	breakfasts int
+	Breakfasts int
 	// the amount of lunches
-	lunches int
+	Lunches int
 	// the amount of dinners
-	dinners int
+	Dinners int
 	// whether the teacher got a official business card
-	officialBusinessCardGot bool
+	OfficialBusinessCardGot bool
 	// whether the teacher got a travel grant
-	travelGrant bool
+	TravelGrant bool
 	// whether the teacher got a replacement for an advantage card
-	replacementForAdvantageCard bool
+	ReplacementForAdvantageCard bool
 	// whether the teacher got a replacement for a train card class 2
-	replacementForTrainCardClass2 bool
+	ReplacementForTrainCardClass2 bool
 	// whether the teacher got a kilometre allowance
-	kilometreAllowance bool
+	KilometreAllowance bool
 	// the regarding kilometre amount
-	kilometreAmount float32
+	KilometreAmount float32
 	// whether the participants of the trip are counted and clearly indicated
-	nrAndIdicationsOfParticipants bool
+	NRAndIdicationsOfParticipants bool
 	// whether the travel costs are clearly cited
-	travelCostsCited bool
+	TravelCostsCited bool
 	// whether there aren't any travel costs
-	noTravelCosts bool
+	NoTravelCosts bool
 	// the regarding calculation
-	Calculation
+	Calculation Calculation
 }
 
 // The calculations in a TravelInvoice
 type Calculation struct {
 	// the id of this calculation
-	id int
+	ID int
 	// rows of this calculation
-	rows []Row
+	Rows []Row
 	// the sum of all travel costs
-	sumTravelCosts float32
+	SumTravelCosts float32
 	// the sum of all daily charges
-	sumDailyCharges float32
+	SumDailyCharges float32
 	// the sum of all nightly charges
-	sumNightlyCharges float32
+	SumNightlyCharges float32
 	// the sum of all additional costs
-	sumAdditionalCosts float32
+	SumAdditionalCosts float32
 	// the sum of all sums
-	sumOfSums float32
+	SumOfSums float32
 }
 
 // The specific Row in a Calculation
 type Row struct {
 	// The row nr
-	nr int
+	NR int
 	// The date this Row refers to
-	date time.Time
+	Date time.Time
 	// the begin time this Row refers to
-	begin time.Time
+	Begin time.Time
 	// the end time this Row refers to
-	end time.Time
+	End time.Time
 	// the amount of kilometres this row refers to
-	kilometres float32
+	Kilometres float32
 	// the travelCosts this Row conducts
-	travelCosts float32
+	TravelCosts float32
 	// the dailyCharges this Row conducts
-	dailyCharges float32
+	DailyCharges float32
 	// the nightlyCharges this Row conducts
-	nightlyCharges float32
+	NightlyCharges float32
 	// the additionalCosts this Row conducts
-	additionalCosts float32
+	AdditionalCosts float32
 	// the sum of all costs in this Row
-	sum float32
+	Sum float32
 }
 
 // Further information of a Teacher (which isnt saved in the LDAP-instance)
 type Teacher struct {
 	// the uuid of this Teacher
-	uuid string
+	UUID string
 	// the short name of the Teacher
-	short string
+	Short string
 	// the longname (firstname + sirname) of the Teacher
-	longname string
+	Longname string
 	// whether this Teacher as av rights
-	av bool
+	AV bool
 	// whether this Teacher as pek rights
-	pek bool
+	PEK bool
 }
