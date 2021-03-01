@@ -70,15 +70,15 @@ func (m MongoDatabaseConnector) Close() (ok bool) {
 
 // Creates a new application in the system
 func (m MongoDatabaseConnector) CreateApplication(application Application) bool {
-	application.uuid = uuid.New().String()
+	application.UUID = uuid.New().String()
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
 	insert, err := collection.InsertOne(m.context, application)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
-	log.Println("Inserted a new application with the UUID: ", application.uuid,
-		"; the Title: ", application.name, "; under the ID: ", insert.InsertedID)
+	log.Println("Inserted a new application with the UUID: ", application.UUID,
+		"; the Title: ", application.Name, "; under the ID: ", insert.InsertedID)
 	return true
 }
 
@@ -138,7 +138,7 @@ func (m MongoDatabaseConnector) GetActiveApplications() (applications []Applicat
 // Updates one application with the matching uuid and updates it with the data in the update Application
 // returns true whether one Application was modified, false if an error occured or no Application was modified
 func (m MongoDatabaseConnector) UpdateApplication(uuid string, update Application) bool {
-	update.uuid = uuid
+	update.UUID = uuid
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
 	result, err := collection.ReplaceOne(m.context, bson.M{"uuid":uuid}, update)
 	if err != nil {
@@ -162,15 +162,15 @@ func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 
 // Creates a new application in the system
 func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
-	teacher.uuid = uuid.New().String()
+	teacher.UUID = uuid.New().String()
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	insert, err := collection.InsertOne(m.context, teacher)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
-	log.Println("Inserted a new teacher with the UUID: ", teacher.uuid,
-		"; the shortname: ", teacher.short, "; under the ID: ", insert.InsertedID)
+	log.Println("Inserted a new teacher with the UUID: ", teacher.UUID,
+		"; the shortname: ", teacher.Short, "; under the ID: ", insert.InsertedID)
 	return true
 }
 
@@ -197,7 +197,7 @@ func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) 
 // Updates one Teacher with the matching uuid and updates it with the data in the update Teacher
 // returns true whether one TEacher was modified, false if an error occured or no Teacher was modified
 func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool {
-	update.uuid = uuid
+	update.UUID = uuid
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	result, err := collection.ReplaceOne(m.context, bson.M{"uuid":uuid}, update)
 	if err != nil {

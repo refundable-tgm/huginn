@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/refundable-tgm/huginn/rest"
+)
 
-func main() {
-	fmt.Println("Hello", "World")
+func main1() {
+	rest.StartService()
 }
