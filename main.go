@@ -4,6 +4,6 @@ import (
 	"github.com/refundable-tgm/huginn/rest"
 )
 
-func main1() {
+func main() {
 	rest.StartService()
 }
