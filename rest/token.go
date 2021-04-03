@@ -120,15 +120,15 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-func TokenValid(r *http.Request) error {
+func TokenValid(r *http.Request) (bool, error) {
 	token, err := VerifyToken(r)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
-		return err
+		return false, err
 	}
-	return nil
+	return true, nil
 }
 
 func ExtractTokenMeta(r *http.Request) (*AccessToken, error) {

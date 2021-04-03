@@ -6,6 +6,18 @@ import (
 	"net/http"
 )
 
+func AuthWall() gin.HandlerFunc {
+	return func(con *gin.Context) {
+		ok, err := TokenValid(con.Request)
+		if !ok {
+			con.JSON(http.StatusUnauthorized, err.Error())
+			con.Abort()
+			return
+		}
+		con.Next()
+	}
+}
+
 func Login(con *gin.Context) {
 	u := struct {
 		Username string `json:"username"`

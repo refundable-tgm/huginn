@@ -13,6 +13,7 @@ func StartService() {
 	router := gin.Default()
 	//gin.SetMode(gin.ReleaseMode)
 	router.POST("/login", Login)
-	router.POST("/logout", Logout)
+	router.POST("/logout", AuthWall(), Logout)
+	router.POST("/refresh", )
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
