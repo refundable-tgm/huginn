@@ -31,3 +31,13 @@ func Login(con *gin.Context) {
 	}
 	con.JSON(http.StatusOK, out)
 }
+
+func Logout(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	DeleteToken(auth.AccessUUID)
+	con.JSON(http.StatusOK, "logged out")
+}

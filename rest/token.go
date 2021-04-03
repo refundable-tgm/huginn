@@ -163,6 +163,10 @@ func FetchAuth(auth *AccessToken) (username string, ok bool) {
 	return
 }
 
+func DeleteToken(uuid string)  {
+	delete(activeTokens, uuid)
+}
+
 func readAccessSecret() {
 	if _, err := os.Stat(pathAccessSecret); os.IsNotExist(err) {
 		const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
