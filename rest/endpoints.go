@@ -158,18 +158,23 @@ func GetTeacher(con *gin.Context) {
 }
 
 func GetActiveApplications(con *gin.Context) {
-	_, err := ExtractTokenMeta(con.Request)
+	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
 		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
 		return
 	}
 	query := con.Request.URL.Query()
 	applyFilter := query.Get("username") == ""
 	filter := query.Get("username")
-	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
-	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
+		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
 	applications := db.GetActiveApplications()
