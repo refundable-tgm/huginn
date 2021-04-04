@@ -18,5 +18,6 @@ func StartService() {
 	router.GET("/getLongName", AuthWall(), GetLongName)
 	router.GET("/getTeacher", AuthWall(), GetTeacher)
 	router.GET("/getActiveApplications", AuthWall(), GetActiveApplications)
+	router.GET("/getAllApplications", AuthWall(), GetAllApplication)
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }

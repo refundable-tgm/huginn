@@ -204,3 +204,51 @@ func GetActiveApplications(con *gin.Context) {
 	}
 	con.JSON(http.StatusOK, applications)
 }
+
+func GetAllApplication(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	query := con.Request.URL.Query()
+	applyFilter := query.Get("username") == ""
+	filter := query.Get("username")
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
+		con.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+	applications := db.GetAllApplications()
+	if applyFilter {
+		res := make([]mongo.Application, 0)
+		for _, app := range applications {
+			if app.Kind == mongo.SchoolEvent {
+				teachers := app.SchoolEventDetails.Teachers
+				for _, t := range teachers {
+					if t.Shortname == filter {
+						res = append(res, app)
+						break
+					}
+				}
+			} else if app.Kind == mongo.Training {
+				if app.TrainingDetails.Organizer == filter {
+					res = append(res, app)
+				}
+			} else if app.Kind == mongo.OtherReason {
+				if app.OtherReasonDetails.Filer == filter {
+					res = append(res, app)
+				}
+			}
+		}
+		con.JSON(http.StatusOK, res)
+		return
+	}
+	con.JSON(http.StatusOK, applications)
+}
