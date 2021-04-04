@@ -22,5 +22,6 @@ func StartService() {
 	router.GET("/getNews", AuthWall(), GetNews)
 	router.GET("/getApplication", AuthWall(), GetApplication)
 	router.GET("/getAdminApplication", AuthWall(), GetAdminApplication)
+	router.POST("/createApplication", AuthWall(), CreateApplication)
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }

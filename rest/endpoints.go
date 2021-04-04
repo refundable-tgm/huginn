@@ -389,4 +389,26 @@ func GetAdminApplication(con *gin.Context) {
 	con.JSON(http.StatusOK, res)
 }
 
-
+func CreateApplication(con *gin.Context) {
+	app := mongo.Application{}
+	if err := con.ShouldBindJSON(&app); err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	_, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	if db.CreateApplication(app) {
+		con.JSON(http.StatusOK, "success; application created")
+	} else {
+		con.JSON(http.StatusOK, "error; application not created")
+	}
+}
