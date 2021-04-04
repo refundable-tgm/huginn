@@ -350,4 +350,43 @@ func GetApplication(con *gin.Context) {
 	con.JSON(http.StatusOK, application)
 }
 
+func GetAdminApplication(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	teacher := db.GetTeacherByShort(auth.Username)
+	if !(teacher.PEK || teacher.Administration || teacher.AV) {
+		con.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+	applications := db.GetAllApplications()
+	res := make([]mongo.Application, 0)
+	for _, app := range applications {
+		if app.Kind == mongo.SchoolEvent {
+			if app.Progress == mongo.SEInProcess && (teacher.Administration || teacher.AV) {
+				res = append(res, app)
+			}
+			if app.Progress == mongo.SECostsInProcess {
+				res = append(res, app)
+			}
+		} else if app.Kind == mongo.Training || app.Kind == mongo.OtherReason {
+			if app.Progress == mongo.TInProcess && (teacher.Administration || teacher.AV) {
+				res = append(res, app)
+			}
+			if app.Progress == mongo.TCostsInProcess {
+				res = append(res, app)
+			}
+		}
+	}
+	con.JSON(http.StatusOK, res)
+}
+
 
