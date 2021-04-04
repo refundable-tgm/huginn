@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/refundable-tgm/huginn/db"
 	"github.com/refundable-tgm/huginn/ldap"
 	"net/http"
 )
@@ -105,4 +106,31 @@ func Refresh(con *gin.Context) {
 	} else {
 		con.JSON(http.StatusUnauthorized, "refresh token expired")
 	}
+}
+
+func GetLongName(con *gin.Context) {
+	_, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	query := con.Request.URL.Query()
+	if query.Get("name") == "" {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	name := query.Get("name")
+	db := db.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	teacher := db.GetTeacherByShort(name)
+	resp := map[string]string {
+		"short": teacher.Short,
+		"long": teacher.Longname,
+		"uuid": teacher.UUID,
+	}
+	con.JSON(http.StatusOK, resp)
 }
