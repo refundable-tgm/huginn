@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/refundable-tgm/huginn/db"
+	mongo "github.com/refundable-tgm/huginn/db"
 	"github.com/refundable-tgm/huginn/ldap"
 	"net/http"
 )
@@ -120,7 +120,7 @@ func GetLongName(con *gin.Context) {
 		return
 	}
 	name := query.Get("name")
-	db := db.MongoDatabaseConnector{}
+	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, "database didn't respond")
@@ -147,7 +147,7 @@ func GetTeacher(con *gin.Context) {
 		return
 	}
 	uuid := query.Get("uuid")
-	db := db.MongoDatabaseConnector{}
+	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, "database didn't respond")
@@ -155,4 +155,47 @@ func GetTeacher(con *gin.Context) {
 	}
 	teacher := db.GetTeacherByUUID(uuid)
 	con.JSON(http.StatusOK, teacher)
+}
+
+func GetActiveApplications(con *gin.Context) {
+	_, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	query := con.Request.URL.Query()
+	applyFilter := query.Get("username") == ""
+	filter := query.Get("username")
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	applications := db.GetActiveApplications()
+	if applyFilter {
+		res := make([]mongo.Application, 0)
+		for _, app := range applications {
+			if app.Kind == mongo.SchoolEvent {
+				teachers := app.SchoolEventDetails.Teachers
+				for _, t := range teachers {
+					if t.Shortname == filter {
+						res = append(res, app)
+						break
+					}
+				}
+			} else if app.Kind == mongo.Training {
+				if app.TrainingDetails.Organizer == filter {
+					res = append(res, app)
+				}
+			} else if app.Kind == mongo.OtherReason {
+				if app.OtherReasonDetails.Filer == filter {
+					res = append(res, app)
+				}
+			}
+		}
+		con.JSON(http.StatusOK, res)
+		return
+	}
+	con.JSON(http.StatusOK, applications)
 }
