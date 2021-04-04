@@ -27,15 +27,17 @@ const (
 
 // Enum for different kinds of applications
 const (
-	Training = iota
-	Careleave
-	ServiceMandate
-	MedicalAppointment
-	SchoolEvent
+	SchoolEvent = iota
+	Training
 	Seminar
 	Conference
 	Course
 	Miscellaneous
+	OtherReason
+	Careleave
+	ServiceMandate
+	MedicalAppointment
+	Other
 )
 
 // Enum for different roles of a teacher in an application
@@ -93,7 +95,7 @@ type Application struct {
 	UUID string
 	// The name on how this Application should be referenced by
 	Name string
-	// The kind of this Application (for more see the Enum for the kinds of Application)
+	// The kind of this Application (for more see the Enum for the kinds of Application on this level only Training, SchoolEvent and OtherReason is applicable, the sub kinds should be used in the further detail section of the corresponding site)
 	Kind int
 	// The Reasoning of this Application (there is none if this isn't of the type Miscellaneous)
 	MiscellaneousReason string
@@ -179,6 +181,8 @@ type OtherReasonDetails struct {
 	ServiceMandateGZ int
 	// the reasoning if the other reason is of kind Miscellaneous
 	MiscellaneousReason string
+	// the teacher this application belongs to
+	Filer string
 }
 
 // A BusinessTripApplication represents one Business Trip Application belonging to an Application for each teacher
