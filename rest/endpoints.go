@@ -134,3 +134,25 @@ func GetLongName(con *gin.Context) {
 	}
 	con.JSON(http.StatusOK, resp)
 }
+
+func GetTeacher(con *gin.Context) {
+	_, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	query := con.Request.URL.Query()
+	if query.Get("uuid") == "" {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	db := db.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	teacher := db.GetTeacherByUUID(uuid)
+	con.JSON(http.StatusOK, teacher)
+}

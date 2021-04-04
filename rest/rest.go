@@ -16,5 +16,6 @@ func StartService() {
 	router.POST("/logout", AuthWall(), Logout)
 	router.POST("/login/refresh", Refresh)
 	router.GET("/getLongName", AuthWall(), GetLongName)
+	router.GET("/getTeacher", AuthWall(), GetTeacher)
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
