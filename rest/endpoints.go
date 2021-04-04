@@ -7,6 +7,7 @@ import (
 	mongo "github.com/refundable-tgm/huginn/db"
 	"github.com/refundable-tgm/huginn/ldap"
 	"net/http"
+	"sort"
 )
 
 func AuthWall() gin.HandlerFunc {
@@ -41,7 +42,7 @@ func Login(con *gin.Context) {
 	}
 	SaveToken(u.Username, token)
 	out := map[string]string{
-		"access_token": token.AccessToken,
+		"access_token":  token.AccessToken,
 		"refresh_token": token.RefreshToken,
 	}
 	con.JSON(http.StatusOK, out)
@@ -93,7 +94,7 @@ func Refresh(con *gin.Context) {
 		}
 		DeleteToken(uuid)
 		tok, err := CreateToken(username)
-		if  err != nil {
+		if err != nil {
 			con.JSON(http.StatusForbidden, err.Error())
 			return
 		}
@@ -127,10 +128,10 @@ func GetLongName(con *gin.Context) {
 		return
 	}
 	teacher := db.GetTeacherByShort(name)
-	resp := map[string]string {
+	resp := map[string]string{
 		"short": teacher.Short,
-		"long": teacher.Longname,
-		"uuid": teacher.UUID,
+		"long":  teacher.Longname,
+		"uuid":  teacher.UUID,
 	}
 	con.JSON(http.StatusOK, resp)
 }
@@ -251,4 +252,59 @@ func GetAllApplication(con *gin.Context) {
 		return
 	}
 	con.JSON(http.StatusOK, applications)
+}
+
+func GetNews(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	user := auth.Username
+	applications := db.GetActiveApplications()
+	res := make([]mongo.Application, 0)
+	for _, app := range applications {
+		if app.Kind == mongo.SchoolEvent {
+			teachers := app.SchoolEventDetails.Teachers
+			for _, t := range teachers {
+				if t.Shortname == user {
+					res = append(res, app)
+					break
+				}
+			}
+		} else if app.Kind == mongo.Training {
+			if app.TrainingDetails.Organizer == user {
+				res = append(res, app)
+			}
+		} else if app.Kind == mongo.OtherReason {
+			if app.OtherReasonDetails.Filer == user {
+				res = append(res, app)
+			}
+		}
+	}
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].LastChanged.After(res[j].LastChanged)
+	})
+	if len(res) > 10 {
+		res = res[0:10]
+	}
+	news := make([]struct {
+		UUID  string `json:"uuid"`
+		Title string `json:"title"`
+		State int    `json:"state"`
+	}, 0)
+	for _, app := range res {
+		news = append(news, struct {
+			UUID  string `json:"uuid"`
+			Title string `json:"title"`
+			State int    `json:"state"`
+		}{app.UUID, app.Name, app.Progress})
+	}
+	con.JSON(http.StatusOK, news)
 }
