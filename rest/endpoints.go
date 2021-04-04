@@ -308,3 +308,46 @@ func GetNews(con *gin.Context) {
 	}
 	con.JSON(http.StatusOK, news)
 }
+
+func GetApplication(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	query := con.Request.URL.Query()
+	uuid := query.Get("uuid")
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	application := db.GetApplication(uuid)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK) {
+		con.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+	con.JSON(http.StatusOK, application)
+}
+
+
