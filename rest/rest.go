@@ -23,5 +23,7 @@ func StartService() {
 	router.GET("/getApplication", AuthWall(), GetApplication)
 	router.GET("/getAdminApplication", AuthWall(), GetAdminApplication)
 	router.POST("/createApplication", AuthWall(), CreateApplication)
+	router.PUT("/updateApplication", AuthWall(), UpdateApplication)
+	router.DELETE("/deleteApplication", AuthWall(), DeleteApplication)
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
