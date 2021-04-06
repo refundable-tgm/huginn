@@ -112,7 +112,7 @@ func Refresh(con *gin.Context) {
 	}
 }
 
-func GetLongName(con *gin.Context) {
+func GetTeacherByShort(con *gin.Context) {
 	_, err := ExtractTokenMeta(con.Request)
 	if err != nil {
 		con.JSON(http.StatusUnauthorized, "you are not logged in")
@@ -131,12 +131,7 @@ func GetLongName(con *gin.Context) {
 		return
 	}
 	teacher := db.GetTeacherByShort(name)
-	resp := map[string]string{
-		"short": teacher.Short,
-		"long":  teacher.Longname,
-		"uuid":  teacher.UUID,
-	}
-	con.JSON(http.StatusOK, resp)
+	con.JSON(http.StatusOK, teacher)
 }
 
 func GetTeacher(con *gin.Context) {

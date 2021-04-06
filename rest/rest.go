@@ -15,7 +15,7 @@ func StartService() {
 	router.POST("/login", Login)
 	router.POST("/logout", AuthWall(), Logout)
 	router.POST("/login/refresh", Refresh)
-	router.GET("/getLongName", AuthWall(), GetLongName)
+	router.GET("/getTeacherByShort", AuthWall(), GetTeacherByShort)
 	router.GET("/getTeacher", AuthWall(), GetTeacher)
 	router.GET("/getActiveApplications", AuthWall(), GetActiveApplications)
 	router.GET("/getAllApplications", AuthWall(), GetAllApplication)
