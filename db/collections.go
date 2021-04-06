@@ -349,6 +349,8 @@ type Teacher struct {
 	Short string
 	// the longname (firstname + sirname) of the Teacher
 	Longname string
+	// Superuser (total admin) of this software
+	Superuser bool
 	// whether this Teacher as av rights
 	AV bool
 	// whether this Teacher as administration rights

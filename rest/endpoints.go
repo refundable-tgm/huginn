@@ -172,7 +172,7 @@ func GetActiveApplications(con *gin.Context) {
 	applyFilter := query.Get("username") == ""
 	filter := query.Get("username")
 	requestTeacher := db.GetTeacherByShort(auth.Username)
-	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
+	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.Superuser || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
 		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
@@ -220,7 +220,7 @@ func GetAllApplication(con *gin.Context) {
 	applyFilter := query.Get("username") == ""
 	filter := query.Get("username")
 	requestTeacher := db.GetTeacherByShort(auth.Username)
-	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
+	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.Superuser || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
 		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
@@ -341,7 +341,7 @@ func GetApplication(con *gin.Context) {
 			in = true
 		}
 	}
-	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK) {
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.Superuser) {
 		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
@@ -361,7 +361,7 @@ func GetAdminApplication(con *gin.Context) {
 		return
 	}
 	teacher := db.GetTeacherByShort(auth.Username)
-	if !(teacher.PEK || teacher.Administration || teacher.AV) {
+	if !(teacher.PEK || teacher.Administration || teacher.AV || teacher.Superuser) {
 		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
@@ -369,14 +369,14 @@ func GetAdminApplication(con *gin.Context) {
 	res := make([]mongo.Application, 0)
 	for _, app := range applications {
 		if app.Kind == mongo.SchoolEvent {
-			if app.Progress == mongo.SEInProcess && (teacher.Administration || teacher.AV) {
+			if app.Progress == mongo.SEInProcess && (teacher.Administration || teacher.AV || teacher.Superuser) {
 				res = append(res, app)
 			}
 			if app.Progress == mongo.SECostsInProcess {
 				res = append(res, app)
 			}
 		} else if app.Kind == mongo.Training || app.Kind == mongo.OtherReason {
-			if app.Progress == mongo.TInProcess && (teacher.Administration || teacher.AV) {
+			if app.Progress == mongo.TInProcess && (teacher.Administration || teacher.AV || teacher.Superuser) {
 				res = append(res, app)
 			}
 			if app.Progress == mongo.TCostsInProcess {
@@ -450,7 +450,7 @@ func UpdateApplication(con *gin.Context) {
 			in = true
 		}
 	}
-	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK) {
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.Superuser) {
 		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
@@ -495,7 +495,7 @@ func DeleteApplication(con *gin.Context) {
 			in = true
 		}
 	}
-	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK) {
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.Superuser) {
 		con.JSON(http.StatusUnauthorized, "unauthorized")
 		return
 	}
