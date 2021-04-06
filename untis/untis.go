@@ -3,8 +3,8 @@ package untis
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"math"
 	"math/rand"
 	"net/http"
@@ -52,7 +52,7 @@ func CreateClient(username, password string) *Client {
 	return &client
 }
 
-func (client *Client) Authenticate() {
+func (client *Client) Authenticate() error {
 	id := getID()
 	body, _ := json.Marshal(map[string]interface{}{
 		"id": id,
@@ -66,12 +66,12 @@ func (client *Client) Authenticate() {
 	})
 	resp, err := http.Post(URL, "application/json", bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	r := struct{
 		JSONRPC string `json:"jsonrpc"`
@@ -80,7 +80,7 @@ func (client *Client) Authenticate() {
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	personType, _ := strconv.Atoi(r.Result["personType"])
 	personID, _ := strconv.Atoi(r.Result["personId"])
@@ -89,15 +89,15 @@ func (client *Client) Authenticate() {
 		client.PersonType = personType
 		client.PersonID = personID
 		client.Authenticated = true
+		return nil
 	} else {
-		log.Println("IDs not matching")
+		return fmt.Errorf("IDs not matching")
 	}
 }
 
-func (client Client) GetTimetable(start, end time.Time) []Lesson {
+func (client Client) GetTimetable(start, end time.Time) ([]Lesson, error) {
 	if !client.Authenticated {
-		log.Println("not authenticated")
-		return nil
+		return nil, fmt.Errorf("not authenticated")
 	}
 	id := getID()
 	smonth := strconv.Itoa(int(start.Month()))
@@ -129,21 +129,18 @@ func (client Client) GetTimetable(start, end time.Time) []Lesson {
 	})
 	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err.Error())
-		return nil
+		return nil, err
 	}
 	req.Header.Set("JSESSIONID", client.SessionID)
 	repClient := &http.Client{}
 	resp, err := repClient.Do(req)
 	if err != nil {
-		log.Printf("Error converting: %v", err.Error())
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	r := struct{
 		JSONRPC string `json:"jsonrpc"`
@@ -169,8 +166,7 @@ func (client Client) GetTimetable(start, end time.Time) []Lesson {
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	rid, _ := strconv.Atoi(r.ID)
 	if rid == id {
@@ -190,17 +186,26 @@ func (client Client) GetTimetable(start, end time.Time) []Lesson {
 			for _, kls := range l.Kl {
 				classIDArr = append(classIDArr, kls.ID)
 			}
-			classArr := client.ResolveClass(classIDArr)
+			classArr, err := client.ResolveClass(classIDArr)
+			if err != nil {
+				return nil, err
+			}
 			teachIDArr := make([]int, 0)
 			for _, tes := range l.Te {
 				teachIDArr = append(teachIDArr, tes.ID)
 			}
-			teachArr := client.ResolveTeacher(teachIDArr)
+			teachArr, err := client.ResolveTeacher(teachIDArr)
+			if err != nil {
+				return nil, err
+			}
 			roomIDArr := make([]int, 0)
 			for _, ros := range l.Ro {
 				roomIDArr = append(roomIDArr, ros.ID)
 			}
-			roomArr := client.ResolveRoom(roomIDArr)
+			roomArr, err := client.ResolveRoom(roomIDArr)
+			if err != nil {
+				return nil, err
+			}
 			lessons = append(lessons, Lesson{
 				Start:      time.Date(year, time.Month(month), day, startHour, startMinute, 0, 0, time.UTC),
 				End:        time.Date(year, time.Month(month), day, endHour, endMinute, 0, 0, time.UTC),
@@ -212,14 +217,14 @@ func (client Client) GetTimetable(start, end time.Time) []Lesson {
 				Rooms:      roomArr,
 			})
 		}
+		return lessons, nil
 	}
-	return nil
+	return nil, fmt.Errorf("ids not matching")
 }
 
-func (client Client) ResolveTeacher(ids []int) []string {
+func (client Client) ResolveTeacher(ids []int) ([]string, error) {
 	if !client.Authenticated {
-		log.Println("not authenticated")
-		return nil
+		return nil, fmt.Errorf("not authenticated")
 	}
 	id := getID()
 	body, _ := json.Marshal(map[string]interface{}{
@@ -230,21 +235,18 @@ func (client Client) ResolveTeacher(ids []int) []string {
 	})
 	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err.Error())
-		return nil
+		return nil, err
 	}
 	req.Header.Set("JSESSIONID", client.SessionID)
 	repClient := &http.Client{}
 	resp, err := repClient.Do(req)
 	if err != nil {
-		log.Printf("Error converting: %v", err.Error())
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	r := struct{
 		JSONRPC string `json:"jsonrpc"`
@@ -260,8 +262,7 @@ func (client Client) ResolveTeacher(ids []int) []string {
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	teacher := make([]string, 0)
 	for _, id := range ids {
@@ -271,13 +272,12 @@ func (client Client) ResolveTeacher(ids []int) []string {
 			}
 		}
 	}
-	return teacher
+	return teacher, nil
 }
 
-func (client Client) ResolveRoom (ids []int) []string {
+func (client Client) ResolveRoom (ids []int) ([]string, error) {
 	if !client.Authenticated {
-		log.Println("not authenticated")
-		return nil
+		return nil, fmt.Errorf("not authenticated")
 	}
 	id := getID()
 	body, _ := json.Marshal(map[string]interface{}{
@@ -288,21 +288,18 @@ func (client Client) ResolveRoom (ids []int) []string {
 	})
 	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err.Error())
-		return nil
+		return nil, err
 	}
 	req.Header.Set("JSESSIONID", client.SessionID)
 	repClient := &http.Client{}
 	resp, err := repClient.Do(req)
 	if err != nil {
-		log.Printf("Error converting: %v", err.Error())
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	r := struct{
 		JSONRPC string `json:"jsonrpc"`
@@ -317,24 +314,27 @@ func (client Client) ResolveRoom (ids []int) []string {
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
-	rooms := make([]string, 0)
-	for _, id := range ids {
-		for _, res := range r.Result {
-			if id == res.ID {
-				rooms = append(rooms, res.Name)
+	rid, _ := strconv.Atoi(r.ID)
+	if id == rid {
+		rooms := make([]string, 0)
+		for _, id := range ids {
+			for _, res := range r.Result {
+				if id == res.ID {
+					rooms = append(rooms, res.Name)
+				}
 			}
 		}
+		return rooms, nil
+	} else {
+		return nil, fmt.Errorf("ids not matching")
 	}
-	return rooms
 }
 
-func (client Client) ResolveClass(ids []int) []string {
+func (client Client) ResolveClass(ids []int) ([]string, error) {
 	if !client.Authenticated {
-		log.Println("not authenticated")
-		return nil
+		return nil, fmt.Errorf("not authenticated")
 	}
 	id := getID()
 	body, _ := json.Marshal(map[string]interface{}{
@@ -345,21 +345,18 @@ func (client Client) ResolveClass(ids []int) []string {
 	})
 	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err.Error())
-		return nil
+		return nil, err
 	}
 	req.Header.Set("JSESSIONID", client.SessionID)
 	repClient := &http.Client{}
 	resp, err := repClient.Do(req)
 	if err != nil {
-		log.Printf("Error converting: %v", err.Error())
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
 	r := struct{
 		JSONRPC string `json:"jsonrpc"`
@@ -376,23 +373,27 @@ func (client Client) ResolveClass(ids []int) []string {
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
-		log.Println(err)
-		return nil
+		return nil, err
 	}
-	classes := make([]string, 0)
-	for _, id := range ids {
-		for _, res := range r.Result {
-			if id == res.ID {
-				classes = append(classes, res.Name)
+	rid, _ := strconv.Atoi(r.ID)
+	if rid == id {
+		classes := make([]string, 0)
+		for _, id := range ids {
+			for _, res := range r.Result {
+				if id == res.ID {
+					classes = append(classes, res.Name)
+				}
 			}
 		}
+		return classes, nil
+	} else {
+		return nil, fmt.Errorf("ids not matching")
 	}
-	return classes
 }
 
-func (client *Client) Close() {
+func (client *Client) Close() error {
 	if !client.Authenticated {
-		log.Println("not authenticated")
+		return fmt.Errorf("not authenticated")
 	}
 	delete(activeClients, client.Username)
 	client.Closed = true
@@ -405,14 +406,15 @@ func (client *Client) Close() {
 	})
 	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err.Error())
+		return err
 	}
 	req.Header.Set("JSESSIONID", client.SessionID)
 	repClient := &http.Client{}
 	_, err = repClient.Do(req)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
+	return nil
 }
 
 func getID() int {
