@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	mongo "github.com/refundable-tgm/huginn/db"
 	"github.com/refundable-tgm/huginn/ldap"
+	"github.com/refundable-tgm/huginn/untis"
 	"net/http"
 	"sort"
 )
@@ -41,6 +42,7 @@ func Login(con *gin.Context) {
 		return
 	}
 	SaveToken(u.Username, token)
+	untis.CreateClient(u.Username, u.Password)
 	out := map[string]string{
 		"access_token":  token.AccessToken,
 		"refresh_token": token.RefreshToken,
@@ -55,6 +57,11 @@ func Logout(con *gin.Context) {
 		return
 	}
 	DeleteToken(auth.AccessUUID)
+	err = untis.GetClient(auth.Username).Close()
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "error logging out of untis")
+		return
+	}
 	con.JSON(http.StatusOK, "logged out")
 }
 
