@@ -57,11 +57,7 @@ func Logout(con *gin.Context) {
 		return
 	}
 	DeleteToken(auth.AccessUUID)
-	err = untis.GetClient(auth.Username).Close()
-	if err != nil {
-		con.JSON(http.StatusInternalServerError, "error logging out of untis")
-		return
-	}
+	untis.GetClient(auth.Username).DeleteClient()
 	con.JSON(http.StatusOK, "logged out")
 }
 

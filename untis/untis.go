@@ -58,6 +58,9 @@ func GetClient(username string) *Client {
 }
 
 func (client *Client) Authenticate() error {
+	if client.Authenticated {
+		return fmt.Errorf("already authenticated")
+	}
 	id := getID()
 	body, _ := json.Marshal(map[string]interface{}{
 		"id": id,
@@ -94,6 +97,7 @@ func (client *Client) Authenticate() error {
 		client.PersonType = personType
 		client.PersonID = personID
 		client.Authenticated = true
+		client.Closed = false
 		return nil
 	} else {
 		return fmt.Errorf("IDs not matching")
@@ -584,8 +588,8 @@ func (client *Client) Close() error {
 	if !client.Authenticated {
 		return fmt.Errorf("not authenticated")
 	}
-	delete(activeClients, client.Username)
 	client.Closed = true
+	client.Authenticated = false
 	id := getID()
 	body, _ := json.Marshal(map[string]interface{}{
 		"id": id,
@@ -604,6 +608,10 @@ func (client *Client) Close() error {
 		return err
 	}
 	return nil
+}
+
+func (client Client) DeleteClient() {
+	delete(activeClients, client.Username)
 }
 
 func getID() int {
