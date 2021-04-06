@@ -156,6 +156,51 @@ func GetTeacher(con *gin.Context) {
 	con.JSON(http.StatusOK, teacher)
 }
 
+func SetTeacherPermissions(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		return
+	}
+	perm := struct {
+		SuperUser bool `json:"super_user"`
+		Administration bool `json:"administration"`
+		AV bool `json:"av"`
+		PEK bool `json:"pek"`
+	}{}
+	if err := con.ShouldBindJSON(&perm); err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	query := con.Request.URL.Query()
+	if query.Get("uuid") == "" {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	requester := db.GetTeacherByShort(auth.Username)
+	if !(requester.PEK || requester.Administration || requester.AV || requester.Superuser) {
+		con.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
+	teacher := db.GetTeacherByUUID(uuid)
+	teacher.Superuser = perm.SuperUser
+	teacher.Administration = perm.Administration
+	teacher.PEK = perm.PEK
+	teacher.Administration = perm.Administration
+	if db.UpdateTeacher(uuid, teacher) {
+		con.JSON(http.StatusOK, "permissions updated")
+	} else {
+		con.JSON(http.StatusInternalServerError, "permissions couldn't be updated")
+	}
+}
+
 func GetActiveApplications(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
