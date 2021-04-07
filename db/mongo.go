@@ -184,6 +184,16 @@ func (m MongoDatabaseConnector) GetTeacherByShort(short string) (teacher Teacher
 	return teacher
 }
 
+// Checks whether the Teacher with the shortname short exists in the database
+func (m MongoDatabaseConnector) DoesTeacherExistsByShort(short string) bool {
+	teacher := Teacher{}
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if err := collection.FindOne(m.context, bson.M{"short": short}).Decode(&teacher); err != nil {
+		return false
+	}
+	return true
+}
+
 // Returns a teacher found by a given UUID
 func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) {
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
