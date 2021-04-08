@@ -290,7 +290,7 @@ type TravelInvoice struct {
 	// the regarding kilometre amount
 	KilometreAmount float32 `json:"kilometre_amount"`
 	// whether the participants of the trip are counted and clearly indicated
-	NRAndIdicationsOfParticipants bool `json:"nr_and_idications_of_participants"`
+	NRAndIndicationsOfParticipants bool `json:"nr_and_indications_of_participants"`
 	// whether the travel costs are clearly cited
 	TravelCostsCited bool `json:"travel_costs_cited"`
 	// whether there aren't any travel costs
