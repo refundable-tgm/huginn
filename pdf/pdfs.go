@@ -717,16 +717,16 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 	m.Row(10, func() {
 		m.Col(12, func() {
 			m.Text("1. Dem Lehrer gebührt für die Teilnahme an mindestens zweitägigen Schulveranstaltungen" +
-				" mit Nöchtigung, sofern er die pädagogisch-inhaltliche Betreuung" +
+				" mit Nächtigung, sofern er die pädagogisch-inhaltliche Betreuung" +
 				" einer Schülergruppe innehat, eine Abgeltung.", props.Text{Size: 8})
 		})
 	})
 	m.Row(5, func() {})
 	m.Row(10, func() {
 		m.Col(12, func() {
-			m.Text("1. Dem Lehrer gebührt für die Teilnahme an mindestens zweitägigen Schulveranstaltungen" +
-				" mit Nöchtigung, sofern er die pädagogisch-inhaltliche Betreuung" +
-				" einer Schülergruppe innehat, eine Abgeltung.", props.Text{Size: 8})
+			m.Text("2. Weiters gebührt dem Leiter einer mindestens viertägigen Schulveranstaltung als" +
+				"Abgeltung die Einrechnung in die Lehrverpflichtung von 4.55 WE in jener Woche in der die" +
+				"Schulveranstaltung endet.", props.Text{Size: 8})
 		})
 	})
 
