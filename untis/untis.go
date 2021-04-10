@@ -61,7 +61,7 @@ func (client *Client) Authenticate() error {
 	if client.Authenticated {
 		return fmt.Errorf("already authenticated")
 	}
-	id := getID()
+	id := rand.Intn(math.MaxInt64)
 	body, _ := json.Marshal(map[string]interface{}{
 		"id": id,
 		"method": "authenticate",
@@ -108,7 +108,6 @@ func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, erro
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
-	id := getID()
 	smonth := strconv.Itoa(int(start.Month()))
 	if len(smonth) == 1 {
 		smonth = "0" + smonth
@@ -125,24 +124,13 @@ func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, erro
 	if len(eday) == 1 {
 		eday = "0" + eday
 	}
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "getTimetable",
-		"params": map[string]interface{}{
-			"id": client.PersonID,
-			"type": client.PersonType,
-			"startDate": strconv.Itoa(start.Year()) + smonth + sday,
-			"endDate": strconv.Itoa(end.Year()) + emonth + eday,
-		},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil, err
+	params := map[string]interface{}{
+		"id": client.PersonID,
+		"type": client.PersonType,
+		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
+		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
 	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	resp, err := repClient.Do(req)
+	resp, id, err := client.sendRequest("getTimetable", params)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +223,6 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
-	id := getID()
 	smonth := strconv.Itoa(int(start.Month()))
 	if len(smonth) == 1 {
 		smonth = "0" + smonth
@@ -253,24 +240,13 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 		eday = "0" + eday
 	}
 	classID, _ := client.ResolveClassID(class)
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "getTimetable",
-		"params": map[string]interface{}{
-			"id": classID,
-			"type": 1,
-			"startDate": strconv.Itoa(start.Year()) + smonth + sday,
-			"endDate": strconv.Itoa(end.Year()) + emonth + eday,
-		},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil, err
+	params := map[string]interface{}{
+		"id": classID,
+		"type": 1,
+		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
+		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
 	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	resp, err := repClient.Do(req)
+	resp, id, err := client.sendRequest("getTimetable", params)
 	if err != nil {
 		return nil, err
 	}
@@ -363,20 +339,7 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
-	id := getID()
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "getTeachers",
-		"params": map[string]string{},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	resp, err := repClient.Do(req)
+	resp, id, err := client.sendRequest("getTeachers", map[string]interface{}{})
 	if err != nil {
 		return nil, err
 	}
@@ -401,35 +364,27 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	teacher := make([]string, 0)
-	for _, id := range ids {
-		for _, res := range r.Result {
-			if id == res.ID {
-				teacher = append(teacher, res.Forename + res.Name)
+	rid, _ := strconv.Atoi(r.ID)
+	if id == rid {
+		teacher := make([]string, 0)
+		for _, id := range ids {
+			for _, res := range r.Result {
+				if id == res.ID {
+					teacher = append(teacher, res.Forename+res.Name)
+				}
 			}
 		}
+		return teacher, nil
+	} else {
+		return nil, fmt.Errorf("ids not matching")
 	}
-	return teacher, nil
 }
 
 func (client Client) ResolveRooms(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
-	id := getID()
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "getRooms",
-		"params": map[string]string{},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	resp, err := repClient.Do(req)
+	resp, id, err := client.sendRequest("getRooms", map[string]interface{}{})
 	if err != nil {
 		return nil, err
 	}
@@ -473,20 +428,7 @@ func (client Client) ResolveClasses(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
 	}
-	id := getID()
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "getKlassen",
-		"params": map[string]string{},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	resp, err := repClient.Do(req)
+	resp, id, err := client.sendRequest("getKlassen", map[string]interface{}{})
 	if err != nil {
 		return nil, err
 	}
@@ -532,20 +474,7 @@ func (client Client) ResolveClassID(class string) (int, error) {
 	if !client.Authenticated {
 		return -1, fmt.Errorf("not authenticated")
 	}
-	id := getID()
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "getKlassen",
-		"params": map[string]string{},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return -1, err
-	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	resp, err := repClient.Do(req)
+	resp, id, err := client.sendRequest("getKlassen", map[string]interface{}{})
 	if err != nil {
 		return -1, err
 	}
@@ -590,20 +519,7 @@ func (client *Client) Close() error {
 	}
 	client.Closed = true
 	client.Authenticated = false
-	id := getID()
-	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
-		"method": "logout",
-		"params": map[string]string {},
-		"jsonrpc": "2.0",
-	})
-	req, err :=  http.NewRequest("POST", URL, bytes.NewBuffer(body))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("JSESSIONID", client.SessionID)
-	repClient := &http.Client{}
-	_, err = repClient.Do(req)
+	_, _, err := client.sendRequest("logout", map[string]interface{}{})
 	if err != nil {
 		return err
 	}
@@ -614,8 +530,22 @@ func (client Client) DeleteClient() {
 	delete(activeClients, client.Username)
 }
 
-func getID() int {
-	return rand.Intn(math.MaxInt64)
+func (client Client) sendRequest(method string, params map[string]interface{}) (*http.Response, int, error) {
+	id := rand.Intn(math.MaxInt64)
+	body, _ := json.Marshal(map[string]interface{} {
+		"id": id,
+		"method": method,
+		"params": params,
+		"jsonrpc": "2.0",
+	})
+	req, err := http.NewRequest("POST", URL, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, -1, err
+	}
+	req.Header.Set("JSESSIONID", client.SessionID)
+	reqClient := http.Client{}
+	resp, err := reqClient.Do(req)
+	return resp, id, err
 }
 
 func GetLessonNrByStart(start time.Time) int {
@@ -695,5 +625,3 @@ func GetLessonNrByEnd(end time.Time) int {
 	}
 	return -1
 }
-
-
