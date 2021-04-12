@@ -749,6 +749,14 @@ func GenerateBusinessTripApplication(path string, app db.Application) {
 
 }
 
+func GenerateTravelInvoiceExcel() {
+
+}
+
+func GenerateBusinessTripApplicationExcel() {
+	
+}
+
 func getWeekday(weekday int) string {
 	switch weekday {
 	case int(time.Monday):

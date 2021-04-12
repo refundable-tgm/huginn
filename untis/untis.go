@@ -370,7 +370,7 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 		for _, id := range ids {
 			for _, res := range r.Result {
 				if id == res.ID {
-					teacher = append(teacher, res.Forename+res.Name)
+					teacher = append(teacher, res.Name)
 				}
 			}
 		}
