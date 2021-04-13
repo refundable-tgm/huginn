@@ -189,6 +189,14 @@ type OtherReasonDetails struct {
 type BusinessTripApplication struct {
 	// The id (counting upwards) of this BusinessTripApplication regarding to the uid
 	ID int `json:"id"`
+	// Surname of the Teacher
+	Surname string `json:"surname"`
+	// Name of the Teacher
+	Name string `json:"name"`
+	// Degree of the Teacher
+	Degree string `json:"degree"`
+	// Title of the Teacher
+	Title string `json:"title"`
 	// The staffnr of the regarding teacher
 	Staffnr int `json:"staffnr"`
 	// The time the trip begins
@@ -243,10 +251,20 @@ type BusinessTripApplication struct {
 type TravelInvoice struct {
 	// The id (counting upwards) of this TravelInvoice regarding to the uid
 	ID int `json:"id"`
+	// Surname of the Teacher
+	Surname string `json:"surname"`
+	// Name of the Teacher
+	Name string `json:"name"`
+	// Degree of the Teacher
+	Degree string `json:"degree"`
+	// Title of the Teacher
+	Title string `json:"title"`
 	// The time the trip begins
 	TripBeginTime time.Time `json:"trip_begin_time"`
 	// The time the trip ends
 	TripEndTime time.Time `json:"trip_end_time"`
+	// The granted travel costs
+	TravelCostsPreGrant int `json:"travel_costs_pre_grant"`
 	// The personell number of the teacher
 	Staffnr int `json:"staffnr"`
 	// the starting point of the trip
@@ -257,8 +275,6 @@ type TravelInvoice struct {
 	Clerk string `json:"clerk"`
 	// the reviewer reviewing the approval of this application
 	Reviewer string `json:"reviewer"`
-	// the travel mode (see the regarding enum)
-	TravelMode int `json:"travel_mode"`
 	// the zi number
 	ZI int `json:"zi"`
 	// the date this application was filed
@@ -268,7 +284,7 @@ type TravelInvoice struct {
 	// the mode how daily charges are handled
 	DailyChargesMode int `json:"daily_charges_mode"`
 	// the amount the daily charges should be shortened
-	ShortenedAmount int `json:"shortened_amount"`
+	ShortenedAmount float32 `json:"shortened_amount"`
 	// the mode how nightly charges are handled
 	NightlyChargesMode int `json:"nightly_charges_mode"`
 	// the amount of breakfasts
@@ -296,7 +312,7 @@ type TravelInvoice struct {
 	// whether there aren't any travel costs
 	NoTravelCosts bool `json:"no_travel_costs"`
 	// the regarding calculation
-	Calculation Calculation `json:"calculation"`
+	Calculation        Calculation `json:"calculation"`
 }
 
 // The calculations in a TravelInvoice
@@ -327,6 +343,8 @@ type Row struct {
 	Begin time.Time `json:"begin"`
 	// the end time this Row refers to
 	End time.Time `json:"end"`
+	// the kind of costs this row describes (see costs enum)
+	KindsOfCost []int `json:"kind_of_cost"`
 	// the amount of kilometres this row refers to
 	Kilometres float32 `json:"kilometres"`
 	// the travelCosts this Row conducts
