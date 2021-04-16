@@ -335,6 +335,121 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 	return nil, fmt.Errorf("ids not matching")
 }
 
+func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher string) ([]Lesson, error) {
+	if !client.Authenticated {
+		return nil, fmt.Errorf("not authenticated")
+	}
+	smonth := strconv.Itoa(int(start.Month()))
+	if len(smonth) == 1 {
+		smonth = "0" + smonth
+	}
+	sday := strconv.Itoa(start.Day())
+	if len(sday) == 1 {
+		sday = "0" + sday
+	}
+	emonth := strconv.Itoa(int(end.Month()))
+	if len(emonth) == 1 {
+		emonth = "0" + emonth
+	}
+	eday := strconv.Itoa(end.Day())
+	if len(eday) == 1 {
+		eday = "0" + eday
+	}
+	params := map[string]interface{}{
+		"id": client.ResolveTeacherID(teacher),
+		"type": 2,
+		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
+		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
+	}
+	resp, id, err := client.sendRequest("getTimetable", params)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	r := struct{
+		JSONRPC string `json:"jsonrpc"`
+		ID string `json:"id"`
+		Result []struct{
+			ID int `json:"id"`
+			Date int `json:"date"`
+			StartTime int `json:"startTime"`
+			EndTime int `json:"endTime"`
+			Kl []struct{
+				ID int `json:"id"`
+			} `json:"kl"`
+			Te []struct{
+				ID int `json:"id"`
+			} `json:"te"`
+			Su []struct{
+				ID int `json:"id"`
+			} `json:"su"`
+			Ro []struct{
+				ID int `json:"id"`
+			} `json:"ro"`
+		} `json:"result"`
+	}{}
+	err = json.Unmarshal(respBody, &r)
+	if err != nil {
+		return nil, err
+	}
+	rid, _ := strconv.Atoi(r.ID)
+	if rid == id {
+		lessons := make([]Lesson, 0)
+		for _, l := range r.Result {
+			date := strconv.Itoa(l.Date)
+			year, _ := strconv.Atoi(date[0:4])
+			month, _ := strconv.Atoi(date[4:6])
+			day, _ := strconv.Atoi(date[6:8])
+			startTime := strconv.Itoa(l.StartTime)
+			startHour, _ := strconv.Atoi(startTime[0:2])
+			startMinute, _ := strconv.Atoi(startTime[2:4])
+			endTime := strconv.Itoa(l.EndTime)
+			endHour, _ := strconv.Atoi(endTime[0:2])
+			endMinute, _ := strconv.Atoi(endTime[2:4])
+			classIDArr := make([]int, 0)
+			for _, kls := range l.Kl {
+				classIDArr = append(classIDArr, kls.ID)
+			}
+			classArr, err := client.ResolveClasses(classIDArr)
+			if err != nil {
+				return nil, err
+			}
+			teachIDArr := make([]int, 0)
+			for _, tes := range l.Te {
+				teachIDArr = append(teachIDArr, tes.ID)
+			}
+			teachArr, err := client.ResolveTeachers(teachIDArr)
+			if err != nil {
+				return nil, err
+			}
+			roomIDArr := make([]int, 0)
+			for _, ros := range l.Ro {
+				roomIDArr = append(roomIDArr, ros.ID)
+			}
+			roomArr, err := client.ResolveRooms(roomIDArr)
+			if err != nil {
+				return nil, err
+			}
+			lessons = append(lessons, Lesson{
+				Start:      time.Date(year, time.Month(month), day, startHour, startMinute, 0, 0, time.UTC),
+				End:        time.Date(year, time.Month(month), day, endHour, endMinute, 0, 0, time.UTC),
+				ClassIDs:   classIDArr,
+				Classes:    classArr,
+				TeacherIDs: teachIDArr,
+				Teachers:   teachArr,
+				RoomIDs:    roomIDArr,
+				Rooms:      roomArr,
+			})
+		}
+		return lessons, nil
+	}
+	return nil, fmt.Errorf("ids not matching")
+}
+
 func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -377,6 +492,48 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 		return teacher, nil
 	} else {
 		return nil, fmt.Errorf("ids not matching")
+	}
+}
+
+func (client Client) ResolveTeacherID(teacher string) (int, error) {
+	if !client.Authenticated {
+		return -1, fmt.Errorf("not authenticated")
+	}
+	resp, id, err := client.sendRequest("getTeacher", map[string]interface{}{})
+	if err != nil {
+		return -1, err
+	}
+	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return -1, err
+	}
+	r := struct{
+		JSONRPC string `json:"jsonrpc"`
+		ID string `json:"id"`
+		Result []struct{
+			ID int `json:"id"`
+			Name string `json:"name"`
+			ForeName string `json:"foreName"`
+			Longname string `json:"longName"`
+			ForeColor string `json:"foreColor"`
+			BackColor string `json:"backColor"`
+		} `json:"result"`
+	}{}
+	err = json.Unmarshal(respBody, &r)
+	if err != nil {
+		return -1, err
+	}
+	rid, _ := strconv.Atoi(r.ID)
+	if rid == id {
+		for _, res := range r.Result {
+			if teacher == res.Name {
+				return res.ID, nil
+			}
+		}
+		return -1, fmt.Errorf("class not found")
+	} else {
+		return -1, fmt.Errorf("ids not matching")
 	}
 }
 
