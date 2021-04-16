@@ -213,8 +213,9 @@ func GetActiveApplications(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, "database didn't respond")
 		return
 	}
+	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
-	applyFilter := query.Get("username") == ""
+	_, applyFilter := con.Request.Form["username"]
 	filter := query.Get("username")
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.SuperUser || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
@@ -261,8 +262,9 @@ func GetAllApplication(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, "database didn't respond")
 		return
 	}
+	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
-	applyFilter := query.Get("username") == ""
+	_, applyFilter := con.Request.Form["username"]
 	filter := query.Get("username")
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.SuperUser || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
@@ -366,6 +368,10 @@ func GetApplication(con *gin.Context) {
 	}
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
+	if query.Get("uuid") == "" {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	application := db.GetApplication(uuid)
 	var in bool
@@ -475,6 +481,10 @@ func UpdateApplication(con *gin.Context) {
 	}
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
+	if query.Get("uuid") == "" {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	application := db.GetApplication(uuid)
 	var in bool
@@ -520,6 +530,10 @@ func DeleteApplication(con *gin.Context) {
 	}
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
+	if query.Get("uuid") == "" {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	application := db.GetApplication(uuid)
 	var in bool
@@ -549,5 +563,4 @@ func DeleteApplication(con *gin.Context) {
 	} else {
 		con.JSON(http.StatusInternalServerError, "error; application not deleted")
 	}
-
 }
