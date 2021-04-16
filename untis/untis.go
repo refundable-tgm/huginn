@@ -355,8 +355,12 @@ func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher
 	if len(eday) == 1 {
 		eday = "0" + eday
 	}
+	id, err := client.ResolveTeacherID(teacher)
+	if err != nil {
+		return nil, err
+	}
 	params := map[string]interface{}{
-		"id": client.ResolveTeacherID(teacher),
+		"id": id,
 		"type": 2,
 		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
 		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
