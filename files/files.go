@@ -33,7 +33,6 @@ const TravelInvoiceExcelFileName = "travel_invoice_%v.xlsx"
 const CheckedCheckBox = "☑"
 const UncheckedCheckBox = "☐"
 const Sheet = "Sheet1"
-const URL = "https://refundable.tech/viewer?uuid="
 
 const (
 	BTAWorkplace                          = "A1"
@@ -225,7 +224,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 				m.ColSpace(2)
 
 				m.Col(3, func() {
-					m.QrCode(URL+app.UUID, props.Rect{
+					m.QrCode(getURL() + app.UUID, props.Rect{
 						Left:    27,
 						Top:     0,
 						Center:  false,
@@ -570,7 +569,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 			m.ColSpace(2)
 
 			m.Col(3, func() {
-				m.QrCode(URL+app.UUID, props.Rect{
+				m.QrCode(getURL() + app.UUID, props.Rect{
 					Left:    27,
 					Top:     0,
 					Center:  false,
@@ -787,7 +786,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			m.ColSpace(2)
 
 			m.Col(3, func() {
-				m.QrCode(URL+app.UUID, props.Rect{
+				m.QrCode(getURL() + app.UUID, props.Rect{
 					Left:    27,
 					Top:     0,
 					Center:  false,
@@ -1166,7 +1165,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		m.ColSpace(2)
 
 		m.Col(3, func() {
-			m.QrCode(URL+uuid, props.Rect{
+			m.QrCode(getURL() + uuid, props.Rect{
 				Left:    27,
 				Top:     0,
 				Center:  true,
@@ -1607,7 +1606,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			m.ColSpace(2)
 
 			m.Col(3, func() {
-				m.QrCode(URL+uuid, props.Rect{
+				m.QrCode(getURL() + uuid, props.Rect{
 					Left:    27,
 					Top:     0,
 					Center:  false,
@@ -2793,4 +2792,12 @@ func getWeekday(weekday int) string {
 		return "Sonntag"
 	}
 	return ""
+}
+
+func getURL() string {
+	file, err := ioutil.ReadFile(filepath.Join(BasePath, ".url"))
+	if err != nil {
+		return ""
+	}
+	return string(file)
 }
