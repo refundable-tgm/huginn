@@ -264,7 +264,7 @@ type TravelInvoice struct {
 	// The time the trip ends
 	TripEndTime time.Time `json:"trip_end_time"`
 	// The granted travel costs
-	TravelCostsPreGrant int `json:"travel_costs_pre_grant"`
+	TravelCostsPreGrant float32 `json:"travel_costs_pre_grant"`
 	// The personell number of the teacher
 	Staffnr int `json:"staffnr"`
 	// the starting point of the trip
