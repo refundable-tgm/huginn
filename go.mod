@@ -9,6 +9,6 @@ require (
 	github.com/go-ldap/ldap/v3 v3.3.0
 	github.com/google/uuid v1.2.0
 	github.com/johnfercher/maroto v0.31.0
-	github.com/pdfcpu/pdfcpu v0.3.11 // indirect
+	github.com/pdfcpu/pdfcpu v0.3.11
 	go.mongodb.org/mongo-driver v1.4.6
 )

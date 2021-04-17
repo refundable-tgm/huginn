@@ -18,34 +18,34 @@ const URL = "https://neilo.webuntis.com/WebUntis/jsonrpc.do?school=tgm"
 var activeClients map[string]Client
 
 type Client struct {
-	Username string
-	Password string
-	SessionID string
-	PersonType int
-	PersonID int
-	Closed bool
+	Username      string
+	Password      string
+	SessionID     string
+	PersonType    int
+	PersonID      int
+	Closed        bool
 	Authenticated bool
 }
 
 type Lesson struct {
-	Start time.Time
-	End time.Time
-	ClassIDs []int
-	Classes []string
+	Start      time.Time
+	End        time.Time
+	ClassIDs   []int
+	Classes    []string
 	TeacherIDs []int
-	Teachers []string
-	RoomIDs []int
-	Rooms []string
+	Teachers   []string
+	RoomIDs    []int
+	Rooms      []string
 }
 
 func CreateClient(username, password string) *Client {
 	client := Client{
-		Username:   username,
-		Password:   password,
-		SessionID:  "",
-		PersonType: -1,
-		PersonID:   -1,
-		Closed:     false,
+		Username:      username,
+		Password:      password,
+		SessionID:     "",
+		PersonType:    -1,
+		PersonID:      -1,
+		Closed:        false,
 		Authenticated: false,
 	}
 	activeClients[username] = client
@@ -63,12 +63,12 @@ func (client *Client) Authenticate() error {
 	}
 	id := rand.Intn(math.MaxInt64)
 	body, _ := json.Marshal(map[string]interface{}{
-		"id": id,
+		"id":     id,
 		"method": "authenticate",
-		"params": map[string]string {
-			"user": client.Username,
+		"params": map[string]string{
+			"user":     client.Username,
 			"password": client.Password,
-			"client": ClientName,
+			"client":   ClientName,
 		},
 		"jsonrpc": "2.0",
 	})
@@ -81,10 +81,10 @@ func (client *Client) Authenticate() error {
 	if err != nil {
 		return err
 	}
-	r := struct{
-		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result map[string]string `json:"result"`
+	r := struct {
+		JSONRPC string            `json:"jsonrpc"`
+		ID      string            `json:"id"`
+		Result  map[string]string `json:"result"`
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
@@ -125,10 +125,10 @@ func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, erro
 		eday = "0" + eday
 	}
 	params := map[string]interface{}{
-		"id": client.PersonID,
-		"type": client.PersonType,
+		"id":        client.PersonID,
+		"type":      client.PersonType,
 		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
-		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
+		"endDate":   strconv.Itoa(end.Year()) + emonth + eday,
 	}
 	resp, id, err := client.sendRequest("getTimetable", params)
 	if err != nil {
@@ -139,24 +139,24 @@ func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, erro
 	if err != nil {
 		return nil, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Date int `json:"date"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int `json:"id"`
+			Date      int `json:"date"`
 			StartTime int `json:"startTime"`
-			EndTime int `json:"endTime"`
-			Kl []struct{
+			EndTime   int `json:"endTime"`
+			Kl        []struct {
 				ID int `json:"id"`
 			} `json:"kl"`
-			Te []struct{
+			Te []struct {
 				ID int `json:"id"`
 			} `json:"te"`
-			Su []struct{
+			Su []struct {
 				ID int `json:"id"`
 			} `json:"su"`
-			Ro []struct{
+			Ro []struct {
 				ID int `json:"id"`
 			} `json:"ro"`
 		} `json:"result"`
@@ -241,10 +241,10 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 	}
 	classID, _ := client.ResolveClassID(class)
 	params := map[string]interface{}{
-		"id": classID,
-		"type": 1,
+		"id":        classID,
+		"type":      1,
 		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
-		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
+		"endDate":   strconv.Itoa(end.Year()) + emonth + eday,
 	}
 	resp, id, err := client.sendRequest("getTimetable", params)
 	if err != nil {
@@ -255,24 +255,24 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 	if err != nil {
 		return nil, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Date int `json:"date"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int `json:"id"`
+			Date      int `json:"date"`
 			StartTime int `json:"startTime"`
-			EndTime int `json:"endTime"`
-			Kl []struct{
+			EndTime   int `json:"endTime"`
+			Kl        []struct {
 				ID int `json:"id"`
 			} `json:"kl"`
-			Te []struct{
+			Te []struct {
 				ID int `json:"id"`
 			} `json:"te"`
-			Su []struct{
+			Su []struct {
 				ID int `json:"id"`
 			} `json:"su"`
-			Ro []struct{
+			Ro []struct {
 				ID int `json:"id"`
 			} `json:"ro"`
 		} `json:"result"`
@@ -360,10 +360,10 @@ func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher
 		return nil, err
 	}
 	params := map[string]interface{}{
-		"id": id,
-		"type": 2,
+		"id":        id,
+		"type":      2,
 		"startDate": strconv.Itoa(start.Year()) + smonth + sday,
-		"endDate": strconv.Itoa(end.Year()) + emonth + eday,
+		"endDate":   strconv.Itoa(end.Year()) + emonth + eday,
 	}
 	resp, id, err := client.sendRequest("getTimetable", params)
 	if err != nil {
@@ -374,24 +374,24 @@ func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher
 	if err != nil {
 		return nil, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Date int `json:"date"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int `json:"id"`
+			Date      int `json:"date"`
 			StartTime int `json:"startTime"`
-			EndTime int `json:"endTime"`
-			Kl []struct{
+			EndTime   int `json:"endTime"`
+			Kl        []struct {
 				ID int `json:"id"`
 			} `json:"kl"`
-			Te []struct{
+			Te []struct {
 				ID int `json:"id"`
 			} `json:"te"`
-			Su []struct{
+			Su []struct {
 				ID int `json:"id"`
 			} `json:"su"`
-			Ro []struct{
+			Ro []struct {
 				ID int `json:"id"`
 			} `json:"ro"`
 		} `json:"result"`
@@ -467,14 +467,14 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Name string `json:"name"`
-			Forename string `json:"foreName"`
-			Longname string `json:"longName"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int    `json:"id"`
+			Name      string `json:"name"`
+			Forename  string `json:"foreName"`
+			Longname  string `json:"longName"`
 			ForeColor string `json:"foreColor"`
 			BackColor string `json:"backColor"`
 		} `json:"result"`
@@ -512,14 +512,14 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Name string `json:"name"`
-			ForeName string `json:"foreName"`
-			Longname string `json:"longName"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int    `json:"id"`
+			Name      string `json:"name"`
+			ForeName  string `json:"foreName"`
+			Longname  string `json:"longName"`
 			ForeColor string `json:"foreColor"`
 			BackColor string `json:"backColor"`
 		} `json:"result"`
@@ -554,13 +554,13 @@ func (client Client) ResolveRooms(ids []int) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Name string `json:"name"`
-			Longname string `json:"longName"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int    `json:"id"`
+			Name      string `json:"name"`
+			Longname  string `json:"longName"`
 			ForeColor string `json:"foreColor"`
 			BackColor string `json:"backColor"`
 		} `json:"result"`
@@ -598,17 +598,17 @@ func (client Client) ResolveClasses(ids []int) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Name string `json:"name"`
-			Longname string `json:"longName"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int    `json:"id"`
+			Name      string `json:"name"`
+			Longname  string `json:"longName"`
 			ForeColor string `json:"foreColor"`
 			BackColor string `json:"backColor"`
-			Teacher1 int `json:"teacher1"`
-			Teacher2 int `json:"teacher2"`
+			Teacher1  int    `json:"teacher1"`
+			Teacher2  int    `json:"teacher2"`
 		} `json:"result"`
 	}{}
 	err = json.Unmarshal(respBody, &r)
@@ -644,17 +644,17 @@ func (client Client) ResolveClassID(class string) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	r := struct{
+	r := struct {
 		JSONRPC string `json:"jsonrpc"`
-		ID string `json:"id"`
-		Result []struct{
-			ID int `json:"id"`
-			Name string `json:"name"`
-			Longname string `json:"longName"`
+		ID      string `json:"id"`
+		Result  []struct {
+			ID        int    `json:"id"`
+			Name      string `json:"name"`
+			Longname  string `json:"longName"`
 			ForeColor string `json:"foreColor"`
 			BackColor string `json:"backColor"`
-			Teacher1 int `json:"teacher1"`
-			Teacher2 int `json:"teacher2"`
+			Teacher1  int    `json:"teacher1"`
+			Teacher2  int    `json:"teacher2"`
 		} `json:"result"`
 	}{}
 	err = json.Unmarshal(respBody, &r)
@@ -693,10 +693,10 @@ func (client Client) DeleteClient() {
 
 func (client Client) sendRequest(method string, params map[string]interface{}) (*http.Response, int, error) {
 	id := rand.Intn(math.MaxInt64)
-	body, _ := json.Marshal(map[string]interface{} {
-		"id": id,
-		"method": method,
-		"params": params,
+	body, _ := json.Marshal(map[string]interface{}{
+		"id":      id,
+		"method":  method,
+		"params":  params,
 		"jsonrpc": "2.0",
 	})
 	req, err := http.NewRequest("POST", URL, bytes.NewBuffer(body))
@@ -714,7 +714,7 @@ func GetLessonNrByStart(start time.Time) int {
 	case 8:
 		if start.Minute() == 0 {
 			return 1
-		} else if start.Minute() == 50{
+		} else if start.Minute() == 50 {
 			return 2
 		}
 	case 9:

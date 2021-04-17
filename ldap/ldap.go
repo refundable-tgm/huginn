@@ -61,7 +61,7 @@ func GetLongName(username, password string) (string, error) {
 		0,
 		false,
 		fmt.Sprintf("(&(mailNickname=%s))", username),
-		[]string {"dn"},
+		[]string{"dn"},
 		nil,
 	)
 	res, err := l.Search(search)

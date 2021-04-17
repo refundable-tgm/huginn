@@ -81,7 +81,6 @@ const (
 	ToBeShortened
 )
 
-
 // Enum for modes of nightly charges
 const (
 	ProofNeededForCharges = iota
@@ -312,7 +311,7 @@ type TravelInvoice struct {
 	// whether there aren't any travel costs
 	NoTravelCosts bool `json:"no_travel_costs"`
 	// the regarding calculation
-	Calculation        Calculation `json:"calculation"`
+	Calculation Calculation `json:"calculation"`
 }
 
 // The calculations in a TravelInvoice

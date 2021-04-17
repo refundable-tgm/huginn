@@ -1434,7 +1434,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.Row(10, func() {
 		m.Col(1, func() {
 			m.Text("Beginn:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1447,7 +1447,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(1, func() {
 			m.Text("Ende:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1460,12 +1460,12 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(2, func() {
 			m.Text("Reisekostenvorschuss:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(1, func() {
-			m.Text(strconv.FormatFloat(float64(app.TravelCostsPreGrant), 'f', 2, 32) + " €", props.Text{
+			m.Text(strconv.FormatFloat(float64(app.TravelCostsPreGrant), 'f', 2, 32)+" €", props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1473,7 +1473,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(2, func() {
 			m.Text("Anzahl der Beilagen:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1489,7 +1489,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.Row(10, func() {
 		m.Col(1, func() {
 			m.Text("Personalnr:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1502,7 +1502,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(1, func() {
 			m.Text("Bearbeiter:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1515,7 +1515,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(1, func() {
 			m.Text("Prüfer:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1528,7 +1528,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(1, func() {
 			m.Text("Eingelangt:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1543,7 +1543,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.Row(10, func() {
 		m.Col(2, func() {
 			m.Text("Ausgangsort:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1556,7 +1556,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(2, func() {
 			m.Text("Zielort:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1604,7 +1604,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	if app.NoTravelCosts {
 		data = data + "Keine Reisekosten;   "
 	}
-	data = data[0:len(data) - 4]
+	data = data[0 : len(data)-4]
 	m.Row(10, func() {
 		m.Col(12, func() {
 			m.Text(data, props.Text{
@@ -1617,7 +1617,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.Row(10, func() {
 		m.Col(1, func() {
 			m.Text("Tagesgebühr:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1640,9 +1640,9 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 			})
 		})
 		m.Col(5, func() {
-			m.Text(strconv.Itoa(app.Breakfasts) + " Frühstück; " +
-				strconv.Itoa(app.Lunches) + " Mittagessen; " +
-				strconv.Itoa(app.Dinners) + " Abendessen",
+			m.Text(strconv.Itoa(app.Breakfasts)+" Frühstück; "+
+				strconv.Itoa(app.Lunches)+" Mittagessen; "+
+				strconv.Itoa(app.Dinners)+" Abendessen",
 				props.Text{
 					Top:   2.5,
 					Align: consts.Middle,
@@ -1651,7 +1651,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 		})
 		m.Col(2, func() {
 			m.Text("Nächtigungsgeb.:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -1715,18 +1715,18 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 				break
 			}
 		}
-		geb = geb[0:len(geb) - 2]
+		geb = geb[0 : len(geb)-2]
 		row[4] = geb
 		row[10] = strconv.FormatFloat(float64(r.Sum), 'f', 2, 32)
 		content = append(content, row)
 	}
-	content = append(content, []string{"","","","","Summe:","",
+	content = append(content, []string{"", "", "", "", "Summe:", "",
 		strconv.FormatFloat(float64(app.Calculation.SumTravelCosts), 'f', 2, 32),
 		strconv.FormatFloat(float64(app.Calculation.SumDailyCharges), 'f', 2, 32),
 		strconv.FormatFloat(float64(app.Calculation.SumNightlyCharges), 'f', 2, 32),
 		strconv.FormatFloat(float64(app.Calculation.SumAdditionalCosts), 'f', 2, 32),
 		strconv.FormatFloat(float64(app.Calculation.SumOfSums), 'f', 2, 32),
-		})
+	})
 	m.TableList(header, content, props.TableList{
 		Align: consts.Center,
 		HeaderProp: props.TableListContent{
@@ -1740,16 +1740,16 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.Row(5, func() {
 		m.Col(4, func() {
 			m.Text("Die sachliche Richtigkeit wird besätigt:", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
 		m.ColSpace(4)
 		m.Col(4, func() {
 			m.Text("gem. § 37 RGV 55: für die Richtigkeit der Angaben:", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
@@ -1759,16 +1759,16 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.Row(5, func() {
 		m.Col(4, func() {
 			m.Text("(Datum, Unterschrift der/s Anweisungsberechtigten)", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
 		m.ColSpace(4)
 		m.Col(4, func() {
 			m.Text("(Datum, Unterschrift der/s Rechnungslegers/in)", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
@@ -1827,7 +1827,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			})
 		})
 		m.Col(4, func() {
-			m.Text(app.Surname + " " + app.Name, props.Text{
+			m.Text(app.Surname+" "+app.Name, props.Text{
 				Top:   2.5,
 				Align: consts.Center,
 				Style: consts.Italic,
@@ -1899,26 +1899,26 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 		})
 		m.Col(2, func() {
 			m.Text("Beginn:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
 			m.Text(app.TripBeginTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
 		})
 		m.Col(2, func() {
 			m.Text("Ende:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
 			m.Text(app.TripEndTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -1934,26 +1934,26 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 		})
 		m.Col(2, func() {
 			m.Text("Beginn:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
 			m.Text(app.ServiceBeginTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
 		})
 		m.Col(2, func() {
 			m.Text("Ende:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
 			m.Text(app.ServiceEndTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -1963,13 +1963,13 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.Col(2, func() {
 			m.Text("Reisezweck:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(10, func() {
 			m.Text(app.TravelPurpose, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -1979,7 +1979,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.Col(2, func() {
 			m.Text("Reiseart:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2017,7 +2017,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 				travel = "BUS - (Beleg erford.)"
 			}
 			m.Text(travel, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -2027,7 +2027,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.Col(3, func() {
 			m.Text("Ausgangspunkt:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2039,14 +2039,14 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 				starting = "Wohnung"
 			}
 			m.Text(starting, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
 		})
 		m.Col(3, func() {
 			m.Text("Endpunkt:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2058,7 +2058,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 				ending = "Wohnung"
 			}
 			m.Text(ending, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -2068,13 +2068,13 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.Col(2, func() {
 			m.Text("Begründung:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(10, func() {
 			m.Text(app.Reasoning, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -2084,7 +2084,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.Col(3, func() {
 			m.Text("Sonstige Teilnehmer/innen:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2093,9 +2093,9 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			for _, t := range app.OtherParticipants {
 				part = part + t + ", "
 			}
-			part = part[0:len(part) - 2]
+			part = part[0 : len(part)-2]
 			m.Text(part, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
 			})
@@ -2112,7 +2112,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 				text = "1. nicht bestätigt"
 			}
 			m.Text(text, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2125,7 +2125,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 				text = "2. nicht bestätigt"
 			}
 			m.Text(text, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2143,7 +2143,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 		}
 		m.Col(12, func() {
 			m.Text(text, props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2151,25 +2151,25 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.Col(3, func() {
 			m.Text("Sonstige Kosten:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
-			m.Text(strconv.FormatFloat(float64(app.OtherCosts), 'f', 2, 32) + " €", props.Text{
-				Top: 2.5,
+			m.Text(strconv.FormatFloat(float64(app.OtherCosts), 'f', 2, 32)+" €", props.Text{
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
 			m.Text("Geschätzte Kosten:", props.Text{
-				Top: 2.5,
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
 		m.Col(3, func() {
-			m.Text(strconv.FormatFloat(float64(app.EstimatedCosts), 'f', 2, 32) + " €", props.Text{
-				Top: 2.5,
+			m.Text(strconv.FormatFloat(float64(app.EstimatedCosts), 'f', 2, 32)+" €", props.Text{
+				Top:   2.5,
 				Align: consts.Left,
 			})
 		})
@@ -2179,24 +2179,24 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(5, func() {
 		m.Col(4, func() {
 			m.Text("Antragsteller/in", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
 		m.Col(8, func() {
 			m.Text("Instituts-/Abteilungsleiter/in", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
 	})
 	m.Line(10.0)
 	m.Row(10, func() {
-		m.Text("Die vorstehend beantragte Dienstreise wird mit " +
-			app.DateApplicationApproved.Format("02. 01. 2006") + " genehmigt.", props.Text{
-			Top: 2.5,
+		m.Text("Die vorstehend beantragte Dienstreise wird mit "+
+			app.DateApplicationApproved.Format("02. 01. 2006")+" genehmigt.", props.Text{
+			Top:   2.5,
 			Align: consts.Left,
 		})
 	})
@@ -2205,16 +2205,16 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(5, func() {
 		m.Col(4, func() {
 			m.Text("Ort, Datum", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
 		m.ColSpace(4)
 		m.Col(4, func() {
 			m.Text("Unterschrift", props.Text{
-				Size: 7,
-				Top: 2.5,
+				Size:  7,
+				Top:   2.5,
 				Align: consts.Center,
 			})
 		})
@@ -2223,8 +2223,8 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.ColSpace(8)
 		m.Col(4, func() {
-			m.Text("Eingabedatum: " + app.DateApplicationFiled.Format("02. 01. 2006"), props.Text{
-				Top: 2.5,
+			m.Text("Eingabedatum: "+app.DateApplicationFiled.Format("02. 01. 2006"), props.Text{
+				Top:   2.5,
 				Align: consts.Right,
 			})
 		})
@@ -2232,8 +2232,8 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.ColSpace(8)
 		m.Col(4, func() {
-			m.Text("Referent/in: " + app.Referee, props.Text{
-				Top: 2.5,
+			m.Text("Referent/in: "+app.Referee, props.Text{
+				Top:   2.5,
 				Align: consts.Right,
 			})
 		})
@@ -2250,8 +2250,8 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 				text = "Rückfahrt"
 			}
 			m.Col(6, func() {
-				m.Text("Businesskarte bei " + text + " ausgefolgt.", props.Text{
-					Top: 2.5,
+				m.Text("Businesskarte bei "+text+" ausgefolgt.", props.Text{
+					Top:   2.5,
 					Align: consts.Right,
 				})
 			})

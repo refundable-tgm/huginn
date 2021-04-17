@@ -27,21 +27,21 @@ var refreshSecret string
 var activeTokens map[string]EntityInformation
 
 type Token struct {
-	AccessToken string
-	RefreshToken string
-	AccessUUID string
-	RefreshUUID string
-	AccessExpires int64
+	AccessToken    string
+	RefreshToken   string
+	AccessUUID     string
+	RefreshUUID    string
+	AccessExpires  int64
 	RefreshExpires int64
 }
 
 type AccessToken struct {
 	AccessUUID string
-	Username string
+	Username   string
 }
 
 type EntityInformation struct {
-	Username string
+	Username  string
 	ExpiresAt time.Time
 }
 
@@ -51,8 +51,6 @@ func InitTokenManager() {
 	activeTokens = make(map[string]EntityInformation)
 	go ttlCheck()
 }
-
-
 
 func CreateToken(username string) (*Token, error) {
 	token := &Token{}
@@ -148,7 +146,7 @@ func ExtractTokenMeta(r *http.Request) (*AccessToken, error) {
 		}
 		return &AccessToken{
 			AccessUUID: acccessUUID,
-			Username: username,
+			Username:   username,
 		}, nil
 	}
 	return nil, err
@@ -163,7 +161,7 @@ func FetchAuth(auth *AccessToken) (username string, ok bool) {
 	return
 }
 
-func DeleteToken(uuid string)  {
+func DeleteToken(uuid string) {
 	delete(activeTokens, uuid)
 }
 

@@ -172,10 +172,10 @@ func SetTeacherPermissions(con *gin.Context) {
 		return
 	}
 	perm := struct {
-		SuperUser bool `json:"super_user"`
+		SuperUser      bool `json:"super_user"`
 		Administration bool `json:"administration"`
-		AV bool `json:"av"`
-		PEK bool `json:"pek"`
+		AV             bool `json:"av"`
+		PEK            bool `json:"pek"`
 	}{}
 	if err := con.ShouldBindJSON(&perm); err != nil {
 		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
@@ -635,9 +635,9 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 	pdfs := make(map[string]string)
 	for _, p := range paths {
 		splits := strings.Split(p, string(filepath.Separator))
-		filename := strings.Split(splits[len(splits) - 1], ".")[0]
+		filename := strings.Split(splits[len(splits)-1], ".")[0]
 		names := strings.Split(filename, "_")
-		class := names[len(names) - 1]
+		class := names[len(names)-1]
 		pdfs[class] = p
 	}
 	if applyClassFilter {
@@ -902,7 +902,7 @@ func GetTravelInvoiceForm(con *gin.Context) {
 				pp = append(pp, filepath.Join(uploadFolder, file.Name()))
 			}
 		}
-		created := filepath.Join(filepath.Dir(path), fmt.Sprintf(files.TravelInvoicePDFFileName, short + "_merge"))
+		created := filepath.Join(filepath.Dir(path), fmt.Sprintf(files.TravelInvoicePDFFileName, short+"_merge"))
 		err = api.MergeCreateFile(pp, created, pdfcpu.NewDefaultConfiguration())
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, "couldn't save merged pdf")
@@ -1264,7 +1264,7 @@ func SaveBillingReceipt(con *gin.Context) {
 		}
 	}
 	for i, pdf := range r.PDFs {
-		name := fmt.Sprintf(files.ReceiptFileName, i + counter, short)
+		name := fmt.Sprintf(files.ReceiptFileName, i+counter, short)
 		dec, err := base64.StdEncoding.DecodeString(pdf)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't decode the pdf file: %v", name))
