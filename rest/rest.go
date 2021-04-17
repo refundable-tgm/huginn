@@ -26,5 +26,13 @@ func StartService() {
 	router.POST("/createApplication", AuthWall(), CreateApplication)
 	router.PUT("/updateApplication", AuthWall(), UpdateApplication)
 	router.DELETE("/deleteApplication", AuthWall(), DeleteApplication)
+	router.GET("/getAbsenceFormForClasses", AuthWall(), GetAbsenceFormForClasses)
+	router.GET("/getAbsenceFormForTeacher", AuthWall(), GetAbsenceFormForTeacher)
+	router.GET("/getCompensationForEducationalSupportForm", AuthWall(), GetCompensationForEducationalSupportForm)
+	router.GET("/getTravelInvoiceForm", AuthWall(), GetTravelInvoiceForm)
+	router.GET("/getBusinessTripApplicationForm", AuthWall(), GetBusinessTripApplicationForm)
+	router.GET("/getTravelInvoiceExcel", AuthWall(), GetTravelInvoiceExcel)
+	router.GET("/getBusinessTripApplicationExcel", AuthWall(), GetBusinessTripApplicationExcel)
+
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }

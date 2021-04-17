@@ -1,14 +1,23 @@
 package rest
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
 	mongo "github.com/refundable-tgm/huginn/db"
+	"github.com/refundable-tgm/huginn/files"
 	"github.com/refundable-tgm/huginn/ldap"
 	"github.com/refundable-tgm/huginn/untis"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
+	"strconv"
+	"strings"
 )
 
 func AuthWall() gin.HandlerFunc {
@@ -563,4 +572,622 @@ func DeleteApplication(con *gin.Context) {
 	} else {
 		con.JSON(http.StatusInternalServerError, "error; application not deleted")
 	}
+}
+
+func GetAbsenceFormForClasses(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	_, applyClassFilter := con.Request.Form["classes"]
+	classes := make([]string, 0)
+	if applyClassFilter {
+		classes = query["classes"]
+	}
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	paths, err := files.GenerateAbsenceFormForClass(path, auth.Username, application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		return
+	}
+
+	pdfs := make(map[string]string)
+	for _, p := range paths {
+		splits := strings.Split(p, string(filepath.Separator))
+		filename := strings.Split(splits[len(splits) - 1], ".")[0]
+		names := strings.Split(filename, "_")
+		class := names[len(names) - 1]
+		pdfs[class] = p
+	}
+	if applyClassFilter {
+		for class := range pdfs {
+			in := false
+			for _, c := range classes {
+				if c == class {
+					in = true
+				}
+			}
+			if !in {
+				delete(pdfs, class)
+			}
+		}
+	}
+	pp := make([]string, 0)
+	for _, p := range pdfs {
+		pp = append(pp, p)
+	}
+	created := filepath.Join(filepath.Dir(pp[0]), fmt.Sprintf(files.ClassAbsenceFormFileName, "merge"))
+	err = api.MergeCreateFile(pp, created, pdfcpu.NewDefaultConfiguration())
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't save merged pdf")
+		return
+	}
+	file, err := ioutil.ReadFile(created)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read merged pdf")
+		return
+	}
+	enc := base64.StdEncoding.EncodeToString(file)
+	res := map[string]string{
+		"pdf": enc,
+	}
+	err = os.Remove(created)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't delete merged pdf")
+		return
+	}
+	con.JSON(http.StatusOK, res)
+}
+
+func GetAbsenceFormForTeacher(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	if _, hasTeacher := con.Request.Form["teacher"]; !hasTeacher {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	teacher := query.Get("teacher")
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, teacher, application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		return
+	}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+		return
+	}
+	enc := base64.StdEncoding.EncodeToString(file)
+	res := map[string]string{
+		"pdf": enc,
+	}
+	con.JSON(http.StatusOK, res)
+}
+
+func GetCompensationForEducationalSupportForm(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	path, err = files.GenerateCompensationForEducationalSupport(path, application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		return
+	}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+		return
+	}
+	enc := base64.StdEncoding.EncodeToString(file)
+	res := map[string]string{
+		"pdf": enc,
+	}
+	con.JSON(http.StatusOK, res)
+}
+
+func GetTravelInvoiceForm(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	if _, hasShort := con.Request.Form["short"]; !hasShort {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	short := query.Get("short")
+	if _, hasTIID := con.Request.Form["ti_id"]; !hasTIID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	tiID, err := strconv.Atoi(query.Get("ti_id"))
+	if err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid ti_id provided")
+		return
+	}
+	_, applyMergeReceipts := con.Request.Form["receipts"]
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	var ti mongo.TravelInvoice
+	for _, tis := range application.TravelInvoices {
+		if tis.ID == tiID {
+			ti = tis
+			break
+		}
+	}
+	path, err = files.GenerateTravelInvoice(path, short, ti, application.UUID)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		return
+	}
+
+	if applyMergeReceipts {
+		pp := append(make([]string, 0), path)
+		uploadFolder := filepath.Join(filepath.Dir(path), files.UploadFolderName)
+		ff, err := ioutil.ReadDir(uploadFolder)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, "couldn't read upload directory")
+			return
+		}
+		for _, file := range ff {
+			data := strings.Split(file.Name(), "_")
+			if data[1] == short {
+				pp = append(pp, filepath.Join(uploadFolder, file.Name()))
+			}
+		}
+		created := filepath.Join(filepath.Dir(path), fmt.Sprintf(files.TravelInvoicePDFFileName, short + "_merge"))
+		err = api.MergeCreateFile(pp, created, pdfcpu.NewDefaultConfiguration())
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, "couldn't save merged pdf")
+			return
+		}
+		file, err := ioutil.ReadFile(created)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+			return
+		}
+		enc := base64.StdEncoding.EncodeToString(file)
+		res := map[string]string{
+			"pdf": enc,
+		}
+		err = os.Remove(created)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, "couldn't delete merged pdf")
+			return
+		}
+		con.JSON(http.StatusOK, res)
+	} else {
+		file, err := ioutil.ReadFile(path)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+			return
+		}
+		enc := base64.StdEncoding.EncodeToString(file)
+		res := map[string]string{
+			"pdf": enc,
+		}
+		con.JSON(http.StatusOK, res)
+	}
+}
+
+func GetBusinessTripApplicationForm(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	if _, hasShort := con.Request.Form["short"]; !hasShort {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	short := query.Get("short")
+	if _, hasBTAID := con.Request.Form["bta_id"]; !hasBTAID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	btaID, err := strconv.Atoi(query.Get("bta_id"))
+	if err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid bta_id provided")
+		return
+	}
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	var bta mongo.BusinessTripApplication
+	for _, btas := range application.BusinessTripApplications {
+		if btas.ID == btaID {
+			bta = btas
+			break
+		}
+	}
+	path, err = files.GenerateBusinessTripApplication(path, short, bta, application.UUID)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create pdf")
+		return
+	}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+		return
+	}
+	enc := base64.StdEncoding.EncodeToString(file)
+	res := map[string]string{
+		"pdf": enc,
+	}
+	con.JSON(http.StatusOK, res)
+}
+
+func GetTravelInvoiceExcel(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	if _, hasShort := con.Request.Form["short"]; !hasShort {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	short := query.Get("short")
+	if _, hasTIID := con.Request.Form["ti_id"]; !hasTIID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	tiID, err := strconv.Atoi(query.Get("ti_id"))
+	if err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid ti_id provided")
+		return
+	}
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	var ti mongo.TravelInvoice
+	for _, tis := range application.TravelInvoices {
+		if tis.ID == tiID {
+			ti = tis
+			break
+		}
+	}
+	path, err = files.GenerateTravelInvoiceExcel(path, short, ti)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create excel")
+		return
+	}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read generated excel")
+		return
+	}
+	enc := base64.StdEncoding.EncodeToString(file)
+	res := map[string]string{
+		"excel": enc,
+	}
+	con.JSON(http.StatusOK, res)
+}
+
+func GetBusinessTripApplicationExcel(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	if _, hasShort := con.Request.Form["short"]; !hasShort {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	short := query.Get("short")
+	if _, hasBTAID := con.Request.Form["bta_id"]; !hasBTAID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	btaID, err := strconv.Atoi(query.Get("bta_id"))
+	if err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid bta_id provided")
+		return
+	}
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	var bta mongo.BusinessTripApplication
+	for _, btas := range application.BusinessTripApplications {
+		if btas.ID == btaID {
+			bta = btas
+			break
+		}
+	}
+	path, err = files.GenerateBusinessTripApplicationExcel(path, short, bta)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create excel")
+		return
+	}
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read generated excel")
+		return
+	}
+	enc := base64.StdEncoding.EncodeToString(file)
+	res := map[string]string{
+		"excel": enc,
+	}
+	con.JSON(http.StatusOK, res)
 }
