@@ -324,30 +324,13 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				start := app.StartTime
-				weekday := getWeekday(int(start.Weekday()))
-				month := strconv.Itoa(int(start.Month()))
-				if len(month) == 1 {
-					month = "0" + month
-				}
-				day := strconv.Itoa(start.Day())
-				if len(day) == 1 {
-					day = "0" + day
-				}
-				year := start.Year()
-				hour := strconv.Itoa(start.Hour())
-				if len(hour) == 1 {
-					hour = "0" + hour
-				}
-				minute := strconv.Itoa(start.Minute())
-				if len(minute) == 1 {
-					minute = "0" + minute
-				}
-				m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v", weekday, day, month, year, hour, minute), props.Text{
-					Top:   2.5,
-					Align: consts.Center,
-					Style: consts.Italic,
-				})
+				weekday := getWeekday(int(app.StartTime.Weekday()))
+				m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.Format("02. 01. 2006 15:04")),
+					props.Text{
+						Top:   2.5,
+						Align: consts.Center,
+						Style: consts.Italic,
+					})
 			})
 			m.Col(6, func() {
 				m.Col(3, func() {
@@ -356,30 +339,13 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				end := app.EndTime
-				weekday := getWeekday(int(end.Weekday()))
-				month := strconv.Itoa(int(end.Month()))
-				if len(month) == 1 {
-					month = "0" + month
-				}
-				day := strconv.Itoa(end.Day())
-				if len(day) == 1 {
-					day = "0" + day
-				}
-				year := end.Year()
-				hour := strconv.Itoa(end.Hour())
-				if len(hour) == 1 {
-					hour = "0" + hour
-				}
-				minute := strconv.Itoa(end.Minute())
-				if len(minute) == 1 {
-					minute = "0" + minute
-				}
-				m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v", weekday, day, month, year, hour, minute), props.Text{
-					Top:   2.5,
-					Align: consts.Center,
-					Style: consts.Italic,
-				})
+				weekday := getWeekday(int(app.EndTime.Weekday()))
+				m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.Format("02. 01. 2006 15:04")),
+					props.Text{
+						Top:   2.5,
+						Align: consts.Center,
+						Style: consts.Italic,
+					})
 			})
 		})
 		m.Line(1.0)
@@ -451,16 +417,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				start := app.StartTime
-				hour := strconv.Itoa(start.Hour())
-				if len(hour) == 1 {
-					hour = "0" + hour
-				}
-				minute := strconv.Itoa(start.Minute())
-				if len(minute) == 1 {
-					minute = "0" + minute
-				}
-				m.Text(fmt.Sprintf("%v:%v", hour, minute), props.Text{
+				m.Text(app.StartTime.Format("15:04"), props.Text{
 					Top:   2.5,
 					Align: consts.Center,
 					Style: consts.Italic,
@@ -511,15 +468,6 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		}
 		for _, lesson := range lessons {
 			date := lesson.Start
-			month := strconv.Itoa(int(date.Month()))
-			if len(month) == 1 {
-				month = "0" + month
-			}
-			day := strconv.Itoa(date.Day())
-			if len(day) == 1 {
-				day = "0" + day
-			}
-			year := date.Year()
 			beginLesson := untis.GetLessonNrByStart(lesson.Start)
 			endLesson := untis.GetLessonNrByEnd(lesson.End)
 			hourString := ""
@@ -540,7 +488,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			supp = supp[0 : len(rooms)-2]
 
 			row := []string{"", class,
-				fmt.Sprintf("%v.%v.%d", day, month, year),
+				date.Format("02.01.2006"),
 				fmt.Sprintf(hourString),
 				rooms,
 				leader + ", " + companion,
@@ -675,47 +623,12 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 					Align: consts.Left,
 				})
 			})
-			start := app.StartTime
-			sweekday := getWeekday(int(start.Weekday()))
-			smonth := strconv.Itoa(int(start.Month()))
-			if len(smonth) == 1 {
-				smonth = "0" + smonth
-			}
-			sday := strconv.Itoa(start.Day())
-			if len(sday) == 1 {
-				sday = "0" + sday
-			}
-			syear := start.Year()
-			shour := strconv.Itoa(start.Hour())
-			if len(shour) == 1 {
-				shour = "0" + shour
-			}
-			sminute := strconv.Itoa(start.Minute())
-			if len(sminute) == 1 {
-				sminute = "0" + sminute
-			}
-			end := app.EndTime
-			eweekday := getWeekday(int(end.Weekday()))
-			emonth := strconv.Itoa(int(end.Month()))
-			if len(emonth) == 1 {
-				emonth = "0" + emonth
-			}
-			eday := strconv.Itoa(end.Day())
-			if len(eday) == 1 {
-				eday = "0" + eday
-			}
-			eyear := end.Year()
-			ehour := strconv.Itoa(end.Hour())
-			if len(ehour) == 1 {
-				ehour = "0" + ehour
-			}
-			eminute := strconv.Itoa(end.Minute())
-			if len(eminute) == 1 {
-				eminute = "0" + eminute
-			}
-			m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v - %v, %v.%v.%d %v:%v",
-				sweekday, sday, smonth, syear, shour, sminute,
-				eweekday, eday, emonth, eyear, ehour, eminute),
+			sweekday := getWeekday(int(app.StartTime.Weekday()))
+			eweekday := getWeekday(int(app.EndTime.Weekday()))
+
+			m.Text(fmt.Sprintf("%v, %v - %v, %v",
+				sweekday, app.StartTime.Format("02. 01. 2006 15:04"),
+				eweekday, app.EndTime.Format("02. 01. 2006 15:04")),
 				props.Text{
 					Top:   2.5,
 					Align: consts.Center,
@@ -762,30 +675,13 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 					Align: consts.Left,
 				})
 			})
-			start := leader.AttendanceFrom
-			weekday := getWeekday(int(start.Weekday()))
-			month := strconv.Itoa(int(start.Month()))
-			if len(month) == 1 {
-				month = "0" + month
-			}
-			day := strconv.Itoa(start.Day())
-			if len(day) == 1 {
-				day = "0" + day
-			}
-			year := start.Year()
-			hour := strconv.Itoa(start.Hour())
-			if len(hour) == 1 {
-				hour = "0" + hour
-			}
-			minute := strconv.Itoa(start.Minute())
-			if len(minute) == 1 {
-				minute = "0" + minute
-			}
-			m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v", weekday, day, month, year, hour, minute), props.Text{
-				Top:   2.5,
-				Align: consts.Center,
-				Style: consts.Italic,
-			})
+			weekday := getWeekday(int(leader.AttendanceFrom.Weekday()))
+			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceFrom.Format("02.01.2006 15:04")),
+				props.Text{
+					Top:   2.5,
+					Align: consts.Center,
+					Style: consts.Italic,
+				})
 		})
 		m.Col(6, func() {
 			m.Col(3, func() {
@@ -794,30 +690,13 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 					Align: consts.Left,
 				})
 			})
-			end := leader.AttendanceTill
-			weekday := getWeekday(int(end.Weekday()))
-			month := strconv.Itoa(int(end.Month()))
-			if len(month) == 1 {
-				month = "0" + month
-			}
-			day := strconv.Itoa(end.Day())
-			if len(day) == 1 {
-				day = "0" + day
-			}
-			year := end.Year()
-			hour := strconv.Itoa(end.Hour())
-			if len(hour) == 1 {
-				hour = "0" + hour
-			}
-			minute := strconv.Itoa(end.Minute())
-			if len(minute) == 1 {
-				minute = "0" + minute
-			}
-			m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v", weekday, day, month, year, hour, minute), props.Text{
-				Top:   2.5,
-				Align: consts.Center,
-				Style: consts.Italic,
-			})
+			weekday := getWeekday(int(leader.AttendanceTill.Weekday()))
+			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceTill.Format("02.01.2006 15:04")),
+				props.Text{
+					Top:   2.5,
+					Align: consts.Center,
+					Style: consts.Italic,
+				})
 		})
 	})
 	m.Line(3.0)
@@ -834,49 +713,13 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 
 	tableString := make([][]string, 0)
 	for _, teacher := range teachers {
-		start := app.StartTime
-		sweekday := getWeekday(int(start.Weekday()))
-		smonth := strconv.Itoa(int(start.Month()))
-		if len(smonth) == 1 {
-			smonth = "0" + smonth
-		}
-		sday := strconv.Itoa(start.Day())
-		if len(sday) == 1 {
-			sday = "0" + sday
-		}
-		syear := start.Year()
-		shour := strconv.Itoa(start.Hour())
-		if len(shour) == 1 {
-			shour = "0" + shour
-		}
-		sminute := strconv.Itoa(start.Minute())
-		if len(sminute) == 1 {
-			sminute = "0" + sminute
-		}
-		end := app.EndTime
-		eweekday := getWeekday(int(end.Weekday()))
-		emonth := strconv.Itoa(int(end.Month()))
-		if len(emonth) == 1 {
-			emonth = "0" + emonth
-		}
-		eday := strconv.Itoa(end.Day())
-		if len(eday) == 1 {
-			eday = "0" + eday
-		}
-		eyear := end.Year()
-		ehour := strconv.Itoa(end.Hour())
-		if len(ehour) == 1 {
-			ehour = "0" + ehour
-		}
-		eminute := strconv.Itoa(end.Minute())
-		if len(eminute) == 1 {
-			eminute = "0" + eminute
-		}
+		sweekday := getWeekday(int(app.StartTime.Weekday()))
+		eweekday := getWeekday(int(app.EndTime.Weekday()))
 		row := []string{
 			teacher.Name,
 			fmt.Sprintf("L%d", teacher.Group),
-			fmt.Sprintf("%v, %v.%v.%d %v:%v", sweekday, sday, smonth, syear, shour, sminute),
-			fmt.Sprintf("%v, %v.%v.%d %v:%v", eweekday, eday, emonth, eyear, ehour, eminute),
+			fmt.Sprintf("%v, %v", sweekday, app.StartTime.Format("02.01.2006 15:04")),
+			fmt.Sprintf("%v, %v", eweekday, app.EndTime.Format("02.01.2006 15:04")),
 		}
 		tableString = append(tableString, row)
 	}
@@ -991,30 +834,13 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 					Align: consts.Left,
 				})
 			})
-			start := app.StartTime
-			weekday := getWeekday(int(start.Weekday()))
-			month := strconv.Itoa(int(start.Month()))
-			if len(month) == 1 {
-				month = "0" + month
-			}
-			day := strconv.Itoa(start.Day())
-			if len(day) == 1 {
-				day = "0" + day
-			}
-			year := start.Year()
-			hour := strconv.Itoa(start.Hour())
-			if len(hour) == 1 {
-				hour = "0" + hour
-			}
-			minute := strconv.Itoa(start.Minute())
-			if len(minute) == 1 {
-				minute = "0" + minute
-			}
-			m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v", weekday, day, month, year, hour, minute), props.Text{
-				Top:   2.5,
-				Align: consts.Center,
-				Style: consts.Italic,
-			})
+			weekday := getWeekday(int(app.StartTime.Weekday()))
+			m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.Format("02.01.2006 15:04")),
+				props.Text{
+					Top:   2.5,
+					Align: consts.Center,
+					Style: consts.Italic,
+				})
 		})
 		m.Col(6, func() {
 			m.Col(3, func() {
@@ -1023,26 +849,8 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 					Align: consts.Left,
 				})
 			})
-			end := app.EndTime
-			weekday := getWeekday(int(end.Weekday()))
-			month := strconv.Itoa(int(end.Month()))
-			if len(month) == 1 {
-				month = "0" + month
-			}
-			day := strconv.Itoa(end.Day())
-			if len(day) == 1 {
-				day = "0" + day
-			}
-			year := end.Year()
-			hour := strconv.Itoa(end.Hour())
-			if len(hour) == 1 {
-				hour = "0" + hour
-			}
-			minute := strconv.Itoa(end.Minute())
-			if len(minute) == 1 {
-				minute = "0" + minute
-			}
-			m.Text(fmt.Sprintf("%v, %v.%v.%d %v:%v", weekday, day, month, year, hour, minute), props.Text{
+			weekday := getWeekday(int(app.EndTime.Weekday()))
+			m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.Format("02.01.2006 15:04")), props.Text{
 				Top:   2.5,
 				Align: consts.Center,
 				Style: consts.Italic,
@@ -1275,16 +1083,6 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		return "", err
 	}
 	for _, lesson := range lessons {
-		date := lesson.Start
-		month := strconv.Itoa(int(date.Month()))
-		if len(month) == 1 {
-			month = "0" + month
-		}
-		day := strconv.Itoa(date.Day())
-		if len(day) == 1 {
-			day = "0" + day
-		}
-		year := date.Year()
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
 		endLesson := untis.GetLessonNrByEnd(lesson.End)
 		hourString := ""
@@ -1304,7 +1102,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		}
 		classes = classes[0 : len(rooms)-2]
 		row := []string{"", classes,
-			fmt.Sprintf("%v.%v.%d", day, month, year),
+			fmt.Sprintf("%v", lesson.Start.Format("02.01.2006")),
 			fmt.Sprintf(hourString),
 			rooms,
 			"",
