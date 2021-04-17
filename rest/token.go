@@ -192,6 +192,9 @@ func readAccessSecret() {
 		defer file.Close()
 		reader := bufio.NewReader(file)
 		secret, _, err := reader.ReadLine()
+		if err != nil {
+			log.Fatal(err)
+		}
 		accessSecret = string(secret)
 	}
 }
@@ -223,6 +226,9 @@ func readRefreshSecret() {
 		defer file.Close()
 		reader := bufio.NewReader(file)
 		secret, _, err := reader.ReadLine()
+		if err != nil {
+			log.Fatal(err)
+		}
 		refreshSecret = string(secret)
 	}
 }

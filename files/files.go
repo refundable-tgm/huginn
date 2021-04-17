@@ -2132,12 +2132,12 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	})
 	m.Row(10, func() {
 		text := ""
-		if app.TravelCostsPayedBySomeone && app.StayingCostsPayedBySomeone {
-			text = "Es werden Aufenthaltskosten und Reisekosten von " + app.PayedByWhom + " getragen"
-		} else if app.TravelCostsPayedBySomeone && !app.StayingCostsPayedBySomeone {
-			text = "Es werden Reisekosten von " + app.PayedByWhom + " getragen"
-		} else if !app.TravelCostsPayedBySomeone && app.StayingCostsPayedBySomeone {
-			text = "Es werden Aufenthaltskosten von " + app.PayedByWhom + " getragen"
+		if app.TravelCostsPaidBySomeone && app.StayingCostsPaidBySomeone {
+			text = "Es werden Aufenthaltskosten und Reisekosten von " + app.PaidByWhom + " getragen"
+		} else if app.TravelCostsPaidBySomeone && !app.StayingCostsPaidBySomeone {
+			text = "Es werden Reisekosten von " + app.PaidByWhom + " getragen"
+		} else if !app.TravelCostsPaidBySomeone && app.StayingCostsPaidBySomeone {
+			text = "Es werden Aufenthaltskosten von " + app.PaidByWhom + " getragen"
 		} else {
 			text = "Es werden keine Kosten von anderer Stelle getragen"
 		}
@@ -2657,6 +2657,9 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 			return "", err
 		}
 		err = excel.SetCellValue(Sheet, TICalcSumColumn+rowNumber, row.Sum)
+		if err != nil {
+			return "", err
+		}
 	}
 	row := strconv.Itoa(len(app.Calculation.Rows) + TIFirstConstantRow)
 	err = excel.SetCellValue(Sheet, TICalcTravelCostsColumn+row, app.Calculation.SumTravelCosts)
@@ -2895,7 +2898,7 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 			return "", err
 		}
 	}
-	if app.TravelCostsPayedBySomeone {
+	if app.TravelCostsPaidBySomeone {
 		err = excel.SetCellValue(Sheet, BTACheckTravelCostsPayedBySomeoneYes, CheckedCheckBox)
 		if err != nil {
 			return "", err
@@ -2915,7 +2918,7 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 		}
 	}
 
-	if app.StayingCostsPayedBySomeone {
+	if app.StayingCostsPaidBySomeone {
 		err = excel.SetCellValue(Sheet, BTACheckStayingCostsPayedBySomeoneYes, CheckedCheckBox)
 		if err != nil {
 			return "", err
@@ -2934,7 +2937,7 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 			return "", err
 		}
 	}
-	err = excel.SetCellValue(Sheet, BTAPayedByWhom, app.PayedByWhom)
+	err = excel.SetCellValue(Sheet, BTAPayedByWhom, app.PaidByWhom)
 	if err != nil {
 		return "", err
 	}

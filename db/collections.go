@@ -164,7 +164,7 @@ type TrainingDetails struct {
 	Kind int `json:"kind"`
 	// if its miscellaneous a reasoning for the Training
 	MiscellaneousReason string `json:"miscellaneous_reason"`
-	// the personnell number of the teacher
+	// the personnel number of the teacher
 	PH int `json:"ph"`
 	// The company who organizes the Training
 	Organizer string `json:"organizer"`
@@ -224,12 +224,12 @@ type BusinessTripApplication struct {
 	BonusMileConfirmation1 bool `json:"bonus_mile_confirmation_1"`
 	// the confirmation of the second bonus mile clause
 	BonusMileConfirmation2 bool `json:"bonus_mile_confirmation_2"`
-	// whether the travel costs are payed by someone else
-	TravelCostsPayedBySomeone bool `json:"travel_costs_payed_by_someone"`
-	// whether the staying costs are payed by someone else
-	StayingCostsPayedBySomeone bool `json:"staying_costs_payed_by_someone"`
-	// if some costs are payed by someone else by whom
-	PayedByWhom string `json:"payed_by_whom"`
+	// whether the travel costs are paid by someone else
+	TravelCostsPaidBySomeone bool `json:"travel_costs_paid_by_someone"`
+	// whether the staying costs are paid by someone else
+	StayingCostsPaidBySomeone bool `json:"staying_costs_paid_by_someone"`
+	// if some costs are paid by someone else by whom
+	PaidByWhom string `json:"paid_by_whom"`
 	// other costs which appeared
 	OtherCosts float32 `json:"other_costs"`
 	// the total estimated costs
@@ -264,7 +264,7 @@ type TravelInvoice struct {
 	TripEndTime time.Time `json:"trip_end_time"`
 	// The granted travel costs
 	TravelCostsPreGrant float32 `json:"travel_costs_pre_grant"`
-	// The personell number of the teacher
+	// The personnel number of the teacher
 	Staffnr int `json:"staffnr"`
 	// the starting point of the trip
 	StartingPoint string `json:"starting_point"`

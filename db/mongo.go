@@ -136,7 +136,7 @@ func (m MongoDatabaseConnector) GetActiveApplications() (applications []Applicat
 }
 
 // Updates one application with the matching uuid and updates it with the data in the update Application
-// returns true whether one Application was modified, false if an error occured or no Application was modified
+// returns true whether one Application was modified, false if an error occurred or no Application was modified
 func (m MongoDatabaseConnector) UpdateApplication(uuid string, update Application) bool {
 	update.UUID = uuid
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
@@ -149,7 +149,7 @@ func (m MongoDatabaseConnector) UpdateApplication(uuid string, update Applicatio
 }
 
 // Deletes one application described by the given uuid
-// returns true if a document was deleted, false if none or an error occured
+// returns true if a document was deleted, false if none or an error occurred
 func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
 	result, err := collection.DeleteOne(m.context, bson.M{"uuid": uuid})
@@ -205,7 +205,7 @@ func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) 
 }
 
 // Updates one Teacher with the matching uuid and updates it with the data in the update Teacher
-// returns true whether one TEacher was modified, false if an error occured or no Teacher was modified
+// returns true whether one TEacher was modified, false if an error occurred or no Teacher was modified
 func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool {
 	update.UUID = uuid
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
@@ -218,7 +218,7 @@ func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool 
 }
 
 // Deletes one teacher described by a given short name
-// returns true if a document was deleted, false if none or an error occured
+// returns true if a document was deleted, false if none or an error occurred
 func (m MongoDatabaseConnector) DeleteTeacher(uuid string) (ok bool) {
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	result, err := collection.DeleteOne(m.context, bson.M{"uuid": uuid})
