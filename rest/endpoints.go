@@ -1191,3 +1191,98 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 	}
 	con.JSON(http.StatusOK, res)
 }
+
+func SaveBillingReceipt(con *gin.Context) {
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, "you are not logged in")
+	}
+	r := struct {
+		PDFs []string `json:"pdfs"`
+	}{}
+	if err := con.ShouldBindJSON(&r); err != nil {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	defer db.Close()
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		return
+	}
+	_ = con.Request.ParseForm()
+	query := con.Request.URL.Query()
+	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	uuid := query.Get("uuid")
+	if _, hasShort := con.Request.Form["short"]; !hasShort {
+		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		return
+	}
+	short := query.Get("short")
+	application := db.GetApplication(uuid)
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	var in bool
+	if application.Kind == mongo.SchoolEvent {
+		teachers := application.SchoolEventDetails.Teachers
+		for _, t := range teachers {
+			if t.Shortname == requestTeacher.Short {
+				in = true
+				break
+			}
+		}
+	} else if application.Kind == mongo.Training {
+		if application.TrainingDetails.Organizer == requestTeacher.Short {
+			in = true
+		}
+	} else if application.Kind == mongo.OtherReason {
+		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+			in = true
+		}
+	}
+	if !in {
+		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		return
+	}
+	path, err := files.GenerateFileEnvironment(application)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		return
+	}
+	ff, err := ioutil.ReadDir(filepath.Join(path, files.UploadFolderName))
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, "couldn't read upload directory")
+		return
+	}
+	counter := 1
+	for _, file := range ff {
+		data := strings.Split(file.Name(), "_")
+		if data[1] == short {
+			counter += 1
+		}
+	}
+	for i, pdf := range r.PDFs {
+		name := fmt.Sprintf(files.ReceiptFileName, i + counter, short)
+		dec, err := base64.StdEncoding.DecodeString(pdf)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't decode the pdf file: %v", name))
+			return
+		}
+		file, err := os.Create(filepath.Join(files.BasePath, files.UploadFolderName, name))
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't create the pdf file: %v", name))
+			return
+		}
+		if _, err := file.Write(dec); err != nil {
+			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't write the pdf file: %v", name))
+			return
+		}
+		if err := file.Sync(); err != nil {
+			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't sync the pdf file: %v", name))
+			return
+		}
+		_ = file.Close()
+	}
+}

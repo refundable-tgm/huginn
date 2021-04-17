@@ -33,6 +33,7 @@ func StartService() {
 	router.GET("/getBusinessTripApplicationForm", AuthWall(), GetBusinessTripApplicationForm)
 	router.GET("/getTravelInvoiceExcel", AuthWall(), GetTravelInvoiceExcel)
 	router.GET("/getBusinessTripApplicationExcel", AuthWall(), GetBusinessTripApplicationExcel)
+	router.POST("/saveBillingReceipt", AuthWall(), SaveBillingReceipt)
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
