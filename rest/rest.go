@@ -7,11 +7,15 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles" // swagger files
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
 // Port is the port this api will listen to
 const Port = 8080
+
+// DebugFilePath to where a .debug file lies
+const DebugFilePath = "/vol/files/.debug"
 
 // StartService starts the rest service
 // @title Refundable
@@ -23,7 +27,7 @@ const Port = 8080
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-// @license.name MIT
+// @license.name MIT Lizenz
 // @license.url https://github.com/refundable-tgm/huginn/blob/master/LICENSE
 // @host localhost:8080
 // @BasePath /api
@@ -31,7 +35,8 @@ const Port = 8080
 func StartService() {
 	InitTokenManager()
 	router := gin.Default()
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(getMode())
+
 	api := router.Group("/api")
 	{
 		api.POST("/login", Login)
@@ -63,6 +68,18 @@ func StartService() {
 	})
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/", func(context *gin.Context) {
+		context.Redirect(http.StatusMovedPermanently, "doc/index.html")
+	})
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
+}
+
+// getMode analyzes whether a .debug File is present (DebugFilePath)
+// if so return gin.DebugMode if not gin.ReleaseMode
+func getMode() string {
+	if _, err := os.Stat(DebugFilePath); err == nil {
+		return gin.DebugMode
+	}
+	return gin.ReleaseMode
 }
