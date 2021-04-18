@@ -739,7 +739,7 @@ func DeleteApplication(con *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
 // @Param uuid query string true "Identifier of the application to generate the pdf from"
-// @Param classes []query string false "Filter for classes"
+// @Param classes query []string false "Filter for classes"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
 // @Failure 422 {object} Error
