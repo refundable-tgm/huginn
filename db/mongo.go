@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-// The name of the collection in which the Teacher data is stored in
+// TeacherCollection is the name of the collection in which the Teacher data is stored in
 const TeacherCollection = "Teacher"
 
-// The name of the collection in which the Application data is stored in
+// ApplicationCollection is the name of the collection in which the Application data is stored in
 const ApplicationCollection = "Application"
 
-// Containing data used for the mongo db connection
+// The MongoDatabaseConnector saves data used for the mongo db connection
 type MongoDatabaseConnector struct {
 	// the name of the database in the mongo db server
 	database string
@@ -30,8 +30,8 @@ type MongoDatabaseConnector struct {
 	closer context.CancelFunc
 }
 
-// Connects the MongoDatabaseConnector with the given MongoDB server
-// returns whether this was successful
+// Connect the MongoDatabaseConnector with the given MongoDB server
+// returns whether this operation was successful
 func (m *MongoDatabaseConnector) Connect() bool {
 	uri, db, ok := resolveURI()
 	if ok {
@@ -56,7 +56,7 @@ func (m *MongoDatabaseConnector) Connect() bool {
 	return false
 }
 
-// Closes the Connection to the MongoDB
+// Close the Connection to the MongoDB
 // returns whether this operation was successful
 func (m MongoDatabaseConnector) Close() (ok bool) {
 	err := m.client.Disconnect(m.context)
@@ -68,7 +68,7 @@ func (m MongoDatabaseConnector) Close() (ok bool) {
 	return true
 }
 
-// Creates a new application in the system
+// CreateApplication creates a new application in the collection in the database
 func (m MongoDatabaseConnector) CreateApplication(application Application) bool {
 	application.UUID = uuid.New().String()
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
@@ -82,7 +82,7 @@ func (m MongoDatabaseConnector) CreateApplication(application Application) bool 
 	return true
 }
 
-// Returns a specific application described by its uuid
+// GetApplication returns a specific application described and identified by its uuid
 func (m MongoDatabaseConnector) GetApplication(uuid string) (application Application) {
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
 	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&application); err != nil {
@@ -92,7 +92,7 @@ func (m MongoDatabaseConnector) GetApplication(uuid string) (application Applica
 	return application
 }
 
-// Returns all applications contained in the collection
+// GetAllApplications analyzes all applications contained in the collection and returns them as an array
 func (m MongoDatabaseConnector) GetAllApplications() (applications []Application) {
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
 	cursor, err := collection.Find(m.context, bson.M{})
@@ -107,7 +107,7 @@ func (m MongoDatabaseConnector) GetAllApplications() (applications []Application
 	return
 }
 
-// Returns all active applications in the system
+// GetActiveApplications returns all currently active applications stored in the database
 func (m MongoDatabaseConnector) GetActiveApplications() (applications []Application) {
 	filter := bson.M{
 		"$or": []bson.M{
@@ -135,7 +135,7 @@ func (m MongoDatabaseConnector) GetActiveApplications() (applications []Applicat
 	return applications
 }
 
-// Updates one application with the matching uuid and updates it with the data in the update Application
+// UpdateApplication updates an application with the matching uuid and updates it with the data in the update struct
 // returns true whether one Application was modified, false if an error occurred or no Application was modified
 func (m MongoDatabaseConnector) UpdateApplication(uuid string, update Application) bool {
 	update.UUID = uuid
@@ -148,8 +148,8 @@ func (m MongoDatabaseConnector) UpdateApplication(uuid string, update Applicatio
 	return result.ModifiedCount == 1
 }
 
-// Deletes one application described by the given uuid
-// returns true if a document was deleted, false if none or an error occurred
+// DeleteApplication deletes an application described by the given uuid
+// returns true if a document was deleted, false if not or if an error occurred
 func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)
 	result, err := collection.DeleteOne(m.context, bson.M{"uuid": uuid})
@@ -160,7 +160,8 @@ func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 	return result.DeletedCount == 1
 }
 
-// Creates a new application in the system
+// CreateTeacher creates a new application in the system
+// it will return true if this operation was successful and false if not
 func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
 	teacher.UUID = uuid.New().String()
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
@@ -174,7 +175,7 @@ func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
 	return true
 }
 
-// Returns a teacher found by a given short name
+// GetTeacherByShort returns a teacher identified by a given short name
 func (m MongoDatabaseConnector) GetTeacherByShort(short string) (teacher Teacher) {
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	if err := collection.FindOne(m.context, bson.M{"short": short}).Decode(&teacher); err != nil {
@@ -184,7 +185,9 @@ func (m MongoDatabaseConnector) GetTeacherByShort(short string) (teacher Teacher
 	return teacher
 }
 
-// Checks whether the Teacher with the shortname short exists in the database
+// DoesTeacherExistsByShort searches the database for a Teacher identified by a shortname
+// and checks whether a teacher can be found whilst performing this search.
+// It will return true if the teacher was found, false if an error occurred or none was found.
 func (m MongoDatabaseConnector) DoesTeacherExistsByShort(short string) bool {
 	teacher := Teacher{}
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
@@ -194,7 +197,7 @@ func (m MongoDatabaseConnector) DoesTeacherExistsByShort(short string) bool {
 	return true
 }
 
-// Returns a teacher found by a given UUID
+// GetTeacherByUUID returns a teacher identified by a given UUID
 func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) {
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&teacher); err != nil {
@@ -204,8 +207,8 @@ func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) 
 	return teacher
 }
 
-// Updates one Teacher with the matching uuid and updates it with the data in the update Teacher
-// returns true whether one TEacher was modified, false if an error occurred or no Teacher was modified
+// UpdateTeacher updates a teacher with the matching uuid and updates it with the data in the update struct
+// returns true whether one Teacher was modified, false if an error occurred or no Teacher was modified
 func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool {
 	update.UUID = uuid
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
@@ -217,7 +220,7 @@ func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool 
 	return result.ModifiedCount == 1
 }
 
-// Deletes one teacher described by a given short name
+// DeleteTeacher deletes one teacher described by a given short name
 // returns true if a document was deleted, false if none or an error occurred
 func (m MongoDatabaseConnector) DeleteTeacher(uuid string) (ok bool) {
 	collection := m.client.Database(m.database).Collection(TeacherCollection)

@@ -12,32 +12,53 @@ import (
 	"time"
 )
 
+// ClientName is the name of this client communicating with the api
 const ClientName = "Refundable"
+// URL is the path this api is available at
 const URL = "https://neilo.webuntis.com/WebUntis/jsonrpc.do?school=tgm"
 
+// activeClients is a map that maps a user (the username) to the active client during an active session
 var activeClients map[string]Client
 
+// Client is the struct representing the client
 type Client struct {
+	// Username of the account the client uses
 	Username      string
+	// Password of the account the client uses
 	Password      string
+	// SessionID of the session the client is currently in
 	SessionID     string
+	// PersonType of the account the client uses
 	PersonType    int
+	// PersonID of the account the client uses
 	PersonID      int
+	// Closed whether the current session is closed or not
 	Closed        bool
+	// Authenticated whether the current session is active authenticated
 	Authenticated bool
 }
 
 type Lesson struct {
+	// Start is the start time of the lesson
 	Start      time.Time
+	// End is the end time of the lesson
 	End        time.Time
+	// ClassIDs are the ids of the classes participating
 	ClassIDs   []int
+	// Classes are the names of all classes participating
 	Classes    []string
+	// TeacherIDs are the ids of the teachers teaching
 	TeacherIDs []int
+	// Teachers are the names of all teachers teaching
 	Teachers   []string
+	// RoomIDs are the room ids this lesson takes place in
 	RoomIDs    []int
+	// Rooms are the room names this lesson takes place in
 	Rooms      []string
 }
 
+// CreateClient creates a new client to communicate with the API
+// the username and password are used to authenticate the client at the service
 func CreateClient(username, password string) *Client {
 	client := Client{
 		Username:      username,
@@ -52,11 +73,13 @@ func CreateClient(username, password string) *Client {
 	return &client
 }
 
+// GetClient returns an active client using the corresponding username
 func GetClient(username string) *Client {
 	client := activeClients[username]
 	return &client
 }
 
+// Authenticate authenticates the client at the untis service
 func (client *Client) Authenticate() error {
 	if client.Authenticated {
 		return fmt.Errorf("already authenticated")
@@ -104,6 +127,7 @@ func (client *Client) Authenticate() error {
 	}
 }
 
+// GetTimetableOfTeacher returns a list of lessons the teacher logged in with the client has in between start and end
 func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -219,6 +243,7 @@ func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, erro
 	return nil, fmt.Errorf("ids not matching")
 }
 
+// GetTimetableOfClass returns a list of lessons a specified class has in between start and end
 func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]Lesson, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -335,6 +360,7 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 	return nil, fmt.Errorf("ids not matching")
 }
 
+// GetTimetableOfSpecificTeacher returns a list of lessons a specified teacher has in between start and end
 func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher string) ([]Lesson, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -454,6 +480,7 @@ func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher
 	return nil, fmt.Errorf("ids not matching")
 }
 
+// ResolveTeachers converts an array of teacher ids into an array of teacher names
 func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -499,6 +526,7 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 	}
 }
 
+// ResolveTeacherID converts a teacher name to the corersponding teacher id
 func (client Client) ResolveTeacherID(teacher string) (int, error) {
 	if !client.Authenticated {
 		return -1, fmt.Errorf("not authenticated")
@@ -541,6 +569,7 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 	}
 }
 
+// ResolveRooms converts an array of room ids into an array of room names
 func (client Client) ResolveRooms(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -585,6 +614,7 @@ func (client Client) ResolveRooms(ids []int) ([]string, error) {
 	}
 }
 
+// ResolveClassID converts an array of class ids into an array of class names
 func (client Client) ResolveClasses(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -631,6 +661,7 @@ func (client Client) ResolveClasses(ids []int) ([]string, error) {
 	}
 }
 
+// ResolveClassID converts a class name to the corresponding class id
 func (client Client) ResolveClassID(class string) (int, error) {
 	if !client.Authenticated {
 		return -1, fmt.Errorf("not authenticated")
@@ -674,6 +705,7 @@ func (client Client) ResolveClassID(class string) (int, error) {
 	}
 }
 
+// Close closes an authenticated connection to the untis api
 func (client *Client) Close() error {
 	if !client.Authenticated {
 		return fmt.Errorf("not authenticated")
@@ -687,10 +719,12 @@ func (client *Client) Close() error {
 	return nil
 }
 
+// DeleteClient deletes the current client out of the map of active clients
 func (client Client) DeleteClient() {
 	delete(activeClients, client.Username)
 }
 
+// sendRequest helps this api to send requests to the untis api
 func (client Client) sendRequest(method string, params map[string]interface{}) (*http.Response, int, error) {
 	id := rand.Intn(math.MaxInt64)
 	body, _ := json.Marshal(map[string]interface{}{
@@ -709,6 +743,7 @@ func (client Client) sendRequest(method string, params map[string]interface{}) (
 	return resp, id, err
 }
 
+// GetLessonNrByStart computes the lesson number by its start time
 func GetLessonNrByStart(start time.Time) int {
 	switch start.Hour() {
 	case 8:
@@ -749,6 +784,7 @@ func GetLessonNrByStart(start time.Time) int {
 	return -1
 }
 
+// GetLessonNrByEnd computes the lesson number by its end time
 func GetLessonNrByEnd(end time.Time) int {
 	switch end.Hour() {
 	case 8:

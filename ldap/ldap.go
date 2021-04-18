@@ -8,9 +8,15 @@ import (
 	"strings"
 )
 
+// URL is the ip address of the tgm ldap server to connect to
 const URL = "10.2.24.151"
+// Port of the tgm ldap server. In this case it is the default port
 const Port = 389
 
+// AuthenticateUserCredentials authenicates a user given by username and password through the tgm ldap server.
+// Furthermore if it is the first login of a user it will create a new Teacher instance and save it to the local database.
+// It will return true if the credentials are valid and able to produce a successful login operation on the ldap server
+// Otherwise if any connection error occurs or the credentials aren't valid this method will return false
 func AuthenticateUserCredentials(username, password string) bool {
 	cred := username + "@tgm.ac.at"
 	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", URL, Port))
@@ -44,6 +50,9 @@ func AuthenticateUserCredentials(username, password string) bool {
 	return true
 }
 
+// GetLongName will find out the full name (name + surname) of a teacher through their saved file on the active directory
+// ldap server. If the search operation was successful the full name is returned. Otherwise any error occurred will be
+// returned.
 func GetLongName(username, password string) (string, error) {
 	cred := username + "@tgm.ac.at"
 	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", URL, Port))

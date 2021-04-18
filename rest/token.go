@@ -13,38 +13,62 @@ import (
 	"time"
 )
 
+// pathAccessSecret is the file path to the secret string to encode access tokens
 const pathAccessSecret = "/vol/secrets/access_secret.env"
+// pathRefreshSecret is the file path to the secret string to encode access tokens
 const pathRefreshSecret = "/vol/secrets/refresh_secret.env"
+// accessSecretLength is the length of the access secret
 const accessSecretLength = 32
+// refreshSecretLength is the length of the refresh secret
 const refreshSecretLength = 64
 
+// accessDuration is the time for which an access token is valid (default 15 mins)
 const accessDuration = time.Minute * 15
+// refreshDuration is the time for which a refresh token is valid (default 7 days)
 const refreshDuration = time.Hour * 24 * 7
 
+// accessSecret is the secret used to encode access tokens
 var accessSecret string
+// refreshSecret is the secret used to encode refresh tokens
 var refreshSecret string
 
+// activeTokens stores all token information of active tokens
 var activeTokens map[string]EntityInformation
 
+// Token represents a token pair
 type Token struct {
+	// AccessToken is the access token itself
 	AccessToken    string
+	// RefreshToken is the refresh token itself
 	RefreshToken   string
+	// AccessUUID is the uuid the access token is referenced by
 	AccessUUID     string
+	// RefreshUUID is the uuid the refresh token is referenced by
 	RefreshUUID    string
+	// AccessExpires is the date the access tokens expires at
 	AccessExpires  int64
+	// RefreshExpires is the date the refresh tokens expires at
 	RefreshExpires int64
 }
 
+// AccessToken represents the further information about an access token
 type AccessToken struct {
+	// AccessUUID is the uuid of the access token
 	AccessUUID string
+	// Username is the username of the user this token belongs to
 	Username   string
 }
 
+// EntityInformation represents information about tokens
 type EntityInformation struct {
+	// Username identifies the user this token belongs to
 	Username  string
+	// ExpiresAt marks the time the token expires at
 	ExpiresAt time.Time
 }
 
+// InitTokenManager initializes the token manager
+// it reads or generates both secrets, creates the map of active tokens, and starts the thread to remove expired tokens
 func InitTokenManager() {
 	readRefreshSecret()
 	readAccessSecret()
@@ -52,6 +76,7 @@ func InitTokenManager() {
 	go ttlCheck()
 }
 
+// CreateToken creates a token pair based on a username
 func CreateToken(username string) (*Token, error) {
 	token := &Token{}
 	token.AccessExpires = time.Now().Add(accessDuration).Unix()
@@ -87,6 +112,7 @@ func CreateToken(username string) (*Token, error) {
 	return token, nil
 }
 
+// SaveToken saves a token in the active token map with its corresponding username as key
 func SaveToken(username string, token *Token) {
 	acExp := time.Unix(token.AccessExpires, 0)
 	refExp := time.Unix(token.RefreshExpires, 0)
@@ -95,6 +121,7 @@ func SaveToken(username string, token *Token) {
 	activeTokens[token.RefreshUUID] = EntityInformation{username, refExp}
 }
 
+// ExtractToken parses the token string out of a request
 func ExtractToken(r *http.Request) string {
 	bear := r.Header.Get("Authorization")
 	split := strings.Split(bear, " ")
@@ -104,6 +131,7 @@ func ExtractToken(r *http.Request) string {
 	return ""
 }
 
+// VerifyToken verifies that the token provided in the request originates from this API
 func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	extr := ExtractToken(r)
 	token, err := jwt.Parse(extr, func(token *jwt.Token) (interface{}, error) {
@@ -118,6 +146,7 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
+// TokenValid checks whether a token is still valid, therefore also verifies it
 func TokenValid(r *http.Request) (bool, error) {
 	token, err := VerifyToken(r)
 	if err != nil {
@@ -129,6 +158,7 @@ func TokenValid(r *http.Request) (bool, error) {
 	return true, nil
 }
 
+// ExtractTokenMeta extracts the meta information encoded in the token and returns both uuid and username
 func ExtractTokenMeta(r *http.Request) (*AccessToken, error) {
 	token, err := VerifyToken(r)
 	if err != nil {
@@ -152,19 +182,12 @@ func ExtractTokenMeta(r *http.Request) (*AccessToken, error) {
 	return nil, err
 }
 
-func FetchAuth(auth *AccessToken) (username string, ok bool) {
-	entity, ok := activeTokens[auth.AccessUUID]
-	username = entity.Username
-	if !ok {
-		return "", ok
-	}
-	return
-}
-
+// DeleteToken deletes a token
 func DeleteToken(uuid string) {
 	delete(activeTokens, uuid)
 }
 
+// readAccessSecret manages the refresh secret generation
 func readAccessSecret() {
 	if _, err := os.Stat(pathAccessSecret); os.IsNotExist(err) {
 		const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -199,6 +222,7 @@ func readAccessSecret() {
 	}
 }
 
+// readRefreshSecret manages the refresh secret generation
 func readRefreshSecret() {
 	if _, err := os.Stat(pathRefreshSecret); os.IsNotExist(err) {
 		const char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -233,6 +257,7 @@ func readRefreshSecret() {
 	}
 }
 
+// ttlCheck checks whether tokens expired and removes them
 func ttlCheck() {
 	for {
 		now := time.Now()
