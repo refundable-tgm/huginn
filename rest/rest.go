@@ -58,10 +58,10 @@ func StartService() {
 		context.JSON(http.StatusNotFound, Error{"this endpoint doesn't exist"})
 	})
 
-	router.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/", func(context *gin.Context) {
 		context.Header("Access-Control-Allow-Origin", "*")
-		context.Redirect(http.StatusMovedPermanently, "doc/index.html")
+		context.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
