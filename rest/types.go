@@ -37,23 +37,23 @@ type RefreshToken struct {
 // Permissions lists the permissions of a teacher
 type Permissions struct {
 	// SuperUser permission
-	SuperUser      bool `json:"super_user"`
+	SuperUser bool `json:"super_user"`
 	// Administration permission
 	Administration bool `json:"administration"`
 	// AV permission
-	AV             bool `json:"av"`
+	AV bool `json:"av"`
 	// PEK permission
-	PEK            bool `json:"pek"`
+	PEK bool `json:"pek"`
 }
 
 // News is a news object for applications
 type News struct {
 	// UUID of the application
-	UUID  string `json:"uuid"`
+	UUID string `json:"uuid"`
 	// Title of the application
 	Title string `json:"title"`
 	// State of the application
-	State int    `json:"state"`
+	State int `json:"state"`
 	// LastChanged is the date of last changes of the application
 	LastChanged string `json:"last_changed"`
 }

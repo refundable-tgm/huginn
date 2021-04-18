@@ -10,6 +10,7 @@ import (
 
 // URL is the ip address of the tgm ldap server to connect to
 const URL = "10.2.24.151"
+
 // Port of the tgm ldap server. In this case it is the default port
 const Port = 389
 

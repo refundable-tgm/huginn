@@ -15,20 +15,25 @@ import (
 
 // pathAccessSecret is the file path to the secret string to encode access tokens
 const pathAccessSecret = "/vol/secrets/access_secret.env"
+
 // pathRefreshSecret is the file path to the secret string to encode access tokens
 const pathRefreshSecret = "/vol/secrets/refresh_secret.env"
+
 // accessSecretLength is the length of the access secret
 const accessSecretLength = 32
+
 // refreshSecretLength is the length of the refresh secret
 const refreshSecretLength = 64
 
 // accessDuration is the time for which an access token is valid (default 15 mins)
 const accessDuration = time.Minute * 15
+
 // refreshDuration is the time for which a refresh token is valid (default 7 days)
 const refreshDuration = time.Hour * 24 * 7
 
 // accessSecret is the secret used to encode access tokens
 var accessSecret string
+
 // refreshSecret is the secret used to encode refresh tokens
 var refreshSecret string
 
@@ -38,15 +43,15 @@ var activeTokens map[string]EntityInformation
 // Token represents a token pair
 type Token struct {
 	// AccessToken is the access token itself
-	AccessToken    string
+	AccessToken string
 	// RefreshToken is the refresh token itself
-	RefreshToken   string
+	RefreshToken string
 	// AccessUUID is the uuid the access token is referenced by
-	AccessUUID     string
+	AccessUUID string
 	// RefreshUUID is the uuid the refresh token is referenced by
-	RefreshUUID    string
+	RefreshUUID string
 	// AccessExpires is the date the access tokens expires at
-	AccessExpires  int64
+	AccessExpires int64
 	// RefreshExpires is the date the refresh tokens expires at
 	RefreshExpires int64
 }
@@ -56,13 +61,13 @@ type AccessToken struct {
 	// AccessUUID is the uuid of the access token
 	AccessUUID string
 	// Username is the username of the user this token belongs to
-	Username   string
+	Username string
 }
 
 // EntityInformation represents information about tokens
 type EntityInformation struct {
 	// Username identifies the user this token belongs to
-	Username  string
+	Username string
 	// ExpiresAt marks the time the token expires at
 	ExpiresAt time.Time
 }

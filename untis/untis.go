@@ -14,6 +14,7 @@ import (
 
 // ClientName is the name of this client communicating with the api
 const ClientName = "Refundable"
+
 // URL is the path this api is available at
 const URL = "https://neilo.webuntis.com/WebUntis/jsonrpc.do?school=tgm"
 
@@ -23,38 +24,38 @@ var activeClients map[string]Client
 // Client is the struct representing the client
 type Client struct {
 	// Username of the account the client uses
-	Username      string
+	Username string
 	// Password of the account the client uses
-	Password      string
+	Password string
 	// SessionID of the session the client is currently in
-	SessionID     string
+	SessionID string
 	// PersonType of the account the client uses
-	PersonType    int
+	PersonType int
 	// PersonID of the account the client uses
-	PersonID      int
+	PersonID int
 	// Closed whether the current session is closed or not
-	Closed        bool
+	Closed bool
 	// Authenticated whether the current session is active authenticated
 	Authenticated bool
 }
 
 type Lesson struct {
 	// Start is the start time of the lesson
-	Start      time.Time
+	Start time.Time
 	// End is the end time of the lesson
-	End        time.Time
+	End time.Time
 	// ClassIDs are the ids of the classes participating
-	ClassIDs   []int
+	ClassIDs []int
 	// Classes are the names of all classes participating
-	Classes    []string
+	Classes []string
 	// TeacherIDs are the ids of the teachers teaching
 	TeacherIDs []int
 	// Teachers are the names of all teachers teaching
-	Teachers   []string
+	Teachers []string
 	// RoomIDs are the room ids this lesson takes place in
-	RoomIDs    []int
+	RoomIDs []int
 	// Rooms are the room names this lesson takes place in
-	Rooms      []string
+	Rooms []string
 }
 
 // CreateClient creates a new client to communicate with the API
