@@ -60,6 +60,7 @@ func StartService() {
 
 	router.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/", func(context *gin.Context) {
+		context.Header("Access-Control-Allow-Origin", "*")
 		context.Redirect(http.StatusMovedPermanently, "doc/index.html")
 	})
 
