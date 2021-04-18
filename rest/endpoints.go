@@ -20,6 +20,7 @@ import (
 	"strings"
 )
 
+// AuthWall drops every token which doesnt provide a valid token
 func AuthWall() gin.HandlerFunc {
 	return func(con *gin.Context) {
 		ok, err := TokenValid(con.Request)
@@ -32,51 +33,81 @@ func AuthWall() gin.HandlerFunc {
 	}
 }
 
+// Login represents the login endpoint
+// @Summary Login a user
+// @Description Login a user using username and password
+// @ID login
+// @Accept json
+// @Produce json
+// @Param user body User true "Account Information"
+// @Success 200 {object} TokenPair
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Router /login [post]
 func Login(con *gin.Context) {
-	u := struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}{}
+	u := User{}
 	if err := con.ShouldBindJSON(&u); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	if !ldap.AuthenticateUserCredentials(u.Username, u.Password) {
-		con.JSON(http.StatusUnauthorized, "this credentials do not resolve into an authorized login")
+		con.JSON(http.StatusUnauthorized, Error{"this credentials do not resolve into an authorized login"})
 		return
 	}
 	token, err := CreateToken(u.Username)
 	if err != nil {
-		con.JSON(http.StatusUnprocessableEntity, err.Error())
+		con.JSON(http.StatusUnprocessableEntity, Error{err.Error()})
 		return
 	}
 	SaveToken(u.Username, token)
 	untis.CreateClient(u.Username, u.Password)
-	out := map[string]string{
-		"access_token":  token.AccessToken,
-		"refresh_token": token.RefreshToken,
+	out := TokenPair{
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
 	}
 	con.JSON(http.StatusOK, out)
 }
 
+// Logout represents the logout endpoint
+// @Summary Logs out a user
+// @Description Destroys the session of a user
+// @ID logout
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Success 200 {object} Information
+// @Failure 401 {object} Error
+// @Router /logout [post]
 func Logout(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	DeleteToken(auth.AccessUUID)
 	untis.GetClient(auth.Username).DeleteClient()
-	con.JSON(http.StatusOK, "logged out")
+	con.JSON(http.StatusOK, Information{"logged out"})
 }
 
+// Refresh represents the refresh endpoint
+// @Summary Refreshes the token pair of a session
+// @Description Creates a new token pair when a valid refresh token is provided
+// @ID refresh
+// @Accept json
+// @Produce json
+// @Param token body RefreshToken true "Refresh Token"
+// @Success 201 {object} TokenPair
+// @Failure 401 {object} Error
+// @Failure 403 {object} Error
+// @Failure 422 {object} Error
+// @Router /refresh [post]
 func Refresh(con *gin.Context) {
-	body := map[string]string{}
+	body := RefreshToken{}
 	if err := con.ShouldBindJSON(&body); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, err.Error())
+		con.JSON(http.StatusUnprocessableEntity, Error{err.Error()})
 		return
 	}
-	refresh := body["refresh_token"]
+	refresh := body.Token
 	token, err := jwt.Parse(refresh, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -85,117 +116,152 @@ func Refresh(con *gin.Context) {
 	})
 
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "token expired")
+		con.JSON(http.StatusUnauthorized, Error{"token expired"})
 	}
 
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
-		con.JSON(http.StatusUnauthorized, err)
+		con.JSON(http.StatusUnauthorized, Error{"token unvalid"})
 		return
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		uuid, ok := claims["refresh_uuid"].(string)
 		if !ok {
-			con.JSON(http.StatusUnprocessableEntity, err)
+			con.JSON(http.StatusUnprocessableEntity, Error{"couldn't extract uuid"})
 			return
 		}
 		username, ok := claims["username"].(string)
 		if !ok {
-			con.JSON(http.StatusUnprocessableEntity, err)
+			con.JSON(http.StatusUnprocessableEntity, Error{"couldn't extract username"})
 			return
 		}
 		DeleteToken(uuid)
 		tok, err := CreateToken(username)
 		if err != nil {
-			con.JSON(http.StatusForbidden, err.Error())
+			con.JSON(http.StatusForbidden, Error{err.Error()})
 			return
 		}
 		SaveToken(username, tok)
-		tokens := map[string]string{
-			"access_token":  tok.AccessToken,
-			"refresh_token": tok.RefreshToken,
+		tokens := TokenPair{
+			tok.AccessToken,
+			tok.RefreshToken,
 		}
 		con.JSON(http.StatusCreated, tokens)
 	} else {
-		con.JSON(http.StatusUnauthorized, "refresh token expired")
+		con.JSON(http.StatusUnauthorized, Error{"refresh token expired"})
 	}
 }
 
+// GetTeacherByShort represents the get teacher by short name endpoint
+// @Summary Returns a teacher with the specified short name
+// @Description Searches for the Teacher with the specified name and returns the data
+// @ID get-teacher-by-short
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param name query string true "Short Name of Teacher"
+// @Success 200 {object} db.Teacher
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getTeacherByShort [get]
 func GetTeacherByShort(con *gin.Context) {
 	_, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	query := con.Request.URL.Query()
 	if query.Get("name") == "" {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	name := query.Get("name")
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	teacher := db.GetTeacherByShort(name)
 	con.JSON(http.StatusOK, teacher)
 }
 
+// GetTeacherByShort represents the get teacher endpoint
+// @Summary Returns a teacher with the specified UUID
+// @Description Searches for the Teacher with the specified uuid and returns the data
+// @ID get-teacher
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "UUID of Teacher"
+// @Success 200 {object} db.Teacher
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getTeacher [get]
 func GetTeacher(con *gin.Context) {
 	_, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	query := con.Request.URL.Query()
 	if query.Get("uuid") == "" {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	teacher := db.GetTeacherByUUID(uuid)
 	con.JSON(http.StatusOK, teacher)
 }
 
+// SetTeacherPermissions represents the set teacher permissions endpoint
+// @Summary Sets the permissions of a Teacher
+// @Description Sets the permissions of a Teacher to update their access rights
+// @ID set-teacher-permissions
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param perm body Permissions true "Permission data of the teacher"
+// @Param uuid query string true "UUID of the teacher whos permissions will be changed"
+// @Success 200 {object} db.Teacher
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /setTeacherPermissions [post]
 func SetTeacherPermissions(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
-	perm := struct {
-		SuperUser      bool `json:"super_user"`
-		Administration bool `json:"administration"`
-		AV             bool `json:"av"`
-		PEK            bool `json:"pek"`
-	}{}
+	perm := Permissions{}
 	if err := con.ShouldBindJSON(&perm); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	query := con.Request.URL.Query()
 	if query.Get("uuid") == "" {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	requester := db.GetTeacherByShort(auth.Username)
 	if !(requester.PEK || requester.Administration || requester.AV || requester.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	teacher := db.GetTeacherByUUID(uuid)
@@ -204,22 +270,34 @@ func SetTeacherPermissions(con *gin.Context) {
 	teacher.PEK = perm.PEK
 	teacher.Administration = perm.Administration
 	if db.UpdateTeacher(uuid, teacher) {
-		con.JSON(http.StatusOK, "permissions updated")
+		con.JSON(http.StatusOK, Information{"permissions updated"})
 	} else {
-		con.JSON(http.StatusInternalServerError, "permissions couldn't be updated")
+		con.JSON(http.StatusInternalServerError, Error{"permissions couldn't be updated"})
 	}
 }
 
+// GetActiveApplications represents the get active applications endpoint
+// @Summary Returns all active applications
+// @Description Returns all active applications as a list of applications
+// @ID get-all-active-applications
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param username query string false "Filter to only show applications of this teacher"
+// @Success 200 {array} db.Application
+// @Failure 401 {object} Error
+// @Failure 500 {object} Error
+// @Router /getActiveApplications [get]
 func GetActiveApplications(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
@@ -259,16 +337,28 @@ func GetActiveApplications(con *gin.Context) {
 	con.JSON(http.StatusOK, applications)
 }
 
-func GetAllApplication(con *gin.Context) {
+// GetAllApplications represents the get all applications endpoint
+// @Summary Returns all applications
+// @Description Returns all applications as a list of applications
+// @ID get-all-applications
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param username query string false "Filter to only show applications of this teacher"
+// @Success 200 {array} db.Application
+// @Failure 401 {object} Error
+// @Failure 500 {object} Error
+// @Router /getAllApplications [get]
+func GetAllApplications(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
@@ -277,7 +367,7 @@ func GetAllApplication(con *gin.Context) {
 	filter := query.Get("username")
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	if !(requestTeacher.Administration || requestTeacher.AV || requestTeacher.SuperUser || requestTeacher.PEK || (applyFilter && requestTeacher.Short == filter)) {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	applications := db.GetAllApplications()
@@ -308,16 +398,27 @@ func GetAllApplication(con *gin.Context) {
 	con.JSON(http.StatusOK, applications)
 }
 
+// GetNews represents the get news endpoint
+// @Summary Returns the news
+// @Description Returns the 10 last changed applications
+// @ID get-news
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Success 200 {array} News
+// @Failure 401 {object} Error
+// @Failure 500 {object} Error
+// @Router /getNews [get]
 func GetNews(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	user := auth.Username
@@ -348,37 +449,42 @@ func GetNews(con *gin.Context) {
 	if len(res) > 10 {
 		res = res[0:10]
 	}
-	news := make([]struct {
-		UUID  string `json:"uuid"`
-		Title string `json:"title"`
-		State int    `json:"state"`
-	}, 0)
+	news := make([]News, 0)
 	for _, app := range res {
-		news = append(news, struct {
-			UUID  string `json:"uuid"`
-			Title string `json:"title"`
-			State int    `json:"state"`
-		}{app.UUID, app.Name, app.Progress})
+		news = append(news, News{app.UUID, app.Name, app.Progress, app.LastChanged.String()})
 	}
 	con.JSON(http.StatusOK, news)
 }
 
+// GetApplication represents the get application endpoint
+// @Summary Returns an Application
+// @Description Returns the Application matching the given UUID
+// @ID get-application
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "The UUID of the specifying Application"
+// @Success 200 {object} db.Application
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getApplication [get]
 func GetApplication(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
 	if query.Get("uuid") == "" {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
@@ -402,27 +508,38 @@ func GetApplication(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	con.JSON(http.StatusOK, application)
 }
 
-func GetAdminApplication(con *gin.Context) {
+// GetAdminApplications represents the get admin applications endpoint
+// @Summary Returns all admin applications
+// @Description Returns all applications currently needing a review by an admin
+// @ID get-admin-applications
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Success 200 {array} db.Application
+// @Failure 401 {object} Error
+// @Failure 500 {object} Error
+// @Router /getApplication [get]
+func GetAdminApplications(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	teacher := db.GetTeacherByShort(auth.Username)
 	if !(teacher.PEK || teacher.Administration || teacher.AV || teacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	applications := db.GetAllApplications()
@@ -447,51 +564,78 @@ func GetAdminApplication(con *gin.Context) {
 	con.JSON(http.StatusOK, res)
 }
 
+// CreateApplication represents the create applications endpoint
+// @Summary Creates a new application
+// @Description Creates the provided application in the system
+// @ID create-application
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param application body db.Application true "The Application Data"
+// @Success 200 {object} Information
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /createApplication [post]
 func CreateApplication(con *gin.Context) {
 	app := mongo.Application{}
 	if err := con.ShouldBindJSON(&app); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	_, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	if db.CreateApplication(app) {
-		con.JSON(http.StatusOK, "success; application created")
+		con.JSON(http.StatusOK, Information{"success; application created"})
 	} else {
-		con.JSON(http.StatusInternalServerError, "error; application not created")
+		con.JSON(http.StatusInternalServerError, Error{"error; application not created"})
 	}
 }
 
+// UpdateApplication represents the update applications endpoint
+// @Summary Updates an existing application
+// @Description Updates an application identified by a uuid with the data in the body in the system
+// @ID update-application
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param application body db.Application true "The application data to update"
+// @Param uuid query string true "Identifier of the application to update"
+// @Success 200 {object} Information
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /updateApplication [put]
 func UpdateApplication(con *gin.Context) {
 	app := mongo.Application{}
 	if err := con.ShouldBindJSON(&app); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
 	if query.Get("uuid") == "" {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
@@ -515,32 +659,45 @@ func UpdateApplication(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	if db.UpdateApplication(uuid, app) {
-		con.JSON(http.StatusOK, "success; application updated")
+		con.JSON(http.StatusOK, Information{"success; application updated"})
 	} else {
-		con.JSON(http.StatusInternalServerError, "error; application not updated")
+		con.JSON(http.StatusInternalServerError, Error{"error; application not updated"})
 	}
 }
 
+// DeleteApplication represents the delete applications endpoint
+// @Summary Deletes an existing application
+// @Description Deletes an application identified by a uuid
+// @ID delete-application
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to delete"
+// @Success 200 {object} Information
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /deleteApplication [delete]
 func DeleteApplication(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
 	if query.Get("uuid") == "" {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
@@ -564,31 +721,45 @@ func DeleteApplication(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "unauthorized")
+		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
 		return
 	}
 	if db.DeleteApplication(uuid) {
-		con.JSON(http.StatusOK, "success; application deleted")
+		con.JSON(http.StatusOK, Information{"success; application deleted"})
 	} else {
-		con.JSON(http.StatusInternalServerError, "error; application not deleted")
+		con.JSON(http.StatusInternalServerError, Error{"error; application not deleted"})
 	}
 }
 
+// GetAbsenceFormForClasses represents get absence form for classes endpoint
+// @Summary Generates an absence form for classes
+// @Description Generates an absence form for classes and returns it
+// @ID get-absence-form-for-classes
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the pdf from"
+// @Param classes []query string false "Filter for classes"
+// @Success 200 {object} PDF
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getAbsenceFormForClasses [get]
 func GetAbsenceFormForClasses(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
@@ -618,17 +789,17 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	paths, err := files.GenerateAbsenceFormForClass(path, auth.Username, application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
 		return
 	}
 
@@ -660,46 +831,58 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 	created := filepath.Join(filepath.Dir(pp[0]), fmt.Sprintf(files.ClassAbsenceFormFileName, "merge"))
 	err = api.MergeCreateFile(pp, created, pdfcpu.NewDefaultConfiguration())
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't save merged pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't save merged pdf"})
 		return
 	}
 	file, err := ioutil.ReadFile(created)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read merged pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read merged pdf"})
 		return
 	}
 	enc := base64.StdEncoding.EncodeToString(file)
-	res := map[string]string{
-		"pdf": enc,
-	}
+	res := PDF{enc}
 	err = os.Remove(created)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't delete merged pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't delete merged pdf"})
 		return
 	}
 	con.JSON(http.StatusOK, res)
 }
 
+// GetAbsenceFormForTeacher represents get absence form for teacher endpoint
+// @Summary Generates an absence form for a teacher
+// @Description Generates an absence form for a teacher and returns it
+// @ID get-absence-form-for-teacher
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the pdf from"
+// @Param teacher query string true "UNTIS-abbrevation name of the teacher"
+// @Success 200 {object} PDF
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getAbsenceFormForTeacher [get]
 func GetAbsenceFormForTeacher(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	if _, hasTeacher := con.Request.Form["teacher"]; !hasTeacher {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	teacher := query.Get("teacher")
@@ -724,46 +907,57 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, teacher, application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
 		return
 	}
 	enc := base64.StdEncoding.EncodeToString(file)
-	res := map[string]string{
-		"pdf": enc,
-	}
+	res := PDF{enc}
 	con.JSON(http.StatusOK, res)
 }
 
+// GetCompensationForEducationalSupportForm represents get compensation for educational support form endpoint
+// @Summary Generates a compensation for educational support form for all teachers
+// @Description Generates a compensation for educational support form for all teachers and returns it
+// @ID get-compensation-for-educational-support-form
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the pdf from"
+// @Success 200 {object} PDF
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getCompensationForEducationalSupportForm [get]
 func GetCompensationForEducationalSupportForm(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
@@ -788,61 +982,75 @@ func GetCompensationForEducationalSupportForm(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	path, err = files.GenerateCompensationForEducationalSupport(path, application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
 		return
 	}
 	enc := base64.StdEncoding.EncodeToString(file)
-	res := map[string]string{
-		"pdf": enc,
-	}
+	res := PDF{enc}
 	con.JSON(http.StatusOK, res)
 }
 
+// GetTravelInvoiceForm represents get travel invoice form endpoint
+// @Summary Generates a travel invoice for a teacher
+// @Description Generates a travel invoice form for a teacher and returns it
+// @ID get-travel-invoice-form
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the pdf from"
+// @Param short query string true "Short name of the teacher this should be generated for"
+// @Param ti_id query int true "ID of the Travel Invoice data"
+// @Param receipts query bool false "If provided the pdf will include all receipt"
+// @Success 200 {object} PDF
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getTravelInvoiceForm [get]
 func GetTravelInvoiceForm(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	if _, hasShort := con.Request.Form["short"]; !hasShort {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	short := query.Get("short")
 	if _, hasTIID := con.Request.Form["ti_id"]; !hasTIID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	tiID, err := strconv.Atoi(query.Get("ti_id"))
 	if err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid ti_id provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid ti_id provided"})
 		return
 	}
 	_, applyMergeReceipts := con.Request.Form["receipts"]
@@ -867,12 +1075,12 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	var ti mongo.TravelInvoice
@@ -884,7 +1092,7 @@ func GetTravelInvoiceForm(con *gin.Context) {
 	}
 	path, err = files.GenerateTravelInvoice(path, short, ti, application.UUID)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create pdfs")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
 		return
 	}
 
@@ -893,7 +1101,7 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		uploadFolder := filepath.Join(filepath.Dir(path), files.UploadFolderName)
 		ff, err := ioutil.ReadDir(uploadFolder)
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, "couldn't read upload directory")
+			con.JSON(http.StatusInternalServerError, Error{"couldn't read upload directory"})
 			return
 		}
 		for _, file := range ff {
@@ -905,68 +1113,79 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		created := filepath.Join(filepath.Dir(path), fmt.Sprintf(files.TravelInvoicePDFFileName, short+"_merge"))
 		err = api.MergeCreateFile(pp, created, pdfcpu.NewDefaultConfiguration())
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, "couldn't save merged pdf")
+			con.JSON(http.StatusInternalServerError, Error{"couldn't save merged pdf"})
 			return
 		}
 		file, err := ioutil.ReadFile(created)
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+			con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
 			return
 		}
 		enc := base64.StdEncoding.EncodeToString(file)
-		res := map[string]string{
-			"pdf": enc,
-		}
+		res := PDF{enc}
 		err = os.Remove(created)
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, "couldn't delete merged pdf")
+			con.JSON(http.StatusInternalServerError, Error{"couldn't delete merged pdf"})
 			return
 		}
 		con.JSON(http.StatusOK, res)
 	} else {
 		file, err := ioutil.ReadFile(path)
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+			con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
 			return
 		}
 		enc := base64.StdEncoding.EncodeToString(file)
-		res := map[string]string{
-			"pdf": enc,
-		}
+		res := PDF{enc}
 		con.JSON(http.StatusOK, res)
 	}
 }
 
+// GetBusinessTripApplicationForm represents get business application form endpoint
+// @Summary Generates a business trip application form for a teacher
+// @Description Generates a business trip application form for a teacher and returns it
+// @ID get-business-trip-application-form
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the form from"
+// @Param short query string true "Short name of the teacher this should be generated for"
+// @Param bta_id query int true "ID of the Business Trip Application data"
+// @Success 200 {object} PDF
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getBusinessTripApplicationForm [get]
 func GetBusinessTripApplicationForm(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	if _, hasShort := con.Request.Form["short"]; !hasShort {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	short := query.Get("short")
 	if _, hasBTAID := con.Request.Form["bta_id"]; !hasBTAID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	btaID, err := strconv.Atoi(query.Get("bta_id"))
 	if err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid bta_id provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid bta_id provided"})
 		return
 	}
 	application := db.GetApplication(uuid)
@@ -990,12 +1209,12 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	var bta mongo.BusinessTripApplication
@@ -1007,51 +1226,64 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 	}
 	path, err = files.GenerateBusinessTripApplication(path, short, bta, application.UUID)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdf"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read generated pdf")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
 		return
 	}
 	enc := base64.StdEncoding.EncodeToString(file)
-	res := map[string]string{
-		"pdf": enc,
-	}
+	res := PDF{enc}
 	con.JSON(http.StatusOK, res)
 }
 
+// GetTravelInvoiceExcel represents get travel invoice excel endpoint
+// @Summary Generates a travel invoice excel for a teacher
+// @Description Generates a travel invoice excel for a teacher and returns it
+// @ID get-travel-invoice-excel
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the excel from"
+// @Param short query string true "Short name of the teacher this should be generated for"
+// @Param ti_id query int true "ID of the Travel Invoice data"
+// @Success 200 {object} Excel
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getTravelInvoiceExcel [get]
 func GetTravelInvoiceExcel(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	if _, hasShort := con.Request.Form["short"]; !hasShort {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	short := query.Get("short")
 	if _, hasTIID := con.Request.Form["ti_id"]; !hasTIID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	tiID, err := strconv.Atoi(query.Get("ti_id"))
 	if err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid ti_id provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid ti_id provided"})
 		return
 	}
 	application := db.GetApplication(uuid)
@@ -1075,12 +1307,12 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	var ti mongo.TravelInvoice
@@ -1092,51 +1324,64 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 	}
 	path, err = files.GenerateTravelInvoiceExcel(path, short, ti)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create excel")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create excel"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read generated excel")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read generated excel"})
 		return
 	}
 	enc := base64.StdEncoding.EncodeToString(file)
-	res := map[string]string{
-		"excel": enc,
-	}
+	res := Excel{enc}
 	con.JSON(http.StatusOK, res)
 }
 
+// GetBusinessTripApplicationExcel represents get business application excel endpoint
+// @Summary Generates a business trip application excel for a teacher
+// @Description Generates a business trip application excel for a teacher and returns it
+// @ID get-business-trip-application-excel
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the excel from"
+// @Param short query string true "Short name of the teacher this should be generated for"
+// @Param bta_id query int true "ID of the Business Trip Application data"
+// @Success 200 {object} Excel
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getBusinessTripApplicationExcel [get]
 func GetBusinessTripApplicationExcel(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	if _, hasShort := con.Request.Form["short"]; !hasShort {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	short := query.Get("short")
 	if _, hasBTAID := con.Request.Form["bta_id"]; !hasBTAID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	btaID, err := strconv.Atoi(query.Get("bta_id"))
 	if err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid bta_id provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid bta_id provided"})
 		return
 	}
 	application := db.GetApplication(uuid)
@@ -1160,12 +1405,12 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 		}
 	}
 	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	var bta mongo.BusinessTripApplication
@@ -1177,48 +1422,58 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 	}
 	path, err = files.GenerateBusinessTripApplicationExcel(path, short, bta)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create excel")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create excel"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read generated excel")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read generated excel"})
 		return
 	}
 	enc := base64.StdEncoding.EncodeToString(file)
-	res := map[string]string{
-		"excel": enc,
-	}
+	res := Excel{enc}
 	con.JSON(http.StatusOK, res)
 }
 
+// SaveBillingReceipt represents get save billing receipt endpoint
+// @Summary Saves a billing receipt
+// @Description Saves a billing receipt in the context of an application
+// @ID save-billing-receipt
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param uuid query string true "Identifier of the application to generate the excel from"
+// @Param short query string true "Short name of the teacher this should be generated for"
+// @Success 200 {object} Information
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /saveBillingReceipt [post]
 func SaveBillingReceipt(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
-		con.JSON(http.StatusUnauthorized, "you are not logged in")
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
-	r := struct {
-		PDFs []string `json:"pdfs"`
-	}{}
+	r := PDFs{}
 	if err := con.ShouldBindJSON(&r); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
 	defer db.Close()
 	if !db.Connect() {
-		con.JSON(http.StatusInternalServerError, "database didn't respond")
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	uuid := query.Get("uuid")
 	if _, hasShort := con.Request.Form["short"]; !hasShort {
-		con.JSON(http.StatusUnprocessableEntity, "invalid request structure provided")
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	short := query.Get("short")
@@ -1243,17 +1498,17 @@ func SaveBillingReceipt(con *gin.Context) {
 		}
 	}
 	if !in {
-		con.JSON(http.StatusUnauthorized, "you have no permission to do this")
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
 	path, err := files.GenerateFileEnvironment(application)
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't create directories")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
 	ff, err := ioutil.ReadDir(filepath.Join(path, files.UploadFolderName))
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, "couldn't read upload directory")
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read upload directory"})
 		return
 	}
 	counter := 1
@@ -1263,26 +1518,27 @@ func SaveBillingReceipt(con *gin.Context) {
 			counter += 1
 		}
 	}
-	for i, pdf := range r.PDFs {
+	for i, pdf := range r.Files {
 		name := fmt.Sprintf(files.ReceiptFileName, i+counter, short)
-		dec, err := base64.StdEncoding.DecodeString(pdf)
+		dec, err := base64.StdEncoding.DecodeString(pdf.Content)
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't decode the pdf file: %v", name))
+			con.JSON(http.StatusInternalServerError, Error{fmt.Sprintf("couldn't decode the pdf file: %v", name)})
 			return
 		}
 		file, err := os.Create(filepath.Join(files.BasePath, files.UploadFolderName, name))
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't create the pdf file: %v", name))
+			con.JSON(http.StatusInternalServerError, Error{fmt.Sprintf("couldn't create the pdf file: %v", name)})
 			return
 		}
 		if _, err := file.Write(dec); err != nil {
-			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't write the pdf file: %v", name))
+			con.JSON(http.StatusInternalServerError, Error{fmt.Sprintf("couldn't write the pdf file: %v", name)})
 			return
 		}
 		if err := file.Sync(); err != nil {
-			con.JSON(http.StatusInternalServerError, fmt.Sprintf("couldn't sync the pdf file: %v", name))
+			con.JSON(http.StatusInternalServerError, Error{fmt.Sprintf("couldn't sync the pdf file: %v", name)})
 			return
 		}
 		_ = file.Close()
 	}
+	con.JSON(http.StatusOK, Information{"saving successful"})
 }

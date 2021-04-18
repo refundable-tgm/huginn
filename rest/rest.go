@@ -1,8 +1,9 @@
 package rest
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"   // gin swagger middleware
+	"github.com/swaggo/gin-swagger/swaggerFiles" // swagger files
 	"log"
 	"net/http"
 	"strconv"
@@ -11,8 +12,21 @@ import (
 // Port is the port this api will listen to
 const Port = 8080
 
-// StartService starts the complete rest service and registers every endpoint.
-// It also starts the token manager
+// StartService starts the rest service
+// @title Refundable
+// @version 1.1
+// @description This REST-API provides the backend of Refundable
+// @contact.name Entwickler (Michael Beier)
+// @contact.url http://mbeier.at
+// @contact.email admin@mbeier.at
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @license.name MIT
+// @license.url https://github.com/refundable-tgm/huginn/blob/master/LICENSE
+// @host localhost:8080
+// @BasePath /
+// @query.collection.format multi
 func StartService() {
 	InitTokenManager()
 	router := gin.Default()
@@ -24,9 +38,9 @@ func StartService() {
 	router.GET("/getTeacher", AuthWall(), GetTeacher)
 	router.GET("/setTeacherPermissions", AuthWall(), SetTeacherPermissions)
 	router.GET("/getActiveApplications", AuthWall(), GetActiveApplications)
-	router.GET("/getAllApplications", AuthWall(), GetAllApplication)
+	router.GET("/getAllApplications", AuthWall(), GetAllApplications)
 	router.GET("/getNews", AuthWall(), GetNews)
-	router.GET("/getAdminApplication", AuthWall(), GetAdminApplication)
+	router.GET("/getAdminApplications", AuthWall(), GetAdminApplications)
 	router.GET("/getApplication", AuthWall(), GetApplication)
 	router.POST("/createApplication", AuthWall(), CreateApplication)
 	router.PUT("/updateApplication", AuthWall(), UpdateApplication)
@@ -41,7 +55,12 @@ func StartService() {
 	router.POST("/saveBillingReceipt", AuthWall(), SaveBillingReceipt)
 
 	router.NoRoute(func(context *gin.Context) {
-		context.JSON(http.StatusNotFound, gin.H{"error": fmt.Errorf("this endpoint doesn't exist")})
+		context.JSON(http.StatusNotFound, Error{"this endpoint doesn't exist"})
+	})
+
+	router.GET("doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/", func(context *gin.Context) {
+		context.Redirect(http.StatusMovedPermanently, "doc/index.html")
 	})
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
