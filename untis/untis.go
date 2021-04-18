@@ -39,6 +39,7 @@ type Client struct {
 	Authenticated bool
 }
 
+// Lesson represents a lesson out of a timetable
 type Lesson struct {
 	// Start is the start time of the lesson
 	Start time.Time
@@ -123,9 +124,8 @@ func (client *Client) Authenticate() error {
 		client.Authenticated = true
 		client.Closed = false
 		return nil
-	} else {
-		return fmt.Errorf("IDs not matching")
 	}
+	return fmt.Errorf("IDs not matching")
 }
 
 // GetTimetableOfTeacher returns a list of lessons the teacher logged in with the client has in between start and end
@@ -522,9 +522,8 @@ func (client Client) ResolveTeachers(ids []int) ([]string, error) {
 			}
 		}
 		return teacher, nil
-	} else {
-		return nil, fmt.Errorf("ids not matching")
 	}
+	return nil, fmt.Errorf("ids not matching")
 }
 
 // ResolveTeacherID converts a teacher name to the corersponding teacher id
@@ -565,9 +564,8 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 			}
 		}
 		return -1, fmt.Errorf("class not found")
-	} else {
-		return -1, fmt.Errorf("ids not matching")
 	}
+	return -1, fmt.Errorf("ids not matching")
 }
 
 // ResolveRooms converts an array of room ids into an array of room names
@@ -610,12 +608,11 @@ func (client Client) ResolveRooms(ids []int) ([]string, error) {
 			}
 		}
 		return rooms, nil
-	} else {
-		return nil, fmt.Errorf("ids not matching")
 	}
+	return nil, fmt.Errorf("ids not matching")
 }
 
-// ResolveClassID converts an array of class ids into an array of class names
+// ResolveClasses converts an array of class ids into an array of class names
 func (client Client) ResolveClasses(ids []int) ([]string, error) {
 	if !client.Authenticated {
 		return nil, fmt.Errorf("not authenticated")
@@ -657,9 +654,8 @@ func (client Client) ResolveClasses(ids []int) ([]string, error) {
 			}
 		}
 		return classes, nil
-	} else {
-		return nil, fmt.Errorf("ids not matching")
 	}
+	return nil, fmt.Errorf("ids not matching")
 }
 
 // ResolveClassID converts a class name to the corresponding class id
@@ -701,9 +697,8 @@ func (client Client) ResolveClassID(class string) (int, error) {
 			}
 		}
 		return -1, fmt.Errorf("class not found")
-	} else {
-		return -1, fmt.Errorf("ids not matching")
 	}
+	return -1, fmt.Errorf("ids not matching")
 }
 
 // Close closes an authenticated connection to the untis api

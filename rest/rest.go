@@ -2,6 +2,7 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
+	// import to make swagger docs accessible
 	_ "github.com/refundable-tgm/huginn/docs"
 	ginSwagger "github.com/swaggo/gin-swagger"   // gin swagger middleware
 	"github.com/swaggo/gin-swagger/swaggerFiles" // swagger files

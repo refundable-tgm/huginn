@@ -10,25 +10,25 @@ type User struct {
 
 // TokenPair consists of an access and a refresh token
 type TokenPair struct {
-	// AccessToken the access token
+	// the access token
 	AccessToken string `json:"access_token"`
-	// RefreshToken the refresh token
+	// the refresh token
 	RefreshToken string `json:"refresh_token"`
 }
 
 // Error maps an error message
 type Error struct {
-	// Message is the message that should be sent
+	// the message that should be sent
 	Message string `json:"error"`
 }
 
 // Information maps an information message
 type Information struct {
-	// Message is the message that should be sent
+	// the message that should be sent
 	Message string `json:"info"`
 }
 
-// Refreshtoken maps an refresh token
+// RefreshToken maps an refresh token
 type RefreshToken struct {
 	// Token is the refresh token
 	Token string `json:"refresh_token"`

@@ -187,7 +187,7 @@ func GetTeacherByShort(con *gin.Context) {
 	con.JSON(http.StatusOK, teacher)
 }
 
-// GetTeacherByShort represents the get teacher endpoint
+// GetTeacher represents the get teacher endpoint
 // @Summary Returns a teacher with the specified UUID
 // @Description Searches for the Teacher with the specified uuid and returns the data
 // @ID get-teacher
@@ -1515,7 +1515,7 @@ func SaveBillingReceipt(con *gin.Context) {
 	for _, file := range ff {
 		data := strings.Split(file.Name(), "_")
 		if data[1] == short {
-			counter += 1
+			counter++
 		}
 	}
 	for i, pdf := range r.Files {

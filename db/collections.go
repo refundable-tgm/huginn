@@ -124,7 +124,7 @@ type Application struct {
 	TravelInvoices []TravelInvoice `json:"travel_invoices"`
 }
 
-// Details an Application has if it is of the kind of SchoolEvent
+// SchoolEventDetails are details an Application has if it is of the kind of SchoolEvent
 type SchoolEventDetails struct {
 	// The participating classes
 	Classes []string `json:"classes"`
@@ -138,7 +138,7 @@ type SchoolEventDetails struct {
 	Teachers []SchoolEventTeacherDetails `json:"teachers"`
 }
 
-// The details of each teacher participating in a SchoolEvent
+// SchoolEventTeacherDetails are details of each teacher participating in a SchoolEvent
 type SchoolEventTeacherDetails struct {
 	// The full name of a teacher
 	Name string `json:"name"`
@@ -158,7 +158,7 @@ type SchoolEventTeacherDetails struct {
 	Role int `json:"role"`
 }
 
-// Details an Application has if it is of the kind of Training
+// TrainingDetails are details an Application has if it is of the kind of Training
 type TrainingDetails struct {
 	// The kind of Training
 	Kind int `json:"kind"`
@@ -170,7 +170,7 @@ type TrainingDetails struct {
 	Organizer string `json:"organizer"`
 }
 
-// Details an Application has if it isnt a Training or SchoolEvent
+// OtherReasonDetails are details an Application has if it isnt a Training or SchoolEvent
 type OtherReasonDetails struct {
 	// The kind of other Reason this Application is filed
 	Kind int `json:"kind"`
@@ -314,7 +314,7 @@ type TravelInvoice struct {
 	Calculation Calculation `json:"calculation"`
 }
 
-// The calculations in a TravelInvoice
+// Calculation represent the calc field in a TravelInvoice
 type Calculation struct {
 	// the id of this calculation
 	ID int `json:"id"`
@@ -332,7 +332,7 @@ type Calculation struct {
 	SumOfSums float32 `json:"sum_of_sums"`
 }
 
-// The specific Row in a Calculation
+// A Row in a Calculation
 type Row struct {
 	// The row nr
 	NR int `json:"nr"`
@@ -358,7 +358,7 @@ type Row struct {
 	Sum float32 `json:"sum"`
 }
 
-// Further information of a Teacher (which isnt saved in the LDAP-instance)
+// Teacher includes further information of a teacher (which isnt saved in the LDAP-instance)
 type Teacher struct {
 	// the uuid of this Teacher
 	UUID string `json:"uuid"`
