@@ -1,0 +1,1342 @@
+definitions:
+  db.Application:
+    properties:
+      business_trip_applications:
+        description: The regarding BusinessTripApplication for each teacher
+        items:
+          $ref: '#/definitions/db.BusinessTripApplication'
+        type: array
+      destination_address:
+        description: The Destination Address of this Application
+        type: string
+      end_time:
+        description: the time the underlying event of this Application ends
+        type: string
+      kind:
+        description: The kind of this Application (for more see the Enum for the kinds
+          of Application on this level only Training, SchoolEvent and OtherReason
+          is applicable, the sub kinds should be used in the further detail section
+          of the corresponding site)
+        type: integer
+      last_changed:
+        description: The timestamp this application was changed last
+        type: string
+      miscellaneous_reason:
+        description: The Reasoning of this Application (there is none if this isn't
+          of the type Miscellaneous)
+        type: string
+      name:
+        description: The name on how this Application should be referenced by
+        type: string
+      notes:
+        description: Other Notes regarding this Application
+        type: string
+      other_reason_details:
+        $ref: '#/definitions/db.OtherReasonDetails'
+        description: Further Details if this is of the kind of any other, if not this
+          will be empty
+      progress:
+        description: The Progress of this Application in filing (for more see the
+          Enum for the Progress)
+        type: integer
+      school_event_details:
+        $ref: '#/definitions/db.SchoolEventDetails'
+        description: Further Details if this is of the kind SchoolEvent, if not this
+          will be empty
+      start_address:
+        description: The starting address of this Application
+        type: string
+      start_time:
+        description: the time the underlying event of this Application starts
+        type: string
+      training_details:
+        $ref: '#/definitions/db.TrainingDetails'
+        description: Further Details if this is of the kind Training, if not this
+          will be empty
+      travel_invoices:
+        description: The regarding TravelInvoice for each teacher
+        items:
+          $ref: '#/definitions/db.TravelInvoice'
+        type: array
+      uuid:
+        description: A generated uuid of this application
+        type: string
+    type: object
+  db.BusinessTripApplication:
+    properties:
+      bonus_mile_confirmation_1:
+        description: the confirmation of the first bonus mile clause
+        type: boolean
+      bonus_mile_confirmation_2:
+        description: the confirmation of the second bonus mile clause
+        type: boolean
+      business_card_emitted_outward:
+        description: whether a business card was emitted outwards
+        type: boolean
+      business_card_emitted_return:
+        description: whether a business card was emitted on the return
+        type: boolean
+      date_application_approved:
+        description: the date this application is approved
+        type: string
+      date_application_filed:
+        description: the date this application is filed
+        type: string
+      degree:
+        description: Degree of the Teacher
+        type: string
+      end_point:
+        description: 'The end point (see the regarding Enum: OwnApartment or Office)'
+        type: integer
+      estimated_costs:
+        description: the total estimated costs
+        type: number
+      id:
+        description: The id (counting upwards) of this BusinessTripApplication regarding
+          to the uid
+        type: integer
+      name:
+        description: Name of the Teacher
+        type: string
+      other_costs:
+        description: other costs which appeared
+        type: number
+      other_participants:
+        description: The name of other participants of this trip
+        items:
+          type: string
+        type: array
+      paid_by_whom:
+        description: if some costs are paid by someone else by whom
+        type: string
+      reasoning:
+        description: The reasoing behind the trip application
+        type: string
+      referee:
+        description: the referee checking this application
+        type: string
+      service_begin_time:
+        description: The time the service begins
+        type: string
+      service_end_time:
+        description: The time the service ends
+        type: string
+      staffnr:
+        description: The staffnr of the regarding teacher
+        type: integer
+      starting_point:
+        description: 'The starting point (see the regarding Enum: OwnApartment or
+          Office'
+        type: integer
+      staying_costs_paid_by_someone:
+        description: whether the staying costs are paid by someone else
+        type: boolean
+      surname:
+        description: Surname of the Teacher
+        type: string
+      title:
+        description: Title of the Teacher
+        type: string
+      travel_costs_paid_by_someone:
+        description: whether the travel costs are paid by someone else
+        type: boolean
+      travel_mode:
+        description: The travel mode (see the regarding Enum for this)
+        type: integer
+      travel_purpose:
+        description: The purpose of travelling
+        type: string
+      trip_begin_time:
+        description: The time the trip begins
+        type: string
+      trip_end_time:
+        description: The time the trip ends
+        type: string
+      trip_goal:
+        description: The trip goal (address)
+        type: string
+    type: object
+  db.Calculation:
+    properties:
+      id:
+        description: the id of this calculation
+        type: integer
+      rows:
+        description: rows of this calculation
+        items:
+          $ref: '#/definitions/db.Row'
+        type: array
+      sum_additional_costs:
+        description: the sum of all additional costs
+        type: number
+      sum_daily_charges:
+        description: the sum of all daily charges
+        type: number
+      sum_nightly_charges:
+        description: the sum of all nightly charges
+        type: number
+      sum_of_sums:
+        description: the sum of all sums
+        type: number
+      sum_travel_costs:
+        description: the sum of all travel costs
+        type: number
+    type: object
+  db.OtherReasonDetails:
+    properties:
+      filer:
+        description: the teacher this application belongs to
+        type: string
+      kind:
+        description: The kind of other Reason this Application is filed
+        type: integer
+      miscellaneous_reason:
+        description: the reasoning if the other reason is of kind Miscellaneous
+        type: string
+      service_mandate_gz:
+        description: the gz number if the other reason is a ServiceMandate
+        type: integer
+      service_mandate_title:
+        description: The title if the other reason is a ServiceMandate
+        type: string
+    type: object
+  db.Row:
+    properties:
+      additional_costs:
+        description: the additionalCosts this Row conducts
+        type: number
+      begin:
+        description: the begin time this Row refers to
+        type: string
+      daily_charges:
+        description: the dailyCharges this Row conducts
+        type: number
+      date:
+        description: The date this Row refers to
+        type: string
+      end:
+        description: the end time this Row refers to
+        type: string
+      kilometres:
+        description: the amount of kilometres this row refers to
+        type: number
+      kind_of_cost:
+        description: the kind of costs this row describes (see costs enum)
+        items:
+          type: integer
+        type: array
+      nightly_charges:
+        description: the nightlyCharges this Row conducts
+        type: number
+      nr:
+        description: The row nr
+        type: integer
+      sum:
+        description: the sum of all costs in this Row
+        type: number
+      travel_costs:
+        description: the travelCosts this Row conducts
+        type: number
+    type: object
+  db.SchoolEventDetails:
+    properties:
+      amount_female_students:
+        description: The amount of female students
+        type: integer
+      amount_male_students:
+        description: The amount of male students
+        type: integer
+      classes:
+        description: The participating classes
+        items:
+          type: string
+        type: array
+      duration_in_days:
+        description: The duration of the event in days
+        type: integer
+      teachers:
+        description: Details of each teacher participating in the SchoolEvent
+        items:
+          $ref: '#/definitions/db.SchoolEventTeacherDetails'
+        type: array
+    type: object
+  db.SchoolEventTeacherDetails:
+    properties:
+      attendance_from:
+        description: The teacher will be attending the SchoolEvent from
+        type: string
+      attendance_till:
+        description: The teacher will be attend the SchoolEvent till
+        type: string
+      group:
+        description: The group number
+        type: integer
+      meeting_point:
+        description: Where the teacher will meet with the group to travel together
+        type: string
+      name:
+        description: The full name of a teacher
+        type: string
+      role:
+        description: The role of each teacher (Leader or Companion)
+        type: integer
+      shortname:
+        description: The short name (abbrevation) of a teacher
+        type: string
+      start_address:
+        description: Where the teacher starts their travel from
+        type: string
+    type: object
+  db.Teacher:
+    properties:
+      administration:
+        description: whether this Teacher as administration rights
+        type: boolean
+      av:
+        description: whether this Teacher as av rights
+        type: boolean
+      longname:
+        description: the longname (firstname + sirname) of the Teacher
+        type: string
+      pek:
+        description: whether this Teacher as pek rights
+        type: boolean
+      short:
+        description: the short name of the Teacher
+        type: string
+      super_user:
+        description: Superuser (total admin) of this software
+        type: boolean
+      uuid:
+        description: the uuid of this Teacher
+        type: string
+    type: object
+  db.TrainingDetails:
+    properties:
+      kind:
+        description: The kind of Training
+        type: integer
+      miscellaneous_reason:
+        description: if its miscellaneous a reasoning for the Training
+        type: string
+      organizer:
+        description: The company who organizes the Training
+        type: string
+      ph:
+        description: the personnel number of the teacher
+        type: integer
+    type: object
+  db.TravelInvoice:
+    properties:
+      approval_date:
+        description: the date this application was approved
+        type: string
+      breakfasts:
+        description: the amount of breakfasts
+        type: integer
+      calculation:
+        $ref: '#/definitions/db.Calculation'
+        description: the regarding calculation
+      clerk:
+        description: the clerk maintaining and checking this application
+        type: string
+      daily_charges_mode:
+        description: the mode how daily charges are handled
+        type: integer
+      degree:
+        description: Degree of the Teacher
+        type: string
+      dinners:
+        description: the amount of dinners
+        type: integer
+      end_point:
+        description: the end point of the trip
+        type: string
+      filing_date:
+        description: the date this application was filed
+        type: string
+      id:
+        description: The id (counting upwards) of this TravelInvoice regarding to
+          the uid
+        type: integer
+      kilometre_allowance:
+        description: whether the teacher got a kilometre allowance
+        type: boolean
+      kilometre_amount:
+        description: the regarding kilometre amount
+        type: number
+      lunches:
+        description: the amount of lunches
+        type: integer
+      name:
+        description: Name of the Teacher
+        type: string
+      nightly_charges_mode:
+        description: the mode how nightly charges are handled
+        type: integer
+      no_travel_costs:
+        description: whether there aren't any travel costs
+        type: boolean
+      nr_and_indications_of_participants:
+        description: whether the participants of the trip are counted and clearly
+          indicated
+        type: boolean
+      official_business_card_got:
+        description: whether the teacher got a official business card
+        type: boolean
+      replacement_for_advantage_card:
+        description: whether the teacher got a replacement for an advantage card
+        type: boolean
+      replacement_for_train_card_class_2:
+        description: whether the teacher got a replacement for a train card class
+          2
+        type: boolean
+      reviewer:
+        description: the reviewer reviewing the approval of this application
+        type: string
+      shortened_amount:
+        description: the amount the daily charges should be shortened
+        type: number
+      staffnr:
+        description: The personnel number of the teacher
+        type: integer
+      starting_point:
+        description: the starting point of the trip
+        type: string
+      surname:
+        description: Surname of the Teacher
+        type: string
+      title:
+        description: Title of the Teacher
+        type: string
+      travel_costs_cited:
+        description: whether the travel costs are clearly cited
+        type: boolean
+      travel_costs_pre_grant:
+        description: The granted travel costs
+        type: number
+      travel_grant:
+        description: whether the teacher got a travel grant
+        type: boolean
+      trip_begin_time:
+        description: The time the trip begins
+        type: string
+      trip_end_time:
+        description: The time the trip ends
+        type: string
+      zi:
+        description: the zi number
+        type: integer
+    type: object
+  rest.Error:
+    properties:
+      error:
+        description: Message is the message that should be sent
+        type: string
+    type: object
+  rest.Excel:
+    properties:
+      excel:
+        description: Content is the content of the excel file
+        type: string
+    type: object
+  rest.Information:
+    properties:
+      info:
+        description: Message is the message that should be sent
+        type: string
+    type: object
+  rest.News:
+    properties:
+      last_changed:
+        description: LastChanged is the date of last changes of the application
+        type: string
+      state:
+        description: State of the application
+        type: integer
+      title:
+        description: Title of the application
+        type: string
+      uuid:
+        description: UUID of the application
+        type: string
+    type: object
+  rest.PDF:
+    properties:
+      pdf:
+        description: Content is the content of this file
+        type: string
+    type: object
+  rest.Permissions:
+    properties:
+      administration:
+        description: Administration permission
+        type: boolean
+      av:
+        description: AV permission
+        type: boolean
+      pek:
+        description: PEK permission
+        type: boolean
+      super_user:
+        description: SuperUser permission
+        type: boolean
+    type: object
+  rest.RefreshToken:
+    properties:
+      refresh_token:
+        description: Token is the refresh token
+        type: string
+    type: object
+  rest.TokenPair:
+    properties:
+      access_token:
+        description: AccessToken the access token
+        type: string
+      refresh_token:
+        description: RefreshToken the refresh token
+        type: string
+    type: object
+  rest.User:
+    properties:
+      password:
+        description: Password of the user
+        type: string
+      username:
+        description: Username of the user
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /createApplication:
+    post:
+      consumes:
+      - application/json
+      description: Creates the provided application in the system
+      operationId: create-application
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: The Application Data
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/db.Application'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Creates a new application
+  /deleteApplication:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an application identified by a uuid
+      operationId: delete-application
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to delete
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Deletes an existing application
+  /getAbsenceFormForClasses:
+    get:
+      consumes:
+      - application/json
+      description: Generates an absence form for classes and returns it
+      operationId: get-absence-form-for-classes
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the pdf from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Filter for classes
+        in: query
+        items:
+          type: string
+        name: classes
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.PDF'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates an absence form for classes
+  /getAbsenceFormForTeacher:
+    get:
+      consumes:
+      - application/json
+      description: Generates an absence form for a teacher and returns it
+      operationId: get-absence-form-for-teacher
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the pdf from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: UNTIS-abbrevation name of the teacher
+        in: query
+        name: teacher
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.PDF'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates an absence form for a teacher
+  /getActiveApplications:
+    get:
+      consumes:
+      - application/json
+      description: Returns all active applications as a list of applications
+      operationId: get-all-active-applications
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Filter to only show applications of this teacher
+        in: query
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Application'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns all active applications
+  /getAllApplications:
+    get:
+      consumes:
+      - application/json
+      description: Returns all applications as a list of applications
+      operationId: get-all-applications
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Filter to only show applications of this teacher
+        in: query
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Application'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns all applications
+  /getApplication:
+    get:
+      consumes:
+      - application/json
+      description: Returns all applications currently needing a review by an admin
+      operationId: get-admin-applications
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Application'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns all admin applications
+  /getBusinessTripApplicationExcel:
+    get:
+      consumes:
+      - application/json
+      description: Generates a business trip application excel for a teacher and returns
+        it
+      operationId: get-business-trip-application-excel
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the excel from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Short name of the teacher this should be generated for
+        in: query
+        name: short
+        required: true
+        type: string
+      - description: ID of the Business Trip Application data
+        in: query
+        name: bta_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Excel'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates a business trip application excel for a teacher
+  /getBusinessTripApplicationForm:
+    get:
+      consumes:
+      - application/json
+      description: Generates a business trip application form for a teacher and returns
+        it
+      operationId: get-business-trip-application-form
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the form from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Short name of the teacher this should be generated for
+        in: query
+        name: short
+        required: true
+        type: string
+      - description: ID of the Business Trip Application data
+        in: query
+        name: bta_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.PDF'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates a business trip application form for a teacher
+  /getCompensationForEducationalSupportForm:
+    get:
+      consumes:
+      - application/json
+      description: Generates a compensation for educational support form for all teachers
+        and returns it
+      operationId: get-compensation-for-educational-support-form
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the pdf from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.PDF'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates a compensation for educational support form for all teachers
+  /getNews:
+    get:
+      consumes:
+      - application/json
+      description: Returns the 10 last changed applications
+      operationId: get-news
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/rest.News'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns the news
+  /getTeacher:
+    get:
+      consumes:
+      - application/json
+      description: Searches for the Teacher with the specified uuid and returns the
+        data
+      operationId: get-teacher
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: UUID of Teacher
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Teacher'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns a teacher with the specified UUID
+  /getTeacherByShort:
+    get:
+      consumes:
+      - application/json
+      description: Searches for the Teacher with the specified name and returns the
+        data
+      operationId: get-teacher-by-short
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Short Name of Teacher
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Teacher'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns a teacher with the specified short name
+  /getTravelInvoiceExcel:
+    get:
+      consumes:
+      - application/json
+      description: Generates a travel invoice excel for a teacher and returns it
+      operationId: get-travel-invoice-excel
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the excel from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Short name of the teacher this should be generated for
+        in: query
+        name: short
+        required: true
+        type: string
+      - description: ID of the Travel Invoice data
+        in: query
+        name: ti_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Excel'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates a travel invoice excel for a teacher
+  /getTravelInvoiceForm:
+    get:
+      consumes:
+      - application/json
+      description: Generates a travel invoice form for a teacher and returns it
+      operationId: get-travel-invoice-form
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the pdf from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Short name of the teacher this should be generated for
+        in: query
+        name: short
+        required: true
+        type: string
+      - description: ID of the Travel Invoice data
+        in: query
+        name: ti_id
+        required: true
+        type: integer
+      - description: If provided the pdf will include all receipt
+        in: query
+        name: receipts
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.PDF'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Generates a travel invoice for a teacher
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user using username and password
+      operationId: login
+      parameters:
+      - description: Account Information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/rest.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.TokenPair'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Login a user
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Destroys the session of a user
+      operationId: logout
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Logs out a user
+  /refresh:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new token pair when a valid refresh token is provided
+      operationId: refresh
+      parameters:
+      - description: Refresh Token
+        in: body
+        name: token
+        required: true
+        schema:
+          $ref: '#/definitions/rest.RefreshToken'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/rest.TokenPair'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Refreshes the token pair of a session
+  /saveBillingReceipt:
+    post:
+      consumes:
+      - application/json
+      description: Saves a billing receipt in the context of an application
+      operationId: save-billing-receipt
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Identifier of the application to generate the excel from
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Short name of the teacher this should be generated for
+        in: query
+        name: short
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Saves a billing receipt
+  /setTeacherPermissions:
+    post:
+      consumes:
+      - application/json
+      description: Sets the permissions of a Teacher to update their access rights
+      operationId: set-teacher-permissions
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Permission data of the teacher
+        in: body
+        name: perm
+        required: true
+        schema:
+          $ref: '#/definitions/rest.Permissions'
+      - description: UUID of the teacher whos permissions will be changed
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Teacher'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Sets the permissions of a Teacher
+  /updateApplication:
+    put:
+      consumes:
+      - application/json
+      description: Updates an application identified by a uuid with the data in the
+        body in the system
+      operationId: update-application
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: The application data to update
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/db.Application'
+      - description: Identifier of the application to update
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Updates an existing application
+swagger: "2.0"
