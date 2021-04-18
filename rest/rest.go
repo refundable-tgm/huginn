@@ -1,8 +1,10 @@
 package rest
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 	"strconv"
 )
 
@@ -34,6 +36,10 @@ func StartService() {
 	router.GET("/getTravelInvoiceExcel", AuthWall(), GetTravelInvoiceExcel)
 	router.GET("/getBusinessTripApplicationExcel", AuthWall(), GetBusinessTripApplicationExcel)
 	router.POST("/saveBillingReceipt", AuthWall(), SaveBillingReceipt)
+
+	router.NoRoute(func(context *gin.Context) {
+		context.JSON(http.StatusNotFound, fmt.Errorf("this endpoint doesn't exist"))
+	})
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
