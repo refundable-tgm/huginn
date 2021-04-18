@@ -1954,7 +1954,7 @@ type swaggerInfo struct {
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.1",
 	Host:        "localhost:8080",
-	BasePath:    "/",
+	BasePath:    "/api",
 	Schemes:     []string{},
 	Title:       "Refundable",
 	Description: "This REST-API provides the backend of Refundable",
