@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   db.Application:
     properties:
@@ -506,8 +507,18 @@ definitions:
         description: Username of the user
         type: string
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: admin@mbeier.at
+    name: Michael Beier - Entwickler
+    url: https://mbeier.at
+  description: This REST-API provides the backend of Refundable
+  license:
+    name: MIT
+    url: https://github.com/refundable-tgm/huginn/blob/master/LICENSE
+  title: Refundable
+  version: "1.1"
 paths:
   /createApplication:
     post:
@@ -604,7 +615,8 @@ paths:
         name: uuid
         required: true
         type: string
-      - description: Filter for classes
+      - collectionFormat: multi
+        description: Filter for classes
         in: query
         items:
           type: string
@@ -1339,4 +1351,9 @@ paths:
           schema:
             $ref: '#/definitions/rest.Error'
       summary: Updates an existing application
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

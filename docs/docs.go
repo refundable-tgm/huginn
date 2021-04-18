@@ -18,7 +18,15 @@ var doc = `{
     "info": {
         "description": "{{.Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Michael Beier - Entwickler",
+            "url": "https://mbeier.at",
+            "email": "admin@mbeier.at"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/refundable-tgm/huginn/blob/master/LICENSE"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -170,6 +178,7 @@ var doc = `{
                         "items": {
                             "type": "string"
                         },
+                        "collectionFormat": "multi",
                         "description": "Filter for classes",
                         "name": "classes",
                         "in": "query"
@@ -1922,6 +1931,13 @@ var doc = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -1936,12 +1952,12 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "",
-	Host:        "",
-	BasePath:    "",
+	Version:     "1.1",
+	Host:        "localhost:8080",
+	BasePath:    "/",
 	Schemes:     []string{},
-	Title:       "",
-	Description: "",
+	Title:       "Refundable",
+	Description: "This REST-API provides the backend of Refundable",
 }
 
 type s struct{}

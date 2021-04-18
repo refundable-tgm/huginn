@@ -1,8 +1,21 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This REST-API provides the backend of Refundable",
+        "title": "Refundable",
+        "contact": {
+            "name": "Michael Beier - Entwickler",
+            "url": "https://mbeier.at",
+            "email": "admin@mbeier.at"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/refundable-tgm/huginn/blob/master/LICENSE"
+        },
+        "version": "1.1"
     },
+    "host": "localhost:8080",
+    "basePath": "/",
     "paths": {
         "/createApplication": {
             "post": {
@@ -150,6 +163,7 @@
                         "items": {
                             "type": "string"
                         },
+                        "collectionFormat": "multi",
                         "description": "Filter for classes",
                         "name": "classes",
                         "in": "query"
@@ -1901,6 +1915,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

@@ -16,8 +16,8 @@ const Port = 8080
 // @title Refundable
 // @version 1.1
 // @description This REST-API provides the backend of Refundable
-// @contact.name Entwickler (Michael Beier)
-// @contact.url http://mbeier.at
+// @contact.name Michael Beier - Entwickler
+// @contact.url https://mbeier.at
 // @contact.email admin@mbeier.at
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
@@ -58,7 +58,7 @@ func StartService() {
 		context.JSON(http.StatusNotFound, Error{"this endpoint doesn't exist"})
 	})
 
-	router.GET("doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/doc/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/", func(context *gin.Context) {
 		context.Redirect(http.StatusMovedPermanently, "doc/index.html")
 	})
