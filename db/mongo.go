@@ -18,6 +18,9 @@ const TeacherCollection = "Teacher"
 // ApplicationCollection is the name of the collection in which the Application data is stored in
 const ApplicationCollection = "Application"
 
+// SuperUserPath is the path to a file containing the name of the first Teacher to become a super user
+const SuperUserPath = "/vol/files/.superuser"
+
 // The MongoDatabaseConnector saves data used for the mongo db connection
 type MongoDatabaseConnector struct {
 	// the name of the database in the mongo db server
@@ -165,6 +168,9 @@ func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
 	teacher.UUID = uuid.New().String()
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if teacher.Short == getInitUserName() {
+		teacher.SuperUser = true
+	}
 	insert, err := collection.InsertOne(m.context, teacher)
 	if err != nil {
 		log.Println(err)
@@ -250,4 +256,13 @@ func resolveURI() (URI string, database string, ok bool) {
 		return "", "", false
 	}
 	return "mongodb://" + string(username) + ":" + string(password) + "@" + "mongo:27017", database, true
+}
+
+// getInitUserName returns the in the config file set username to set the first super user
+func getInitUserName() string {
+	file, err := ioutil.ReadFile(SuperUserPath)
+	if err != nil {
+		return ""
+	}
+	return string(file)
 }
