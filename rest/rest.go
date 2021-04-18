@@ -8,8 +8,11 @@ import (
 	"strconv"
 )
 
+// Port is the port this api will listen to
 const Port = 8080
 
+// StartService starts the complete rest service and registers every endpoint.
+// It also starts the token manager
 func StartService() {
 	InitTokenManager()
 	router := gin.Default()
@@ -38,7 +41,7 @@ func StartService() {
 	router.POST("/saveBillingReceipt", AuthWall(), SaveBillingReceipt)
 
 	router.NoRoute(func(context *gin.Context) {
-		context.JSON(http.StatusNotFound, fmt.Errorf("this endpoint doesn't exist"))
+		context.JSON(http.StatusNotFound, gin.H{"error": fmt.Errorf("this endpoint doesn't exist")})
 	})
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
