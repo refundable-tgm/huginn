@@ -70,7 +70,7 @@ func StartService() {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/", func(context *gin.Context) {
-		context.Redirect(http.StatusMovedPermanently, "doc/index.html")
+		context.Redirect(http.StatusMovedPermanently, "swagger/index.html")
 	})
 
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
