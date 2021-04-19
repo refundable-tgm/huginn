@@ -327,6 +327,52 @@ var doc = `{
                 }
             }
         },
+        "/getAdminApplication": {
+            "get": {
+                "description": "Returns all applications currently needing a review by an admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns all admin applications",
+                "operationId": "get-admin-applications",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Application"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/getAllApplications": {
             "get": {
                 "description": "Returns all applications as a list of applications",
@@ -381,15 +427,15 @@ var doc = `{
         },
         "/getApplication": {
             "get": {
-                "description": "Returns all applications currently needing a review by an admin",
+                "description": "Returns the Application matching the given UUID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Returns all admin applications",
-                "operationId": "get-admin-applications",
+                "summary": "Returns an Application",
+                "operationId": "get-application",
                 "parameters": [
                     {
                         "type": "string",
@@ -398,20 +444,30 @@ var doc = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "The UUID of the specifying Application",
+                        "name": "uuid",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.Application"
-                            }
+                            "$ref": "#/definitions/db.Application"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/rest.Error"
                         }

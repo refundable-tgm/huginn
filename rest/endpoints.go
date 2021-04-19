@@ -524,7 +524,7 @@ func GetApplication(con *gin.Context) {
 // @Success 200 {array} db.Application
 // @Failure 401 {object} Error
 // @Failure 500 {object} Error
-// @Router /getApplication [get]
+// @Router /getAdminApplication [get]
 func GetAdminApplications(con *gin.Context) {
 	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
