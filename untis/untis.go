@@ -531,7 +531,7 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 	if !client.Authenticated {
 		return -1, fmt.Errorf("not authenticated")
 	}
-	resp, id, err := client.sendRequest("getTeacher", map[string]interface{}{})
+	resp, id, err := client.sendRequest("getTeachers", map[string]interface{}{})
 	if err != nil {
 		return -1, err
 	}
