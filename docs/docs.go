@@ -1922,7 +1922,7 @@ var doc = `{
                 "error": {
                     "description": "the message that should be sent",
                     "type": "string",
-                    "example": "couldn't convert token'"
+                    "example": "couldn't convert token"
                 }
             }
         },

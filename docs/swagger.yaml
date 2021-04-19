@@ -528,7 +528,7 @@ definitions:
     properties:
       error:
         description: the message that should be sent
-        example: couldn't convert token'
+        example: couldn't convert token
         type: string
     type: object
   rest.Excel:

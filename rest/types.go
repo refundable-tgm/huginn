@@ -19,7 +19,7 @@ type TokenPair struct {
 // Error maps an error message
 type Error struct {
 	// the message that should be sent
-	Message string `json:"error" example:"couldn't convert token'"`
+	Message string `json:"error" example:"couldn't convert token"`
 }
 
 // Information maps an information message
