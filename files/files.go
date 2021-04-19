@@ -19,6 +19,9 @@ import (
 // BasePath is the path to the file volume directory
 const BasePath = "/vol/files/"
 
+// LogoPath is the path to the tgm logo
+const LogoPath = "assets/TGM_Logo.png"
+
 // TemplatePath is the path to the excel_template directory containing all base template excel files
 const TemplatePath = "/go/src/huginn/excel_template/"
 
@@ -69,7 +72,7 @@ const CheckedCheckBox = "☑"
 const UncheckedCheckBox = "☐"
 
 // Sheet is the default name of a worksheet in excel
-const Sheet = "Sheet1"
+const Sheet = "Seite 1"
 
 // These variables are constants representing all excel cells in the Business Trip Application excel template
 const (
@@ -248,7 +251,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		m.RegisterHeader(func() {
 			m.Row(20, func() {
 				m.Col(3, func() {
-					_ = m.FileImage("../assets/TGM_Logo.png", props.Rect{
+					_ = m.FileImage(LogoPath, props.Rect{
 						Left:    0,
 						Top:     0,
 						Center:  false,
@@ -541,9 +544,18 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			}
 			tableStrings = append(tableStrings, row)
 		}
-		m.TableList([]string{"H/R/E", "Jahrgang", "Datum", "Stunde", "Saal", "LK Supp.", "LK Entf.", "Paraphe"}, tableStrings)
+		m.TableList([]string{"H/R/E", "Jahrgang", "Datum", "Stunde", "Saal", "LK Supp.", "LK Entf.", "Paraphe"},
+			tableStrings, props.TableList{
+				Align: consts.Center,
+				HeaderProp: props.TableListContent{
+					GridSizes: []uint{1, 1, 2, 1, 2, 1, 1, 1, 2, 2, 2},
+				},
+				ContentProp: props.TableListContent{
+					GridSizes: []uint{1, 1, 2, 1, 2, 1, 1, 1, 2, 2, 2},
+				},
+				Line: true,
+			})
 
-		m.Line(2.0)
 		m.Row(3, func() {})
 		m.Row(10, func() {
 			m.Col(12, func() {
@@ -555,13 +567,22 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			})
 		})
 		ackStrings := make([][]string, 6)
-		ackStrings[0][0] = "AV"
-		ackStrings[1][0] = "AV"
-		ackStrings[2][0] = "WL"
-		ackStrings[3][0] = "Begleitperson"
-		ackStrings[4][0] = "Ersteller/in"
-		ackStrings[5][0] = "UNTIS Eintragung"
-		m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings)
+		ackStrings[0] = []string{"AV", "", ""}
+		ackStrings[1] = []string{"AV", "", ""}
+		ackStrings[2] = []string{"WL", "", ""}
+		ackStrings[3] = []string{"Begleitperson", "", ""}
+		ackStrings[4] = []string{"Ersteller/in", "", ""}
+		ackStrings[5] = []string{"UNTIS Eintragung", "", ""}
+		m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings, props.TableList{
+			Align: consts.Center,
+			HeaderProp: props.TableListContent{
+				GridSizes: []uint{4, 4, 4},
+			},
+			ContentProp: props.TableListContent{
+				GridSizes: []uint{4, 4, 4},
+			},
+			Line: true,
+		})
 
 		savePath := filepath.Join(path, fmt.Sprintf(ClassAbsenceFormFileName, class))
 		err = m.OutputFileAndClose(savePath)
@@ -596,7 +617,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 	m.RegisterHeader(func() {
 		m.Row(20, func() {
 			m.Col(3, func() {
-				_ = m.FileImage("../assets/TGM_Logo.png", props.Rect{
+				_ = m.FileImage(LogoPath, props.Rect{
 					Left:    0,
 					Top:     0,
 					Center:  false,
@@ -770,7 +791,16 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 		}
 		tableString = append(tableString, row)
 	}
-	m.TableList([]string{"Name", "Verwendungsgruppe", "Beginn", "Ende"}, tableString)
+	m.TableList([]string{"Name", "Verwendungsgruppe", "Beginn", "Ende"}, tableString, props.TableList{
+		Align: consts.Center,
+		HeaderProp: props.TableListContent{
+			GridSizes: []uint{3, 3, 3, 3},
+		},
+		ContentProp: props.TableListContent{
+			GridSizes: []uint{3, 3, 3, 3},
+		},
+		Line: true,
+	})
 
 	m.Row(15, func() {})
 	m.Line(1.0)
@@ -817,7 +847,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 	m.RegisterHeader(func() {
 		m.Row(20, func() {
 			m.Col(3, func() {
-				_ = m.FileImage("../assets/TGM_Logo.png", props.Rect{
+				_ = m.FileImage(LogoPath, props.Rect{
 					Left:    0,
 					Top:     0,
 					Center:  false,
@@ -1162,9 +1192,18 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		}
 		tableStrings = append(tableStrings, row)
 	}
-	m.TableList([]string{"H/R/E", "Jahrgang", "Datum", "Stunde", "Saal", "LK Supp.", "LK Entf.", "Paraphe"}, tableStrings)
+	m.TableList([]string{"H/R/E", "Jahrgang", "Datum", "Stunde", "Saal", "LK Supp.", "LK Entf.", "Paraphe"},
+		tableStrings, props.TableList{
+			Align: consts.Center,
+			HeaderProp: props.TableListContent{
+				GridSizes: []uint{1, 1, 2, 1, 2, 1, 1, 1, 2, 2, 2},
+			},
+			ContentProp: props.TableListContent{
+				GridSizes: []uint{1, 1, 2, 1, 2, 1, 1, 1, 2, 2, 2},
+			},
+			Line: true,
+		})
 
-	m.Line(2.0)
 	m.Row(3, func() {})
 	m.Row(10, func() {
 		m.Col(12, func() {
@@ -1176,11 +1215,20 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		})
 	})
 	ackStrings := make([][]string, 4)
-	ackStrings[0][0] = "AV"
-	ackStrings[2][0] = "WL"
-	ackStrings[4][0] = "Ersteller/in"
-	ackStrings[5][0] = "UNTIS Eintragung"
-	m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings)
+	ackStrings[0] = []string{"AV", "", ""}
+	ackStrings[1] = []string{"WL", "", ""}
+	ackStrings[2] = []string{"Ersteller/in", "", ""}
+	ackStrings[3] = []string{"UNTIS Eintragung", "", ""}
+	m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings, props.TableList{
+		Align: consts.Center,
+		HeaderProp: props.TableListContent{
+			GridSizes: []uint{4, 4, 4},
+		},
+		ContentProp: props.TableListContent{
+			GridSizes: []uint{4, 4, 4},
+		},
+		Line: true,
+	})
 
 	savePath := filepath.Join(path, fmt.Sprintf(TeacherAbsenceFormFileName, username))
 	err = m.OutputFileAndClose(savePath)
@@ -1199,7 +1247,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	m.SetDefaultFontFamily(consts.Helvetica)
 	m.Row(15, func() {
 		m.Col(3, func() {
-			_ = m.FileImage("../assets/TGM_Logo.png", props.Rect{
+			_ = m.FileImage(LogoPath, props.Rect{
 				Left:    0,
 				Top:     0,
 				Center:  true,
@@ -1643,7 +1691,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.RegisterHeader(func() {
 		m.Row(20, func() {
 			m.Col(3, func() {
-				_ = m.FileImage("../assets/TGM_Logo.png", props.Rect{
+				_ = m.FileImage(LogoPath, props.Rect{
 					Left:    0,
 					Top:     0,
 					Center:  false,
@@ -2159,51 +2207,51 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	bday := app.TripBeginTime.Format("02")
 	bhour := app.TripBeginTime.Format("15")
 	bminute := app.TripBeginTime.Format("04")
-	err = excel.SetCellValue(Sheet, TITripBeginYear1, byear[0])
+	err = excel.SetCellValue(Sheet, TITripBeginYear1, string(byear[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginYear2, byear[1])
+	err = excel.SetCellValue(Sheet, TITripBeginYear2, string(byear[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginYear3, byear[2])
+	err = excel.SetCellValue(Sheet, TITripBeginYear3, string(byear[2]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginYear4, byear[3])
+	err = excel.SetCellValue(Sheet, TITripBeginYear4, string(byear[3]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginMonth1, bmonth[0])
+	err = excel.SetCellValue(Sheet, TITripBeginMonth1, string(bmonth[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginMonth2, bmonth[1])
+	err = excel.SetCellValue(Sheet, TITripBeginMonth2, string(bmonth[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginDay1, bday[0])
+	err = excel.SetCellValue(Sheet, TITripBeginDay1, string(bday[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginDay2, bday[1])
+	err = excel.SetCellValue(Sheet, TITripBeginDay2, string(bday[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginHour1, bhour[0])
+	err = excel.SetCellValue(Sheet, TITripBeginHour1, string(bhour[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginHour2, bhour[1])
+	err = excel.SetCellValue(Sheet, TITripBeginHour2, string(bhour[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginMinute1, bminute[0])
+	err = excel.SetCellValue(Sheet, TITripBeginMinute1, string(bminute[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripBeginMinute2, bminute[1])
+	err = excel.SetCellValue(Sheet, TITripBeginMinute2, string(bminute[1]))
 	if err != nil {
 		return "", err
 	}
@@ -2212,51 +2260,51 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	eday := app.TripEndTime.Format("02")
 	ehour := app.TripEndTime.Format("15")
 	eminute := app.TripEndTime.Format("04")
-	err = excel.SetCellValue(Sheet, TITripEndYear1, eyear[0])
+	err = excel.SetCellValue(Sheet, TITripEndYear1, string(eyear[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndYear2, eyear[1])
+	err = excel.SetCellValue(Sheet, TITripEndYear2, string(eyear[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndYear3, eyear[2])
+	err = excel.SetCellValue(Sheet, TITripEndYear3, string(eyear[2]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndYear4, eyear[3])
+	err = excel.SetCellValue(Sheet, TITripEndYear4, string(eyear[3]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndMonth1, emonth[0])
+	err = excel.SetCellValue(Sheet, TITripEndMonth1, string(emonth[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndMonth2, emonth[1])
+	err = excel.SetCellValue(Sheet, TITripEndMonth2, string(emonth[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndDay1, eday[0])
+	err = excel.SetCellValue(Sheet, TITripEndDay1, string(eday[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndDay2, eday[1])
+	err = excel.SetCellValue(Sheet, TITripEndDay2, string(eday[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndHour1, ehour[0])
+	err = excel.SetCellValue(Sheet, TITripEndHour1, string(ehour[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndHour2, ehour[1])
+	err = excel.SetCellValue(Sheet, TITripEndHour2, string(ehour[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndMinute1, eminute[0])
+	err = excel.SetCellValue(Sheet, TITripEndMinute1, string(eminute[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITripEndMinute2, eminute[1])
+	err = excel.SetCellValue(Sheet, TITripEndMinute2, string(eminute[1]))
 	if err != nil {
 		return "", err
 	}
@@ -2297,35 +2345,35 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if len(ph) != 8 {
 		return "", fmt.Errorf("staffnr length isnt 8")
 	}
-	err = excel.SetCellValue(Sheet, TIPNR1, ph[0])
+	err = excel.SetCellValue(Sheet, TIPNR1, string(ph[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR2, ph[1])
+	err = excel.SetCellValue(Sheet, TIPNR2, string(ph[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR3, ph[2])
+	err = excel.SetCellValue(Sheet, TIPNR3, string(ph[2]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR4, ph[3])
+	err = excel.SetCellValue(Sheet, TIPNR4, string(ph[3]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR5, ph[4])
+	err = excel.SetCellValue(Sheet, TIPNR5, string(ph[4]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR6, ph[5])
+	err = excel.SetCellValue(Sheet, TIPNR6, string(ph[5]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR7, ph[6])
+	err = excel.SetCellValue(Sheet, TIPNR7, string(ph[6]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIPNR8, ph[7])
+	err = excel.SetCellValue(Sheet, TIPNR8, string(ph[7]))
 	if err != nil {
 		return "", err
 	}
@@ -2520,6 +2568,9 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 		}
 	}
 	row := strconv.Itoa(len(app.Calculation.Rows) + TIFirstConstantRow)
+	if len(app.Calculation.Rows) < 5 {
+		row = strconv.Itoa(TIFirstGeneratedRow)
+	}
 	err = excel.SetCellValue(Sheet, TICalcTravelCostsColumn+row, app.Calculation.SumTravelCosts)
 	if err != nil {
 		return "", err
@@ -2598,35 +2649,35 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	if len(ph) != 8 {
 		return "", fmt.Errorf("staff nr doesnt match valid length")
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR1, ph[0])
+	err = excel.SetCellValue(Sheet, BTAPNR1, string(ph[0]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR2, ph[1])
+	err = excel.SetCellValue(Sheet, BTAPNR2, string(ph[1]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR3, ph[2])
+	err = excel.SetCellValue(Sheet, BTAPNR3, string(ph[2]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR4, ph[3])
+	err = excel.SetCellValue(Sheet, BTAPNR4, string(ph[3]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR5, ph[4])
+	err = excel.SetCellValue(Sheet, BTAPNR5, string(ph[4]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR6, ph[5])
+	err = excel.SetCellValue(Sheet, BTAPNR6, string(ph[5]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR7, ph[6])
+	err = excel.SetCellValue(Sheet, BTAPNR7, string(ph[6]))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAPNR8, ph[7])
+	err = excel.SetCellValue(Sheet, BTAPNR8, string(ph[7]))
 	if err != nil {
 		return "", err
 	}
