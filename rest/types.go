@@ -3,74 +3,74 @@ package rest
 // User data input
 type User struct {
 	// Username of the user
-	Username string `json:"username"`
+	Username string `json:"username" example:"lehrer1234"`
 	// Password of the user
-	Password string `json:"password"`
+	Password string `json:"password" example:"password1234"`
 }
 
 // TokenPair consists of an access and a refresh token
 type TokenPair struct {
 	// the access token
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"access_token" example:"<jwt-token>"`
 	// the refresh token
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refresh_token" example:"<jwt-token>"`
 }
 
 // Error maps an error message
 type Error struct {
 	// the message that should be sent
-	Message string `json:"error"`
+	Message string `json:"error" example:"couldn't convert token'"`
 }
 
 // Information maps an information message
 type Information struct {
 	// the message that should be sent
-	Message string `json:"info"`
+	Message string `json:"info" example:"updated teacher successfully"`
 }
 
 // RefreshToken maps an refresh token
 type RefreshToken struct {
 	// Token is the refresh token
-	Token string `json:"refresh_token"`
+	Token string `json:"refresh_token" example:"<jwt-token>"`
 }
 
 // Permissions lists the permissions of a teacher
 type Permissions struct {
 	// SuperUser permission
-	SuperUser bool `json:"super_user"`
+	SuperUser bool `json:"super_user" example:"true"`
 	// Administration permission
-	Administration bool `json:"administration"`
+	Administration bool `json:"administration" example:"true"`
 	// AV permission
-	AV bool `json:"av"`
+	AV bool `json:"av" example:"true"`
 	// PEK permission
-	PEK bool `json:"pek"`
+	PEK bool `json:"pek" example:"true"`
 }
 
 // News is a news object for applications
 type News struct {
 	// UUID of the application
-	UUID string `json:"uuid"`
+	UUID string `json:"uuid" example:"3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4"`
 	// Title of the application
-	Title string `json:"title"`
+	Title string `json:"title" example:"Sommersportwoche"`
 	// State of the application
-	State int `json:"state"`
+	State int `json:"state" example:"3"`
 	// LastChanged is the date of last changes of the application
-	LastChanged string `json:"last_changed"`
+	LastChanged string `json:"last_changed" example:"2009-11-10 23:00:00 +0000 UTC m=+0.000000001"`
 }
 
 // PDF represents a pdf file
 type PDF struct {
 	// Content is the content of this file
-	Content string `json:"pdf"`
+	Content string `json:"pdf" example:"<base64>"`
 }
 
 // PDFs is a wrapper for a single pdf
 type PDFs struct {
-	Files []PDF `json:"files"`
+	Files []PDF `json:"files" example:"[<base64>, <base64>]"`
 }
 
 // Excel represents an excel output
 type Excel struct {
 	// Content is the content of the excel file
-	Content string `json:"excel"`
+	Content string `json:"excel" example:"<base64>"`
 }

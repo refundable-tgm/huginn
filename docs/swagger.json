@@ -9,7 +9,7 @@
             "email": "admin@mbeier.at"
         },
         "license": {
-            "name": "MIT",
+            "name": "MIT Lizenz",
             "url": "https://github.com/refundable-tgm/huginn/blob/master/LICENSE"
         },
         "version": "1.1"
@@ -1248,7 +1248,8 @@
                 },
                 "destination_address": {
                     "description": "The Destination Address of this Application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Karl Hönck Heim, Kärnten"
                 },
                 "end_time": {
                     "description": "the time the underlying event of this Application ends",
@@ -1256,7 +1257,8 @@
                 },
                 "kind": {
                     "description": "The kind of this Application (for more see the Enum for the kinds of Application on this level only Training, SchoolEvent and OtherReason is applicable, the sub kinds should be used in the further detail section of the corresponding site)",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 0
                 },
                 "last_changed": {
                     "description": "The timestamp this application was changed last",
@@ -1264,15 +1266,18 @@
                 },
                 "miscellaneous_reason": {
                     "description": "The Reasoning of this Application (there is none if this isn't of the type Miscellaneous)",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Guter Grund"
                 },
                 "name": {
                     "description": "The name on how this Application should be referenced by",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Sommersportwoche"
                 },
                 "notes": {
                     "description": "Other Notes regarding this Application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Wichtig ist, dass wir die Reise bewilligen lassen!"
                 },
                 "other_reason_details": {
                     "description": "Further Details if this is of the kind of any other, if not this will be empty",
@@ -1280,7 +1285,8 @@
                 },
                 "progress": {
                     "description": "The Progress of this Application in filing (for more see the Enum for the Progress)",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "school_event_details": {
                     "description": "Further Details if this is of the kind SchoolEvent, if not this will be empty",
@@ -1288,7 +1294,8 @@
                 },
                 "start_address": {
                     "description": "The starting address of this Application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "TGM, Wexstraße 19-23, 1220 Wien"
                 },
                 "start_time": {
                     "description": "the time the underlying event of this Application starts",
@@ -1307,7 +1314,8 @@
                 },
                 "uuid": {
                     "description": "A generated uuid of this application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "693aa616-9895-418b-8904-765f0f6d26a4"
                 }
             }
         },
@@ -1316,19 +1324,23 @@
             "properties": {
                 "bonus_mile_confirmation_1": {
                     "description": "the confirmation of the first bonus mile clause",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "bonus_mile_confirmation_2": {
                     "description": "the confirmation of the second bonus mile clause",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "business_card_emitted_outward": {
                     "description": "whether a business card was emitted outwards",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "business_card_emitted_return": {
                     "description": "whether a business card was emitted on the return",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "date_application_approved": {
                     "description": "the date this application is approved",
@@ -1340,42 +1352,54 @@
                 },
                 "degree": {
                     "description": "Degree of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "DI"
                 },
                 "end_point": {
                     "description": "The end point (see the regarding Enum: OwnApartment or Office)",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "estimated_costs": {
                     "description": "the total estimated costs",
-                    "type": "number"
+                    "type": "number",
+                    "example": 25.32
                 },
                 "id": {
                     "description": "The id (counting upwards) of this BusinessTripApplication regarding to the uid",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "name": {
                     "description": "Name of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Stefan"
                 },
                 "other_costs": {
                     "description": "other costs which appeared",
-                    "type": "number"
+                    "type": "number",
+                    "example": 2.42
                 },
                 "other_participants": {
                     "description": "The name of other participants of this trip",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "Markus Schabel",
+                        " Gottfried Koppensteiner"
+                    ]
                 },
                 "paid_by_whom": {
                     "description": "if some costs are paid by someone else by whom",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Technologenverband"
                 },
                 "reasoning": {
                     "description": "The reasoing behind the trip application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Lehrausgang ins technische Museum"
                 },
                 "referee": {
                     "description": "the referee checking this application",
@@ -1391,19 +1415,23 @@
                 },
                 "staffnr": {
                     "description": "The staffnr of the regarding teacher",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 938503154
                 },
                 "starting_point": {
                     "description": "The starting point (see the regarding Enum: OwnApartment or Office",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "staying_costs_paid_by_someone": {
                     "description": "whether the staying costs are paid by someone else",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "surname": {
                     "description": "Surname of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Zakall"
                 },
                 "title": {
                     "description": "Title of the Teacher",
@@ -1411,15 +1439,18 @@
                 },
                 "travel_costs_paid_by_someone": {
                     "description": "whether the travel costs are paid by someone else",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "travel_mode": {
                     "description": "The travel mode (see the regarding Enum for this)",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 6
                 },
                 "travel_purpose": {
                     "description": "The purpose of travelling",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Lehrausgang"
                 },
                 "trip_begin_time": {
                     "description": "The time the trip begins",
@@ -1431,7 +1462,8 @@
                 },
                 "trip_goal": {
                     "description": "The trip goal (address)",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Technisches Museum Wien"
                 }
             }
         },
@@ -1440,7 +1472,8 @@
             "properties": {
                 "id": {
                     "description": "the id of this calculation",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "rows": {
                     "description": "rows of this calculation",
@@ -1476,15 +1509,18 @@
             "properties": {
                 "filer": {
                     "description": "the teacher this application belongs to",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Stefan Zakall"
                 },
                 "kind": {
                     "description": "The kind of other Reason this Application is filed",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 7
                 },
                 "miscellaneous_reason": {
                     "description": "the reasoning if the other reason is of kind Miscellaneous",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Ein guter Grund"
                 },
                 "service_mandate_gz": {
                     "description": "the gz number if the other reason is a ServiceMandate",
@@ -1492,7 +1528,8 @@
                 },
                 "service_mandate_title": {
                     "description": "The title if the other reason is a ServiceMandate",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Dienstverrichtung"
                 }
             }
         },
@@ -1501,7 +1538,8 @@
             "properties": {
                 "additional_costs": {
                     "description": "the additionalCosts this Row conducts",
-                    "type": "number"
+                    "type": "number",
+                    "example": 4.32
                 },
                 "begin": {
                     "description": "the begin time this Row refers to",
@@ -1509,7 +1547,8 @@
                 },
                 "daily_charges": {
                     "description": "the dailyCharges this Row conducts",
-                    "type": "number"
+                    "type": "number",
+                    "example": 4.32
                 },
                 "date": {
                     "description": "The date this Row refers to",
@@ -1521,30 +1560,40 @@
                 },
                 "kilometres": {
                     "description": "the amount of kilometres this row refers to",
-                    "type": "number"
+                    "type": "number",
+                    "example": 4.32
                 },
                 "kind_of_cost": {
                     "description": "the kind of costs this row describes (see costs enum)",
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1,
+                        2,
+                        3
+                    ]
                 },
                 "nightly_charges": {
                     "description": "the nightlyCharges this Row conducts",
-                    "type": "number"
+                    "type": "number",
+                    "example": 4.32
                 },
                 "nr": {
                     "description": "The row nr",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "sum": {
                     "description": "the sum of all costs in this Row",
-                    "type": "number"
+                    "type": "number",
+                    "example": 4.32
                 },
                 "travel_costs": {
                     "description": "the travelCosts this Row conducts",
-                    "type": "number"
+                    "type": "number",
+                    "example": 4.32
                 }
             }
         },
@@ -1553,22 +1602,31 @@
             "properties": {
                 "amount_female_students": {
                     "description": "The amount of female students",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 0
                 },
                 "amount_male_students": {
                     "description": "The amount of male students",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 17
                 },
                 "classes": {
                     "description": "The participating classes",
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "example": [
+                        "5BHIT",
+                        " 5AHIT",
+                        " 5CHIT",
+                        " 5DHIT"
+                    ]
                 },
                 "duration_in_days": {
                     "description": "The duration of the event in days",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "teachers": {
                     "description": "Details of each teacher participating in the SchoolEvent",
@@ -1592,27 +1650,33 @@
                 },
                 "group": {
                     "description": "The group number",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "meeting_point": {
                     "description": "Where the teacher will meet with the group to travel together",
-                    "type": "string"
+                    "type": "string",
+                    "example": "TGM, Wexstraße 19-23, 1220 Wien"
                 },
                 "name": {
                     "description": "The full name of a teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Stefan Zakall"
                 },
                 "role": {
                     "description": "The role of each teacher (Leader or Companion)",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 0
                 },
                 "shortname": {
                     "description": "The short name (abbrevation) of a teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "szakall"
                 },
                 "start_address": {
                     "description": "Where the teacher starts their travel from",
-                    "type": "string"
+                    "type": "string",
+                    "example": "TGM, Wexstraße 19-23, 1220 Wien"
                 }
             }
         },
@@ -1621,31 +1685,38 @@
             "properties": {
                 "administration": {
                     "description": "whether this Teacher as administration rights",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "av": {
                     "description": "whether this Teacher as av rights",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "longname": {
                     "description": "the longname (firstname + sirname) of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Stefan Zakall"
                 },
                 "pek": {
                     "description": "whether this Teacher as pek rights",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "short": {
                     "description": "the short name of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "szakall"
                 },
                 "super_user": {
                     "description": "Superuser (total admin) of this software",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "uuid": {
                     "description": "the uuid of this Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4"
                 }
             }
         },
@@ -1654,19 +1725,23 @@
             "properties": {
                 "kind": {
                     "description": "The kind of Training",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "miscellaneous_reason": {
                     "description": "if its miscellaneous a reasoning for the Training",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Ein sonstiger Grund"
                 },
                 "organizer": {
                     "description": "The company who organizes the Training",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Accenture"
                 },
                 "ph": {
                     "description": "the personnel number of the teacher",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 938503154
                 }
             }
         },
@@ -1679,7 +1754,8 @@
                 },
                 "breakfasts": {
                     "description": "the amount of breakfasts",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "calculation": {
                     "description": "the regarding calculation",
@@ -1691,19 +1767,23 @@
                 },
                 "daily_charges_mode": {
                     "description": "the mode how daily charges are handled",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "degree": {
                     "description": "Degree of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "DI"
                 },
                 "dinners": {
                     "description": "the amount of dinners",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 4
                 },
                 "end_point": {
                     "description": "the end point of the trip",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Hauptbahnhof, 1220 Wien"
                 },
                 "filing_date": {
                     "description": "the date this application was filed",
@@ -1711,47 +1791,58 @@
                 },
                 "id": {
                     "description": "The id (counting upwards) of this TravelInvoice regarding to the uid",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "kilometre_allowance": {
                     "description": "whether the teacher got a kilometre allowance",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "kilometre_amount": {
                     "description": "the regarding kilometre amount",
-                    "type": "number"
+                    "type": "number",
+                    "example": 25.12
                 },
                 "lunches": {
                     "description": "the amount of lunches",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "name": {
                     "description": "Name of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Stefan"
                 },
                 "nightly_charges_mode": {
                     "description": "the mode how nightly charges are handled",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "no_travel_costs": {
                     "description": "whether there aren't any travel costs",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "nr_and_indications_of_participants": {
                     "description": "whether the participants of the trip are counted and clearly indicated",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "official_business_card_got": {
                     "description": "whether the teacher got a official business card",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "replacement_for_advantage_card": {
                     "description": "whether the teacher got a replacement for an advantage card",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "replacement_for_train_card_class_2": {
                     "description": "whether the teacher got a replacement for a train card class 2",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "reviewer": {
                     "description": "the reviewer reviewing the approval of this application",
@@ -1759,19 +1850,23 @@
                 },
                 "shortened_amount": {
                     "description": "the amount the daily charges should be shortened",
-                    "type": "number"
+                    "type": "number",
+                    "example": 0
                 },
                 "staffnr": {
                     "description": "The personnel number of the teacher",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 938503154
                 },
                 "starting_point": {
                     "description": "the starting point of the trip",
-                    "type": "string"
+                    "type": "string",
+                    "example": "TGM, Wexstraße 19-23, 1220 Wien"
                 },
                 "surname": {
                     "description": "Surname of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Zakall"
                 },
                 "title": {
                     "description": "Title of the Teacher",
@@ -1779,15 +1874,18 @@
                 },
                 "travel_costs_cited": {
                     "description": "whether the travel costs are clearly cited",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "travel_costs_pre_grant": {
                     "description": "The granted travel costs",
-                    "type": "number"
+                    "type": "number",
+                    "example": 0
                 },
                 "travel_grant": {
                     "description": "whether the teacher got a travel grant",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "trip_begin_time": {
                     "description": "The time the trip begins",
@@ -1807,8 +1905,9 @@
             "type": "object",
             "properties": {
                 "error": {
-                    "description": "Message is the message that should be sent",
-                    "type": "string"
+                    "description": "the message that should be sent",
+                    "type": "string",
+                    "example": "couldn't convert token'"
                 }
             }
         },
@@ -1817,7 +1916,8 @@
             "properties": {
                 "excel": {
                     "description": "Content is the content of the excel file",
-                    "type": "string"
+                    "type": "string",
+                    "example": "\u003cbase64\u003e"
                 }
             }
         },
@@ -1825,8 +1925,9 @@
             "type": "object",
             "properties": {
                 "info": {
-                    "description": "Message is the message that should be sent",
-                    "type": "string"
+                    "description": "the message that should be sent",
+                    "type": "string",
+                    "example": "updated teacher successfully"
                 }
             }
         },
@@ -1835,19 +1936,23 @@
             "properties": {
                 "last_changed": {
                     "description": "LastChanged is the date of last changes of the application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "2009-11-10 23:00:00 +0000 UTC m=+0.000000001"
                 },
                 "state": {
                     "description": "State of the application",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "title": {
                     "description": "Title of the application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Sommersportwoche"
                 },
                 "uuid": {
                     "description": "UUID of the application",
-                    "type": "string"
+                    "type": "string",
+                    "example": "3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4"
                 }
             }
         },
@@ -1856,7 +1961,8 @@
             "properties": {
                 "pdf": {
                     "description": "Content is the content of this file",
-                    "type": "string"
+                    "type": "string",
+                    "example": "\u003cbase64\u003e"
                 }
             }
         },
@@ -1865,19 +1971,23 @@
             "properties": {
                 "administration": {
                     "description": "Administration permission",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "av": {
                     "description": "AV permission",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "pek": {
                     "description": "PEK permission",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 },
                 "super_user": {
                     "description": "SuperUser permission",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
@@ -1886,7 +1996,8 @@
             "properties": {
                 "refresh_token": {
                     "description": "Token is the refresh token",
-                    "type": "string"
+                    "type": "string",
+                    "example": "\u003cjwt-token\u003e"
                 }
             }
         },
@@ -1894,12 +2005,14 @@
             "type": "object",
             "properties": {
                 "access_token": {
-                    "description": "AccessToken the access token",
-                    "type": "string"
+                    "description": "the access token",
+                    "type": "string",
+                    "example": "\u003cjwt-token\u003e"
                 },
                 "refresh_token": {
-                    "description": "RefreshToken the refresh token",
-                    "type": "string"
+                    "description": "the refresh token",
+                    "type": "string",
+                    "example": "\u003cjwt-token\u003e"
                 }
             }
         },
@@ -1908,11 +2021,13 @@
             "properties": {
                 "password": {
                     "description": "Password of the user",
-                    "type": "string"
+                    "type": "string",
+                    "example": "password1234"
                 },
                 "username": {
                     "description": "Username of the user",
-                    "type": "string"
+                    "type": "string",
+                    "example": "lehrer1234"
                 }
             }
         }

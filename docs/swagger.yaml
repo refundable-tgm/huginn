@@ -9,6 +9,7 @@ definitions:
         type: array
       destination_address:
         description: The Destination Address of this Application
+        example: Karl Hönck Heim, Kärnten
         type: string
       end_time:
         description: the time the underlying event of this Application ends
@@ -18,6 +19,7 @@ definitions:
           of Application on this level only Training, SchoolEvent and OtherReason
           is applicable, the sub kinds should be used in the further detail section
           of the corresponding site)
+        example: 0
         type: integer
       last_changed:
         description: The timestamp this application was changed last
@@ -25,12 +27,15 @@ definitions:
       miscellaneous_reason:
         description: The Reasoning of this Application (there is none if this isn't
           of the type Miscellaneous)
+        example: Guter Grund
         type: string
       name:
         description: The name on how this Application should be referenced by
+        example: Sommersportwoche
         type: string
       notes:
         description: Other Notes regarding this Application
+        example: Wichtig ist, dass wir die Reise bewilligen lassen!
         type: string
       other_reason_details:
         $ref: '#/definitions/db.OtherReasonDetails'
@@ -39,6 +44,7 @@ definitions:
       progress:
         description: The Progress of this Application in filing (for more see the
           Enum for the Progress)
+        example: 3
         type: integer
       school_event_details:
         $ref: '#/definitions/db.SchoolEventDetails'
@@ -46,6 +52,7 @@ definitions:
           will be empty
       start_address:
         description: The starting address of this Application
+        example: TGM, Wexstraße 19-23, 1220 Wien
         type: string
       start_time:
         description: the time the underlying event of this Application starts
@@ -61,21 +68,26 @@ definitions:
         type: array
       uuid:
         description: A generated uuid of this application
+        example: 693aa616-9895-418b-8904-765f0f6d26a4
         type: string
     type: object
   db.BusinessTripApplication:
     properties:
       bonus_mile_confirmation_1:
         description: the confirmation of the first bonus mile clause
+        example: true
         type: boolean
       bonus_mile_confirmation_2:
         description: the confirmation of the second bonus mile clause
+        example: true
         type: boolean
       business_card_emitted_outward:
         description: whether a business card was emitted outwards
+        example: false
         type: boolean
       business_card_emitted_return:
         description: whether a business card was emitted on the return
+        example: false
         type: boolean
       date_application_approved:
         description: the date this application is approved
@@ -85,33 +97,44 @@ definitions:
         type: string
       degree:
         description: Degree of the Teacher
+        example: DI
         type: string
       end_point:
         description: 'The end point (see the regarding Enum: OwnApartment or Office)'
+        example: 1
         type: integer
       estimated_costs:
         description: the total estimated costs
+        example: 25.32
         type: number
       id:
         description: The id (counting upwards) of this BusinessTripApplication regarding
           to the uid
+        example: 1
         type: integer
       name:
         description: Name of the Teacher
+        example: Stefan
         type: string
       other_costs:
         description: other costs which appeared
+        example: 2.42
         type: number
       other_participants:
         description: The name of other participants of this trip
+        example:
+        - Markus Schabel
+        - ' Gottfried Koppensteiner'
         items:
           type: string
         type: array
       paid_by_whom:
         description: if some costs are paid by someone else by whom
+        example: Technologenverband
         type: string
       reasoning:
         description: The reasoing behind the trip application
+        example: Lehrausgang ins technische Museum
         type: string
       referee:
         description: the referee checking this application
@@ -124,28 +147,35 @@ definitions:
         type: string
       staffnr:
         description: The staffnr of the regarding teacher
+        example: 938503154
         type: integer
       starting_point:
         description: 'The starting point (see the regarding Enum: OwnApartment or
           Office'
+        example: 1
         type: integer
       staying_costs_paid_by_someone:
         description: whether the staying costs are paid by someone else
+        example: true
         type: boolean
       surname:
         description: Surname of the Teacher
+        example: Zakall
         type: string
       title:
         description: Title of the Teacher
         type: string
       travel_costs_paid_by_someone:
         description: whether the travel costs are paid by someone else
+        example: true
         type: boolean
       travel_mode:
         description: The travel mode (see the regarding Enum for this)
+        example: 6
         type: integer
       travel_purpose:
         description: The purpose of travelling
+        example: Lehrausgang
         type: string
       trip_begin_time:
         description: The time the trip begins
@@ -155,12 +185,14 @@ definitions:
         type: string
       trip_goal:
         description: The trip goal (address)
+        example: Technisches Museum Wien
         type: string
     type: object
   db.Calculation:
     properties:
       id:
         description: the id of this calculation
+        example: 1
         type: integer
       rows:
         description: rows of this calculation
@@ -187,30 +219,36 @@ definitions:
     properties:
       filer:
         description: the teacher this application belongs to
+        example: Stefan Zakall
         type: string
       kind:
         description: The kind of other Reason this Application is filed
+        example: 7
         type: integer
       miscellaneous_reason:
         description: the reasoning if the other reason is of kind Miscellaneous
+        example: Ein guter Grund
         type: string
       service_mandate_gz:
         description: the gz number if the other reason is a ServiceMandate
         type: integer
       service_mandate_title:
         description: The title if the other reason is a ServiceMandate
+        example: Dienstverrichtung
         type: string
     type: object
   db.Row:
     properties:
       additional_costs:
         description: the additionalCosts this Row conducts
+        example: 4.32
         type: number
       begin:
         description: the begin time this Row refers to
         type: string
       daily_charges:
         description: the dailyCharges this Row conducts
+        example: 4.32
         type: number
       date:
         description: The date this Row refers to
@@ -220,40 +258,57 @@ definitions:
         type: string
       kilometres:
         description: the amount of kilometres this row refers to
+        example: 4.32
         type: number
       kind_of_cost:
         description: the kind of costs this row describes (see costs enum)
+        example:
+        - 1
+        - 2
+        - 3
         items:
           type: integer
         type: array
       nightly_charges:
         description: the nightlyCharges this Row conducts
+        example: 4.32
         type: number
       nr:
         description: The row nr
+        example: 1
         type: integer
       sum:
         description: the sum of all costs in this Row
+        example: 4.32
         type: number
       travel_costs:
         description: the travelCosts this Row conducts
+        example: 4.32
         type: number
     type: object
   db.SchoolEventDetails:
     properties:
       amount_female_students:
         description: The amount of female students
+        example: 0
         type: integer
       amount_male_students:
         description: The amount of male students
+        example: 17
         type: integer
       classes:
         description: The participating classes
+        example:
+        - 5BHIT
+        - ' 5AHIT'
+        - ' 5CHIT'
+        - ' 5DHIT'
         items:
           type: string
         type: array
       duration_in_days:
         description: The duration of the event in days
+        example: 2
         type: integer
       teachers:
         description: Details of each teacher participating in the SchoolEvent
@@ -271,60 +326,77 @@ definitions:
         type: string
       group:
         description: The group number
+        example: 1
         type: integer
       meeting_point:
         description: Where the teacher will meet with the group to travel together
+        example: TGM, Wexstraße 19-23, 1220 Wien
         type: string
       name:
         description: The full name of a teacher
+        example: Stefan Zakall
         type: string
       role:
         description: The role of each teacher (Leader or Companion)
+        example: 0
         type: integer
       shortname:
         description: The short name (abbrevation) of a teacher
+        example: szakall
         type: string
       start_address:
         description: Where the teacher starts their travel from
+        example: TGM, Wexstraße 19-23, 1220 Wien
         type: string
     type: object
   db.Teacher:
     properties:
       administration:
         description: whether this Teacher as administration rights
+        example: true
         type: boolean
       av:
         description: whether this Teacher as av rights
+        example: true
         type: boolean
       longname:
         description: the longname (firstname + sirname) of the Teacher
+        example: Stefan Zakall
         type: string
       pek:
         description: whether this Teacher as pek rights
+        example: true
         type: boolean
       short:
         description: the short name of the Teacher
+        example: szakall
         type: string
       super_user:
         description: Superuser (total admin) of this software
+        example: true
         type: boolean
       uuid:
         description: the uuid of this Teacher
+        example: 3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4
         type: string
     type: object
   db.TrainingDetails:
     properties:
       kind:
         description: The kind of Training
+        example: 2
         type: integer
       miscellaneous_reason:
         description: if its miscellaneous a reasoning for the Training
+        example: Ein sonstiger Grund
         type: string
       organizer:
         description: The company who organizes the Training
+        example: Accenture
         type: string
       ph:
         description: the personnel number of the teacher
+        example: 938503154
         type: integer
     type: object
   db.TravelInvoice:
@@ -334,6 +406,7 @@ definitions:
         type: string
       breakfasts:
         description: the amount of breakfasts
+        example: 2
         type: integer
       calculation:
         $ref: '#/definitions/db.Calculation'
@@ -343,15 +416,19 @@ definitions:
         type: string
       daily_charges_mode:
         description: the mode how daily charges are handled
+        example: 1
         type: integer
       degree:
         description: Degree of the Teacher
+        example: DI
         type: string
       dinners:
         description: the amount of dinners
+        example: 4
         type: integer
       end_point:
         description: the end point of the trip
+        example: Hauptbahnhof, 1220 Wien
         type: string
       filing_date:
         description: the date this application was filed
@@ -359,65 +436,83 @@ definitions:
       id:
         description: The id (counting upwards) of this TravelInvoice regarding to
           the uid
+        example: 1
         type: integer
       kilometre_allowance:
         description: whether the teacher got a kilometre allowance
+        example: true
         type: boolean
       kilometre_amount:
         description: the regarding kilometre amount
+        example: 25.12
         type: number
       lunches:
         description: the amount of lunches
+        example: 3
         type: integer
       name:
         description: Name of the Teacher
+        example: Stefan
         type: string
       nightly_charges_mode:
         description: the mode how nightly charges are handled
+        example: 1
         type: integer
       no_travel_costs:
         description: whether there aren't any travel costs
+        example: true
         type: boolean
       nr_and_indications_of_participants:
         description: whether the participants of the trip are counted and clearly
           indicated
+        example: true
         type: boolean
       official_business_card_got:
         description: whether the teacher got a official business card
+        example: true
         type: boolean
       replacement_for_advantage_card:
         description: whether the teacher got a replacement for an advantage card
+        example: false
         type: boolean
       replacement_for_train_card_class_2:
         description: whether the teacher got a replacement for a train card class
           2
+        example: false
         type: boolean
       reviewer:
         description: the reviewer reviewing the approval of this application
         type: string
       shortened_amount:
         description: the amount the daily charges should be shortened
+        example: 0
         type: number
       staffnr:
         description: The personnel number of the teacher
+        example: 938503154
         type: integer
       starting_point:
         description: the starting point of the trip
+        example: TGM, Wexstraße 19-23, 1220 Wien
         type: string
       surname:
         description: Surname of the Teacher
+        example: Zakall
         type: string
       title:
         description: Title of the Teacher
         type: string
       travel_costs_cited:
         description: whether the travel costs are clearly cited
+        example: false
         type: boolean
       travel_costs_pre_grant:
         description: The granted travel costs
+        example: 0
         type: number
       travel_grant:
         description: whether the teacher got a travel grant
+        example: false
         type: boolean
       trip_begin_time:
         description: The time the trip begins
@@ -432,79 +527,96 @@ definitions:
   rest.Error:
     properties:
       error:
-        description: Message is the message that should be sent
+        description: the message that should be sent
+        example: couldn't convert token'
         type: string
     type: object
   rest.Excel:
     properties:
       excel:
         description: Content is the content of the excel file
+        example: <base64>
         type: string
     type: object
   rest.Information:
     properties:
       info:
-        description: Message is the message that should be sent
+        description: the message that should be sent
+        example: updated teacher successfully
         type: string
     type: object
   rest.News:
     properties:
       last_changed:
         description: LastChanged is the date of last changes of the application
+        example: 2009-11-10 23:00:00 +0000 UTC m=+0.000000001
         type: string
       state:
         description: State of the application
+        example: 3
         type: integer
       title:
         description: Title of the application
+        example: Sommersportwoche
         type: string
       uuid:
         description: UUID of the application
+        example: 3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4
         type: string
     type: object
   rest.PDF:
     properties:
       pdf:
         description: Content is the content of this file
+        example: <base64>
         type: string
     type: object
   rest.Permissions:
     properties:
       administration:
         description: Administration permission
+        example: true
         type: boolean
       av:
         description: AV permission
+        example: true
         type: boolean
       pek:
         description: PEK permission
+        example: true
         type: boolean
       super_user:
         description: SuperUser permission
+        example: true
         type: boolean
     type: object
   rest.RefreshToken:
     properties:
       refresh_token:
         description: Token is the refresh token
+        example: <jwt-token>
         type: string
     type: object
   rest.TokenPair:
     properties:
       access_token:
-        description: AccessToken the access token
+        description: the access token
+        example: <jwt-token>
         type: string
       refresh_token:
-        description: RefreshToken the refresh token
+        description: the refresh token
+        example: <jwt-token>
         type: string
     type: object
   rest.User:
     properties:
       password:
         description: Password of the user
+        example: password1234
         type: string
       username:
         description: Username of the user
+        example: lehrer1234
         type: string
     type: object
 host: localhost:8080
@@ -515,7 +627,7 @@ info:
     url: https://mbeier.at
   description: This REST-API provides the backend of Refundable
   license:
-    name: MIT
+    name: MIT Lizenz
     url: https://github.com/refundable-tgm/huginn/blob/master/LICENSE
   title: Refundable
   version: "1.1"

@@ -91,25 +91,25 @@ const (
 // An Application filed by a teacher represents the core group of data in this Application
 type Application struct {
 	// A generated uuid of this application
-	UUID string `json:"uuid"`
+	UUID string `json:"uuid" example:"693aa616-9895-418b-8904-765f0f6d26a4"`
 	// The name on how this Application should be referenced by
-	Name string `json:"name"`
+	Name string `json:"name" example:"Sommersportwoche"`
 	// The kind of this Application (for more see the Enum for the kinds of Application on this level only Training, SchoolEvent and OtherReason is applicable, the sub kinds should be used in the further detail section of the corresponding site)
-	Kind int `json:"kind"`
+	Kind int `json:"kind" example:"0"`
 	// The Reasoning of this Application (there is none if this isn't of the type Miscellaneous)
-	MiscellaneousReason string `json:"miscellaneous_reason"`
+	MiscellaneousReason string `json:"miscellaneous_reason" example:"Guter Grund"`
 	// The Progress of this Application in filing (for more see the Enum for the Progress)
-	Progress int `json:"progress"`
+	Progress int `json:"progress" example:"3"`
 	// the time the underlying event of this Application starts
 	StartTime time.Time `json:"start_time"`
 	// the time the underlying event of this Application ends
 	EndTime time.Time `json:"end_time"`
 	// Other Notes regarding this Application
-	Notes string `json:"notes"`
+	Notes string `json:"notes" example:"Wichtig ist, dass wir die Reise bewilligen lassen!"`
 	// The starting address of this Application
-	StartAddress string `json:"start_address"`
+	StartAddress string `json:"start_address" example:"TGM, Wexstraße 19-23, 1220 Wien"`
 	// The Destination Address of this Application
-	DestinationAddress string `json:"destination_address"`
+	DestinationAddress string `json:"destination_address" example:"Karl Hönck Heim, Kärnten"`
 	// The timestamp this application was changed last
 	LastChanged time.Time `json:"last_changed"`
 	// Further Details if this is of the kind SchoolEvent, if not this will be empty
@@ -127,13 +127,13 @@ type Application struct {
 // SchoolEventDetails are details an Application has if it is of the kind of SchoolEvent
 type SchoolEventDetails struct {
 	// The participating classes
-	Classes []string `json:"classes"`
+	Classes []string `json:"classes" example:"5BHIT, 5AHIT, 5CHIT, 5DHIT"`
 	// The amount of male students
-	AmountMaleStudents int `json:"amount_male_students"`
+	AmountMaleStudents int `json:"amount_male_students" example:"17"`
 	// The amount of female students
-	AmountFemaleStudents int `json:"amount_female_students"`
+	AmountFemaleStudents int `json:"amount_female_students" example:"0"`
 	// The duration of the event in days
-	DurationInDays int `json:"duration_in_days"`
+	DurationInDays int `json:"duration_in_days" example:"2"`
 	// Details of each teacher participating in the SchoolEvent
 	Teachers []SchoolEventTeacherDetails `json:"teachers"`
 }
@@ -141,63 +141,63 @@ type SchoolEventDetails struct {
 // SchoolEventTeacherDetails are details of each teacher participating in a SchoolEvent
 type SchoolEventTeacherDetails struct {
 	// The full name of a teacher
-	Name string `json:"name"`
+	Name string `json:"name" example:"Stefan Zakall"`
 	// The short name (abbrevation) of a teacher
-	Shortname string `json:"shortname"`
+	Shortname string `json:"shortname" example:"szakall"`
 	// The teacher will be attending the SchoolEvent from
 	AttendanceFrom time.Time `json:"attendance_from"`
 	// The teacher will be attend the SchoolEvent till
 	AttendanceTill time.Time `json:"attendance_till"`
 	// The group number
-	Group int `json:"group"`
+	Group int `json:"group" example:"1"`
 	// Where the teacher starts their travel from
-	StartAddress string `json:"start_address"`
+	StartAddress string `json:"start_address" example:"TGM, Wexstraße 19-23, 1220 Wien"`
 	// Where the teacher will meet with the group to travel together
-	MeetingPoint string `json:"meeting_point"`
+	MeetingPoint string `json:"meeting_point" example:"TGM, Wexstraße 19-23, 1220 Wien"`
 	// The role of each teacher (Leader or Companion)
-	Role int `json:"role"`
+	Role int `json:"role" example:"0"`
 }
 
 // TrainingDetails are details an Application has if it is of the kind of Training
 type TrainingDetails struct {
 	// The kind of Training
-	Kind int `json:"kind"`
+	Kind int `json:"kind" example:"2"`
 	// if its miscellaneous a reasoning for the Training
-	MiscellaneousReason string `json:"miscellaneous_reason"`
+	MiscellaneousReason string `json:"miscellaneous_reason" example:"Ein sonstiger Grund"`
 	// the personnel number of the teacher
-	PH int `json:"ph"`
+	PH int `json:"ph" example:"938503154"`
 	// The company who organizes the Training
-	Organizer string `json:"organizer"`
+	Organizer string `json:"organizer" example:"Accenture"`
 }
 
 // OtherReasonDetails are details an Application has if it isnt a Training or SchoolEvent
 type OtherReasonDetails struct {
 	// The kind of other Reason this Application is filed
-	Kind int `json:"kind"`
+	Kind int `json:"kind" example:"7"`
 	// The title if the other reason is a ServiceMandate
-	ServiceMandateTitle string `json:"service_mandate_title"`
+	ServiceMandateTitle string `json:"service_mandate_title" example:"Dienstverrichtung"`
 	// the gz number if the other reason is a ServiceMandate
 	ServiceMandateGZ int `json:"service_mandate_gz"`
 	// the reasoning if the other reason is of kind Miscellaneous
-	MiscellaneousReason string `json:"miscellaneous_reason"`
+	MiscellaneousReason string `json:"miscellaneous_reason" example:"Ein guter Grund"`
 	// the teacher this application belongs to
-	Filer string `json:"filer"`
+	Filer string `json:"filer" example:"Stefan Zakall"`
 }
 
 // A BusinessTripApplication represents one Business Trip Application belonging to an Application for each teacher
 type BusinessTripApplication struct {
 	// The id (counting upwards) of this BusinessTripApplication regarding to the uid
-	ID int `json:"id"`
+	ID int `json:"id" example:"1"`
 	// Surname of the Teacher
-	Surname string `json:"surname"`
+	Surname string `json:"surname" example:"Zakall"`
 	// Name of the Teacher
-	Name string `json:"name"`
+	Name string `json:"name" example:"Stefan"`
 	// Degree of the Teacher
-	Degree string `json:"degree"`
+	Degree string `json:"degree" example:"DI"`
 	// Title of the Teacher
-	Title string `json:"title"`
+	Title string `json:"title" example:""`
 	// The staffnr of the regarding teacher
-	Staffnr int `json:"staffnr"`
+	Staffnr int `json:"staffnr" example:"938503154"`
 	// The time the trip begins
 	TripBeginTime time.Time `json:"trip_begin_time"`
 	// The time the trip ends
@@ -207,33 +207,33 @@ type BusinessTripApplication struct {
 	// The time the service ends
 	ServiceEndTime time.Time `json:"service_end_time"`
 	// The trip goal (address)
-	TripGoal string `json:"trip_goal"`
+	TripGoal string `json:"trip_goal" example:"Technisches Museum Wien"`
 	// The purpose of travelling
-	TravelPurpose string `json:"travel_purpose"`
+	TravelPurpose string `json:"travel_purpose" example:"Lehrausgang"`
 	// The travel mode (see the regarding Enum for this)
-	TravelMode int `json:"travel_mode"`
+	TravelMode int `json:"travel_mode" example:"6"`
 	// The starting point (see the regarding Enum: OwnApartment or Office
-	StartingPoint int `json:"starting_point"`
+	StartingPoint int `json:"starting_point" example:"1"`
 	// The end point (see the regarding Enum: OwnApartment or Office)
-	EndPoint int `json:"end_point"`
+	EndPoint int `json:"end_point" example:"1"`
 	// The reasoing behind the trip application
-	Reasoning string `json:"reasoning"`
+	Reasoning string `json:"reasoning" example:"Lehrausgang ins technische Museum"`
 	// The name of other participants of this trip
-	OtherParticipants []string `json:"other_participants"`
+	OtherParticipants []string `json:"other_participants" example:"Markus Schabel, Gottfried Koppensteiner"`
 	// the confirmation of the first bonus mile clause
-	BonusMileConfirmation1 bool `json:"bonus_mile_confirmation_1"`
+	BonusMileConfirmation1 bool `json:"bonus_mile_confirmation_1" example:"true"`
 	// the confirmation of the second bonus mile clause
-	BonusMileConfirmation2 bool `json:"bonus_mile_confirmation_2"`
+	BonusMileConfirmation2 bool `json:"bonus_mile_confirmation_2" example:"true"`
 	// whether the travel costs are paid by someone else
-	TravelCostsPaidBySomeone bool `json:"travel_costs_paid_by_someone"`
+	TravelCostsPaidBySomeone bool `json:"travel_costs_paid_by_someone" example:"true"`
 	// whether the staying costs are paid by someone else
-	StayingCostsPaidBySomeone bool `json:"staying_costs_paid_by_someone"`
+	StayingCostsPaidBySomeone bool `json:"staying_costs_paid_by_someone" example:"true"`
 	// if some costs are paid by someone else by whom
-	PaidByWhom string `json:"paid_by_whom"`
+	PaidByWhom string `json:"paid_by_whom" example:"Technologenverband"`
 	// other costs which appeared
-	OtherCosts float32 `json:"other_costs"`
+	OtherCosts float32 `json:"other_costs" example:"2.42"`
 	// the total estimated costs
-	EstimatedCosts float32 `json:"estimated_costs"`
+	EstimatedCosts float32 `json:"estimated_costs" example:"25.32"`
 	// the date this application is filed
 	DateApplicationFiled time.Time `json:"date_application_filed"`
 	// the date this application is approved
@@ -241,35 +241,35 @@ type BusinessTripApplication struct {
 	// the referee checking this application
 	Referee string `json:"referee"`
 	// whether a business card was emitted outwards
-	BusinessCardEmittedOutward bool `json:"business_card_emitted_outward"`
+	BusinessCardEmittedOutward bool `json:"business_card_emitted_outward" example:"false"`
 	// whether a business card was emitted on the return
-	BusinessCardEmittedReturn bool `json:"business_card_emitted_return"`
+	BusinessCardEmittedReturn bool `json:"business_card_emitted_return" example:"false"`
 }
 
 // A TravelInvoice represents one Travel Invoice belonging to an Application for each teacher
 type TravelInvoice struct {
 	// The id (counting upwards) of this TravelInvoice regarding to the uid
-	ID int `json:"id"`
+	ID int `json:"id" example:"1"`
 	// Surname of the Teacher
-	Surname string `json:"surname"`
+	Surname string `json:"surname" example:"Zakall"`
 	// Name of the Teacher
-	Name string `json:"name"`
+	Name string `json:"name" example:"Stefan"`
 	// Degree of the Teacher
-	Degree string `json:"degree"`
+	Degree string `json:"degree" example:"DI"`
 	// Title of the Teacher
-	Title string `json:"title"`
+	Title string `json:"title" example:""`
 	// The time the trip begins
 	TripBeginTime time.Time `json:"trip_begin_time"`
 	// The time the trip ends
 	TripEndTime time.Time `json:"trip_end_time"`
 	// The granted travel costs
-	TravelCostsPreGrant float32 `json:"travel_costs_pre_grant"`
+	TravelCostsPreGrant float32 `json:"travel_costs_pre_grant" example:"0"`
 	// The personnel number of the teacher
-	Staffnr int `json:"staffnr"`
+	Staffnr int `json:"staffnr" example:"938503154"`
 	// the starting point of the trip
-	StartingPoint string `json:"starting_point"`
+	StartingPoint string `json:"starting_point" example:"TGM, Wexstraße 19-23, 1220 Wien"`
 	// the end point of the trip
-	EndPoint string `json:"end_point"`
+	EndPoint string `json:"end_point" example:"Hauptbahnhof, 1220 Wien"`
 	// the clerk maintaining and checking this application
 	Clerk string `json:"clerk"`
 	// the reviewer reviewing the approval of this application
@@ -281,35 +281,35 @@ type TravelInvoice struct {
 	// the date this application was approved
 	ApprovalDate time.Time `json:"approval_date"`
 	// the mode how daily charges are handled
-	DailyChargesMode int `json:"daily_charges_mode"`
+	DailyChargesMode int `json:"daily_charges_mode" example:"1"`
 	// the amount the daily charges should be shortened
-	ShortenedAmount float32 `json:"shortened_amount"`
+	ShortenedAmount float32 `json:"shortened_amount" example:"0"`
 	// the mode how nightly charges are handled
-	NightlyChargesMode int `json:"nightly_charges_mode"`
+	NightlyChargesMode int `json:"nightly_charges_mode" example:"1"`
 	// the amount of breakfasts
-	Breakfasts int `json:"breakfasts"`
+	Breakfasts int `json:"breakfasts" example:"2"`
 	// the amount of lunches
-	Lunches int `json:"lunches"`
+	Lunches int `json:"lunches" example:"3"`
 	// the amount of dinners
-	Dinners int `json:"dinners"`
+	Dinners int `json:"dinners" example:"4"`
 	// whether the teacher got a official business card
-	OfficialBusinessCardGot bool `json:"official_business_card_got"`
+	OfficialBusinessCardGot bool `json:"official_business_card_got" example:"true"`
 	// whether the teacher got a travel grant
-	TravelGrant bool `json:"travel_grant"`
+	TravelGrant bool `json:"travel_grant" example:"false"`
 	// whether the teacher got a replacement for an advantage card
-	ReplacementForAdvantageCard bool `json:"replacement_for_advantage_card"`
+	ReplacementForAdvantageCard bool `json:"replacement_for_advantage_card" example:"false"`
 	// whether the teacher got a replacement for a train card class 2
-	ReplacementForTrainCardClass2 bool `json:"replacement_for_train_card_class_2"`
+	ReplacementForTrainCardClass2 bool `json:"replacement_for_train_card_class_2" example:"false"`
 	// whether the teacher got a kilometre allowance
-	KilometreAllowance bool `json:"kilometre_allowance"`
+	KilometreAllowance bool `json:"kilometre_allowance" example:"true"`
 	// the regarding kilometre amount
-	KilometreAmount float32 `json:"kilometre_amount"`
+	KilometreAmount float32 `json:"kilometre_amount" example:"25.12"`
 	// whether the participants of the trip are counted and clearly indicated
-	NRAndIndicationsOfParticipants bool `json:"nr_and_indications_of_participants"`
+	NRAndIndicationsOfParticipants bool `json:"nr_and_indications_of_participants" example:"true"`
 	// whether the travel costs are clearly cited
-	TravelCostsCited bool `json:"travel_costs_cited"`
+	TravelCostsCited bool `json:"travel_costs_cited" example:"false"`
 	// whether there aren't any travel costs
-	NoTravelCosts bool `json:"no_travel_costs"`
+	NoTravelCosts bool `json:"no_travel_costs" example:"true"`
 	// the regarding calculation
 	Calculation Calculation `json:"calculation"`
 }
@@ -317,7 +317,7 @@ type TravelInvoice struct {
 // Calculation represent the calc field in a TravelInvoice
 type Calculation struct {
 	// the id of this calculation
-	ID int `json:"id"`
+	ID int `json:"id" example:"1"`
 	// rows of this calculation
 	Rows []Row `json:"rows"`
 	// the sum of all travel costs
@@ -335,7 +335,7 @@ type Calculation struct {
 // A Row in a Calculation
 type Row struct {
 	// The row nr
-	NR int `json:"nr"`
+	NR int `json:"nr" example:"1"`
 	// The date this Row refers to
 	Date time.Time `json:"date"`
 	// the begin time this Row refers to
@@ -343,35 +343,35 @@ type Row struct {
 	// the end time this Row refers to
 	End time.Time `json:"end"`
 	// the kind of costs this row describes (see costs enum)
-	KindsOfCost []int `json:"kind_of_cost"`
+	KindsOfCost []int `json:"kind_of_cost" example:"1,2,3"`
 	// the amount of kilometres this row refers to
-	Kilometres float32 `json:"kilometres"`
+	Kilometres float32 `json:"kilometres" example:"4.32"`
 	// the travelCosts this Row conducts
-	TravelCosts float32 `json:"travel_costs"`
+	TravelCosts float32 `json:"travel_costs" example:"4.32"`
 	// the dailyCharges this Row conducts
-	DailyCharges float32 `json:"daily_charges"`
+	DailyCharges float32 `json:"daily_charges" example:"4.32"`
 	// the nightlyCharges this Row conducts
-	NightlyCharges float32 `json:"nightly_charges"`
+	NightlyCharges float32 `json:"nightly_charges" example:"4.32"`
 	// the additionalCosts this Row conducts
-	AdditionalCosts float32 `json:"additional_costs"`
+	AdditionalCosts float32 `json:"additional_costs" example:"4.32"`
 	// the sum of all costs in this Row
-	Sum float32 `json:"sum"`
+	Sum float32 `json:"sum" example:"4.32"`
 }
 
 // Teacher includes further information of a teacher (which isnt saved in the LDAP-instance)
 type Teacher struct {
 	// the uuid of this Teacher
-	UUID string `json:"uuid"`
+	UUID string `json:"uuid" example:"3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4"`
 	// the short name of the Teacher
-	Short string `json:"short"`
+	Short string `json:"short" example:"szakall"`
 	// the longname (firstname + sirname) of the Teacher
-	Longname string `json:"longname"`
+	Longname string `json:"longname" example:"Stefan Zakall"`
 	// Superuser (total admin) of this software
-	SuperUser bool `json:"super_user"`
+	SuperUser bool `json:"super_user" example:"true"`
 	// whether this Teacher as av rights
-	AV bool `json:"av"`
+	AV bool `json:"av" example:"true"`
 	// whether this Teacher as administration rights
-	Administration bool `json:"administration"`
+	Administration bool `json:"administration" example:"true"`
 	// whether this Teacher as pek rights
-	PEK bool `json:"pek"`
+	PEK bool `json:"pek" example:"true"`
 }
