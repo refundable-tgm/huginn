@@ -628,7 +628,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 			m.ColSpace(2)
 
 			m.Col(2, func() {
-				m.Text("Abgeltung für pädagogische Betreeung gemäß §63a", props.Text{
+				m.Text("Abgeltung für pädagogische Betreuung gemäß §63a", props.Text{
 					Align:  consts.Center,
 					Family: consts.Helvetica,
 					Size:   12,
