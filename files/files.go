@@ -2915,5 +2915,5 @@ func getURL() string {
 	if err != nil {
 		return ""
 	}
-	return string(file)
+	return string(file) + "/viewer?uuid="
 }
