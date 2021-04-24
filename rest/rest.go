@@ -35,10 +35,23 @@ const DebugFilePath = "/vol/files/.debug"
 // @BasePath /api
 // @query.collection.format multi
 func StartService() {
+	// initializing Token Manager
 	InitTokenManager()
+
+	// Creating new Router
 	router := gin.Default()
+
+	// Setting Mode of API
 	gin.SetMode(getMode())
 
+	// Handling CORS Requests
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+	config.AddAllowHeaders("Authorization")
+	router.Use(cors.New(config))
+
+	// Registering routes under API Group
 	api := router.Group("/api")
 	{
 		api.POST("/login", Login)
@@ -75,13 +88,6 @@ func StartService() {
 	router.GET("/", func(context *gin.Context) {
 		context.Redirect(http.StatusMovedPermanently, "swagger/index.html")
 	})
-
-	// Handling CORS Requests
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowCredentials = true
-	config.AddAllowHeaders("Authorization")
-	router.Use(cors.New(config))
 
 	// Starting
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
