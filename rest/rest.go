@@ -77,7 +77,11 @@ func StartService() {
 	})
 
 	// Handling CORS Requests
-	router.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+	config.AddAllowHeaders("Authorization")
+	router.Use(cors.New(config))
 
 	// Starting
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
