@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	// import to make swagger docs accessible
 	_ "github.com/refundable-tgm/huginn/docs"
@@ -45,11 +44,17 @@ func StartService() {
 	gin.SetMode(getMode())
 
 	// Handling CORS Requests
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowCredentials = true
-	config.AddAllowHeaders("Authorization")
-	router.Use(cors.New(config))
+	router.Use(func(context *gin.Context) {
+		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		context.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		context.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		context.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+		if context.Request.Method == "OPTIONS" {
+			context.AbortWithStatus(204)
+			return
+		}
+		context.Next()
+	})
 
 	// Registering routes under API Group
 	api := router.Group("/api")
