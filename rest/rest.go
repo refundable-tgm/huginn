@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	// import to make swagger docs accessible
 	_ "github.com/refundable-tgm/huginn/docs"
@@ -64,15 +65,21 @@ func StartService() {
 		api.POST("/saveBillingReceipt", AuthWall(), SaveBillingReceipt)
 	}
 
+	// Not Found Route
 	router.NoRoute(func(context *gin.Context) {
 		context.JSON(http.StatusNotFound, Error{"this endpoint doesn't exist"})
 	})
 
+	// Providing API
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/", func(context *gin.Context) {
 		context.Redirect(http.StatusMovedPermanently, "swagger/index.html")
 	})
 
+	// Handling CORS Requests
+	router.Use(cors.Default())
+
+	// Starting
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
 
