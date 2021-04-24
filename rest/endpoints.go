@@ -857,7 +857,7 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
 // @Param uuid query string true "Identifier of the application to generate the pdf from"
-// @Param teacher query string true "UNTIS-abbrevation name of the teacher"
+// @Param teacher query string false "untis name of the teacher, if not provided logged in teacher will be used"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
 // @Failure 422 {object} Error
@@ -881,11 +881,11 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		return
 	}
 	uuid := query.Get("uuid")
-	if _, hasTeacher := con.Request.Form["teacher"]; !hasTeacher {
-		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
-		return
+	_, applyTeacher := con.Request.Form["teacher"]
+	teacher := ""
+	if applyTeacher {
+		teacher = query.Get("teacher")
 	}
-	teacher := query.Get("teacher")
 	application := db.GetApplication(uuid)
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	var in bool
@@ -906,7 +906,11 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 			in = true
 		}
 	}
-	if !(in || requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser) {
+	if !(!applyTeacher && in) {
+		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
+		return
+	}
+	if !(applyTeacher && (requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser)) {
 		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
@@ -915,7 +919,12 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create directories"})
 		return
 	}
-	path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, teacher, application)
+	if applyTeacher {
+		// ToDo prepare teacher variable for untis data model
+		path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, teacher, application)
+	} else {
+		path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, "self", application)
+	}
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
 		return

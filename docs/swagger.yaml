@@ -772,10 +772,10 @@ paths:
         name: uuid
         required: true
         type: string
-      - description: UNTIS-abbrevation name of the teacher
+      - description: untis name of the teacher, if not provided logged in teacher
+          will be used
         in: query
         name: teacher
-        required: true
         type: string
       produces:
       - application/json

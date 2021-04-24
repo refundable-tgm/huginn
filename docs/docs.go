@@ -241,10 +241,9 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "UNTIS-abbrevation name of the teacher",
+                        "description": "untis name of the teacher, if not provided logged in teacher will be used",
                         "name": "teacher",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {

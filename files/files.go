@@ -1159,9 +1159,19 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		})
 	})
 	tableStrings := make([][]string, 0)
-	lessons, err := client.GetTimetableOfSpecificTeacher(app.StartTime, app.EndTime, teacher)
-	if err != nil {
-		return "", err
+	lessons := make([]untis.Lesson, 0)
+	if teacher == "self" {
+		var err error
+		lessons, err = client.GetTimetableOfTeacher(app.StartTime, app.EndTime)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		var err error
+		lessons, err = client.GetTimetableOfSpecificTeacher(app.StartTime, app.EndTime, teacher)
+		if err != nil {
+			return "", err
+		}
 	}
 	for _, lesson := range lessons {
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
@@ -1231,7 +1241,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 	})
 
 	savePath := filepath.Join(path, fmt.Sprintf(TeacherAbsenceFormFileName, username))
-	err = m.OutputFileAndClose(savePath)
+	err := m.OutputFileAndClose(savePath)
 	if err != nil {
 		return "", fmt.Errorf("could not save pdf: %v", err)
 	}
