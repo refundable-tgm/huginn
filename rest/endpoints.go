@@ -1453,6 +1453,7 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 // @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
 // @Param uuid query string true "Identifier of the application to generate the excel from"
 // @Param short query string true "Short name of the teacher this should be generated for"
+// @Param files body PDFs true "The files to save as an array of the base64 decoded file contents"
 // @Success 200 {object} Information
 // @Failure 401 {object} Error
 // @Failure 422 {object} Error

@@ -66,7 +66,7 @@ type PDF struct {
 
 // PDFs is a wrapper for a single pdf
 type PDFs struct {
-	Files []PDF `json:"files" example:"[<base64>, <base64>]"`
+	Files []PDF `json:"files"`
 }
 
 // Excel represents an excel output

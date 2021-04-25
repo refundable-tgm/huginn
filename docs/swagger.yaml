@@ -571,6 +571,13 @@ definitions:
         example: <base64>
         type: string
     type: object
+  rest.PDFs:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/rest.PDF'
+        type: array
+    type: object
   rest.Permissions:
     properties:
       administration:
@@ -627,7 +634,7 @@ info:
     url: https://mbeier.at
   description: This REST-API provides the backend of Refundable
   license:
-    name: MIT Lizenz
+    name: MIT License
     url: https://github.com/refundable-tgm/huginn/blob/master/LICENSE
   title: Refundable
   version: "1.1"
@@ -1392,6 +1399,12 @@ paths:
         name: short
         required: true
         type: string
+      - description: The files to save as an array of the base64 decoded file contents
+        in: body
+        name: files
+        required: true
+        schema:
+          $ref: '#/definitions/rest.PDFs'
       produces:
       - application/json
       responses:

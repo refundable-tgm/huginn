@@ -24,7 +24,7 @@ var doc = `{
             "email": "admin@mbeier.at"
         },
         "license": {
-            "name": "MIT Lizenz",
+            "name": "MIT License",
             "url": "https://github.com/refundable-tgm/huginn/blob/master/LICENSE"
         },
         "version": "{{.Version}}"
@@ -1144,6 +1144,15 @@ var doc = `{
                         "name": "short",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "description": "The files to save as an array of the base64 decoded file contents",
+                        "name": "files",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.PDFs"
+                        }
                     }
                 ],
                 "responses": {
@@ -2033,6 +2042,17 @@ var doc = `{
                     "description": "Content is the content of this file",
                     "type": "string",
                     "example": "\u003cbase64\u003e"
+                }
+            }
+        },
+        "rest.PDFs": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest.PDF"
+                    }
                 }
             }
         },

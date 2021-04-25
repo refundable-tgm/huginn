@@ -29,7 +29,7 @@ const DebugFilePath = "/vol/files/.debug"
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-// @license.name MIT Lizenz
+// @license.name MIT License
 // @license.url https://github.com/refundable-tgm/huginn/blob/master/LICENSE
 // @host localhost:8080
 // @BasePath /api
