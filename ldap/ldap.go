@@ -29,12 +29,13 @@ func AuthenticateUserCredentials(username, password string) bool {
 		return false
 	}
 	mongo := db.MongoDatabaseConnector{}
-	defer mongo.Close()
 	if !mongo.Connect() {
+		mongo.Close()
 		return false
 	}
 	longname, err := GetLongName(username, password)
 	if err != nil {
+		mongo.Close()
 		return false
 	}
 	if !mongo.DoesTeacherExistsByShort(username) {
@@ -48,6 +49,7 @@ func AuthenticateUserCredentials(username, password string) bool {
 			PEK:            false,
 		})
 	}
+	mongo.Close()
 	return true
 }
 
