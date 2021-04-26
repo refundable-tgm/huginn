@@ -71,6 +71,9 @@ func CreateClient(username, password string) *Client {
 		Closed:        false,
 		Authenticated: false,
 	}
+	if activeClients == nil {
+		activeClients = make(map[string]Client)
+	}
 	activeClients[username] = client
 	return &client
 }
