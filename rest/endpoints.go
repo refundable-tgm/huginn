@@ -178,11 +178,11 @@ func GetTeacherByShort(con *gin.Context) {
 	}
 	name := query.Get("name")
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	teacher := db.GetTeacherByShort(name)
 	con.JSON(http.StatusOK, teacher)
 }
@@ -213,11 +213,11 @@ func GetTeacher(con *gin.Context) {
 	}
 	uuid := query.Get("uuid")
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	teacher := db.GetTeacherByUUID(uuid)
 	con.JSON(http.StatusOK, teacher)
 }
@@ -254,11 +254,11 @@ func SetTeacherPermissions(con *gin.Context) {
 	}
 	uuid := query.Get("uuid")
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	requester := db.GetTeacherByShort(auth.Username)
 	if !(requester.PEK || requester.Administration || requester.AV || requester.SuperUser) {
 		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
@@ -295,11 +295,11 @@ func GetActiveApplications(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	_, applyFilter := con.Request.Form["username"]
@@ -356,11 +356,11 @@ func GetAllApplications(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	_, applyFilter := con.Request.Form["username"]
@@ -416,11 +416,11 @@ func GetNews(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	user := auth.Username
 	applications := db.GetActiveApplications()
 	res := make([]mongo.Application, 0)
@@ -476,11 +476,11 @@ func GetApplication(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
 	if query.Get("uuid") == "" {
@@ -532,11 +532,11 @@ func GetAdminApplications(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	teacher := db.GetTeacherByShort(auth.Username)
 	if !(teacher.PEK || teacher.Administration || teacher.AV || teacher.SuperUser) {
 		con.JSON(http.StatusUnauthorized, Error{"unauthorized"})
@@ -589,11 +589,11 @@ func CreateApplication(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	if db.CreateApplication(app) {
 		con.JSON(http.StatusOK, Information{"success; application created"})
 	} else {
@@ -627,11 +627,11 @@ func UpdateApplication(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
 	if query.Get("uuid") == "" {
@@ -689,11 +689,11 @@ func DeleteApplication(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	query := con.Request.URL.Query()
 	uuid := query.Get("uuid")
 	if query.Get("uuid") == "" {
@@ -751,11 +751,11 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -869,11 +869,11 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -958,11 +958,11 @@ func GetCompensationForEducationalSupportForm(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -1036,11 +1036,11 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -1171,11 +1171,11 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -1269,11 +1269,11 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -1367,11 +1367,11 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
@@ -1470,11 +1470,11 @@ func SaveBillingReceipt(con *gin.Context) {
 		return
 	}
 	db := mongo.MongoDatabaseConnector{}
-	defer db.Close()
 	if !db.Connect() {
 		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
 		return
 	}
+	defer db.Close()
 	_ = con.Request.ParseForm()
 	query := con.Request.URL.Query()
 	if _, hasUUID := con.Request.Form["uuid"]; !hasUUID {
