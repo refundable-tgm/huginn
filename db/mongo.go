@@ -267,5 +267,6 @@ func getInitUserName() string {
 	if err != nil {
 		return ""
 	}
-	return string(file)
+	name := strings.TrimSuffix(string(file), "\n")
+	return name
 }

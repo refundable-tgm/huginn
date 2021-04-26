@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -2925,5 +2926,6 @@ func getURL() string {
 	if err != nil {
 		return ""
 	}
-	return string(file) + "/viewer?uuid="
+	url := strings.TrimSuffix(string(file), "\n")
+	return url + "/viewer?uuid="
 }
