@@ -920,8 +920,8 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		return
 	}
 	if applyTeacher {
-		// ToDo prepare teacher variable for untis data model
-		path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, teacher, application)
+		reqTeacher := db.GetTeacherByShort(teacher)
+		path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, reqTeacher.Longname, application)
 	} else {
 		path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, "self", application)
 	}

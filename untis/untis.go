@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -550,7 +551,7 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 			ID        int    `json:"id"`
 			Name      string `json:"name"`
 			ForeName  string `json:"foreName"`
-			Longname  string `json:"longName"`
+			LongName  string `json:"longName"`
 			ForeColor string `json:"foreColor"`
 			BackColor string `json:"backColor"`
 		} `json:"result"`
@@ -562,7 +563,10 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 	rid, _ := strconv.Atoi(r.ID)
 	if rid == id {
 		for _, res := range r.Result {
-			if teacher == res.Name {
+			split := strings.Split(teacher, " ")
+			forename := split[0]
+			longname := split[1]
+			if forename == res.ForeName && longname == res.LongName {
 				return res.ID, nil
 			}
 		}
