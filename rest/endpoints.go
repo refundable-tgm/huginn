@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
 	mongo "github.com/refundable-tgm/huginn/db"
@@ -583,6 +584,7 @@ func CreateApplication(con *gin.Context) {
 		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
+	app.UUID = uuid.NewString()
 	_, err := ExtractTokenMeta(con.Request)
 	if err != nil {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
