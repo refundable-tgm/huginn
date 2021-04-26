@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -255,7 +256,9 @@ func resolveURI() (URI string, database string, ok bool) {
 		log.Println(err)
 		return "", "", false
 	}
-	return "mongodb://" + string(username) + ":" + string(password) + "@" + "mongo:27017", database, true
+	usernameString := strings.TrimSuffix(string(username), "\n")
+	passwordString := strings.TrimSuffix(string(password), "\n")
+	return "mongodb://" + usernameString + ":" + passwordString + "@" + "mongo:27017", database, true
 }
 
 // getInitUserName returns the in the config file set username to set the first super user

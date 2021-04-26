@@ -30,7 +30,6 @@ func AuthenticateUserCredentials(username, password string) bool {
 	}
 	mongo := db.MongoDatabaseConnector{}
 	if !mongo.Connect() {
-		mongo.Close()
 		return false
 	}
 	longname, err := GetLongName(username, password)
