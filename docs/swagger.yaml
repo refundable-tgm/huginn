@@ -1318,32 +1318,7 @@ paths:
           schema:
             $ref: '#/definitions/rest.Error'
       summary: Login a user
-  /logout:
-    post:
-      consumes:
-      - application/json
-      description: Destroys the session of a user
-      operationId: logout
-      parameters:
-      - default: Bearer <Add access token here>
-        description: Access Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/rest.Information'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/rest.Error'
-      summary: Logs out a user
-  /refresh:
+  /login/refresh:
     post:
       consumes:
       - application/json
@@ -1376,6 +1351,31 @@ paths:
           schema:
             $ref: '#/definitions/rest.Error'
       summary: Refreshes the token pair of a session
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Destroys the session of a user
+      operationId: logout
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Logs out a user
   /saveBillingReceipt:
     post:
       consumes:

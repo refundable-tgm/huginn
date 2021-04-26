@@ -101,7 +101,7 @@ func Logout(con *gin.Context) {
 // @Failure 401 {object} Error
 // @Failure 403 {object} Error
 // @Failure 422 {object} Error
-// @Router /refresh [post]
+// @Router /login/refresh [post]
 func Refresh(con *gin.Context) {
 	body := RefreshToken{}
 	if err := con.ShouldBindJSON(&body); err != nil {
