@@ -25,7 +25,7 @@ func AuthWall() gin.HandlerFunc {
 	return func(con *gin.Context) {
 		ok, err := TokenValid(con.Request)
 		if !ok && err != nil {
-			con.JSON(http.StatusUnauthorized, Error{err.Error()})
+			con.JSON(http.StatusUnauthorized, Error{"present a valid token"})
 			con.Abort()
 			return
 		}
