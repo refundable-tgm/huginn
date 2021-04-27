@@ -33,10 +33,12 @@ func AuthWall() gin.HandlerFunc {
 		auth, err := ExtractTokenMeta(con.Request)
 		if err != nil {
 			con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
+			con.Abort()
 			return
 		}
 		if _, ok = activeTokens[auth.AccessUUID]; !ok {
 			con.JSON(http.StatusUnauthorized, Error{"token presented is invalid"})
+			con.Abort()
 			return
 		}
 		con.Next()
