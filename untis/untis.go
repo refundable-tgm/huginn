@@ -113,16 +113,16 @@ func (client *Client) Authenticate() error {
 	r := struct {
 		JSONRPC string            `json:"jsonrpc"`
 		ID      string            `json:"id"`
-		Result  map[string]string `json:"result"`
+		Result  map[string]interface{} `json:"result"`
 	}{}
 	err = json.Unmarshal(respBody, &r)
 	if err != nil {
 		return err
 	}
-	personType, _ := strconv.Atoi(r.Result["personType"])
-	personID, _ := strconv.Atoi(r.Result["personId"])
+	personType, _ := r.Result["personType"].(int)
+	personID, _ := r.Result["personId"].(int)
 	if r.ID == strconv.Itoa(id) {
-		client.SessionID = r.Result["sessionID"]
+		client.SessionID = r.Result["sessionId"].(string)
 		client.PersonType = personType
 		client.PersonID = personID
 		client.Authenticated = true
