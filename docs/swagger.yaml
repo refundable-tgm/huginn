@@ -382,6 +382,10 @@ definitions:
     type: object
   db.TrainingDetails:
     properties:
+      filer:
+        description: the teacher this application belongs to
+        example: Stefan Zakall
+        type: string
       kind:
         description: The kind of Training
         example: 2

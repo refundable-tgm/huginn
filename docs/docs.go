@@ -1802,6 +1802,11 @@ var doc = `{
         "db.TrainingDetails": {
             "type": "object",
             "properties": {
+                "filer": {
+                    "description": "the teacher this application belongs to",
+                    "type": "string",
+                    "example": "Stefan Zakall"
+                },
                 "kind": {
                     "description": "The kind of Training",
                     "type": "integer",
