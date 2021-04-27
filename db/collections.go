@@ -168,6 +168,8 @@ type TrainingDetails struct {
 	PH int `json:"ph" example:"938503154"`
 	// The company who organizes the Training
 	Organizer string `json:"organizer" example:"Accenture"`
+	// the teacher this application belongs to
+	Filer string `json:"filer" example:"Stefan Zakall"`
 }
 
 // OtherReasonDetails are details an Application has if it isnt a Training or SchoolEvent
