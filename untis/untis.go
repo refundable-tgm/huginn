@@ -562,15 +562,15 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 	}
 	rid, _ := strconv.Atoi(r.ID)
 	if rid == id {
+		split := strings.Split(teacher, " ")
+		forename := split[0]
+		longname := split[1]
 		for _, res := range r.Result {
-			split := strings.Split(teacher, " ")
-			forename := split[0]
-			longname := split[1]
 			if forename == res.ForeName && longname == res.LongName {
 				return res.ID, nil
 			}
 		}
-		return -1, fmt.Errorf("class not found")
+		return -1, fmt.Errorf("teacher not found")
 	}
 	return -1, fmt.Errorf("ids not matching")
 }
