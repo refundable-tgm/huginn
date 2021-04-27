@@ -532,19 +532,30 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			for _, room := range lesson.Rooms {
 				rooms = rooms + room + ", "
 			}
-			rooms = rooms[0 : len(rooms)-2]
-			supp := ""
-			for _, teach := range lesson.Teachers {
-				supp = supp + teach + ", "
+			if len(rooms) != 0 {
+				rooms = rooms[0 : len(rooms)-2]
 			}
-			supp = supp[0 : len(rooms)-2]
+			classes := ""
+			for _, c := range lesson.Classes {
+				classes = classes + c + ", "
+			}
+			if len(classes) != 0 {
+				classes = classes[0 : len(rooms)-2]
+			}
+			teachers := ""
+			for _, t := range lesson.Teachers {
+				teachers = teachers + t + ", "
+			}
+			if len(teachers) != 0 {
+				teachers = teachers[0 : len(teachers)-2]
+			}
 
-			row := []string{"", class,
+			row := []string{"", classes,
 				date.Format("02.01.2006"),
 				fmt.Sprintf(hourString),
 				rooms,
 				leader + ", " + companion,
-				supp,
+				teachers,
 				"",
 			}
 			tableStrings = append(tableStrings, row)
@@ -1199,18 +1210,29 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		for _, room := range lesson.Rooms {
 			rooms = rooms + room + ", "
 		}
-		rooms = rooms[0 : len(rooms)-2]
+		if len(rooms) != 0 {
+			rooms = rooms[0 : len(rooms)-2]
+		}
 		classes := ""
 		for _, class := range lesson.Classes {
 			classes = classes + class + ", "
 		}
-		classes = classes[0 : len(rooms)-2]
+		if len(classes) != 0 {
+			classes = classes[0 : len(rooms)-2]
+		}
+		teachers := ""
+		for _, t := range lesson.Teachers {
+			teachers = teachers + t + ", "
+		}
+		if len(teachers) != 0 {
+			teachers = teachers[0 : len(teachers)-2]
+		}
 		row := []string{"", classes,
 			fmt.Sprintf("%v", lesson.Start.Format("02.01.2006")),
 			fmt.Sprintf(hourString),
 			rooms,
 			"",
-			username,
+			teachers,
 			"",
 		}
 		tableStrings = append(tableStrings, row)
