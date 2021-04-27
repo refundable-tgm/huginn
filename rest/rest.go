@@ -38,11 +38,15 @@ func StartService() {
 	// initializing Token Manager
 	InitTokenManager()
 
+	// Setting Mode of API
+	if debugMode() {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Creating new Router
 	router := gin.Default()
-
-	// Setting Mode of API
-	gin.SetMode(getMode())
 
 	// Handling CORS Requests
 	config := cors.DefaultConfig()
@@ -93,11 +97,11 @@ func StartService() {
 	log.Fatal(router.Run(":" + strconv.Itoa(Port)))
 }
 
-// getMode analyzes whether a .debug File is present (DebugFilePath)
-// if so return gin.DebugMode if not gin.ReleaseMode
-func getMode() string {
+// setDebugMode analyzes whether a .debug File is present (DebugFilePath)
+// if so return true if not false
+func debugMode() bool {
 	if _, err := os.Stat(DebugFilePath); err == nil {
-		return gin.DebugMode
+		return true
 	}
-	return gin.ReleaseMode
+	return false
 }
