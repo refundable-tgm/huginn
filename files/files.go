@@ -510,6 +510,10 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			})
 		})
 		tableStrings := make([][]string, 0)
+		err := client.Authenticate()
+		if err != nil {
+			return nil, err
+		}
 		lessons, err := client.GetTimetableOfClass(app.StartTime, app.EndTime, class)
 		if err != nil {
 			return nil, err
@@ -1163,12 +1167,20 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 	lessons := make([]untis.Lesson, 0)
 	if teacher == "self" {
 		var err error
+		err = client.Authenticate()
+		if err != nil {
+			return "", err
+		}
 		lessons, err = client.GetTimetableOfTeacher(app.StartTime, app.EndTime)
 		if err != nil {
 			return "", err
 		}
 	} else {
 		var err error
+		err = client.Authenticate()
+		if err != nil {
+			return "", err
+		}
 		lessons, err = client.GetTimetableOfSpecificTeacher(app.StartTime, app.EndTime, teacher)
 		if err != nil {
 			return "", err
