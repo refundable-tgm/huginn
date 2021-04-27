@@ -926,7 +926,7 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		path, err = files.GenerateAbsenceFormForTeacher(path, auth.Username, "self", application)
 	}
 	if err != nil {
-		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdf"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
