@@ -311,23 +311,24 @@ func GetActiveApplications(con *gin.Context) {
 		return
 	}
 	applications := db.GetActiveApplications()
+	teacher := db.GetTeacherByShort(filter)
 	if applyFilter {
 		res := make([]mongo.Application, 0)
 		for _, app := range applications {
 			if app.Kind == mongo.SchoolEvent {
 				teachers := app.SchoolEventDetails.Teachers
 				for _, t := range teachers {
-					if t.Shortname == filter {
+					if t.Shortname == teacher.Short {
 						res = append(res, app)
 						break
 					}
 				}
 			} else if app.Kind == mongo.Training {
-				if app.TrainingDetails.Organizer == filter {
+				if app.TrainingDetails.Filer == teacher.Longname {
 					res = append(res, app)
 				}
 			} else if app.Kind == mongo.OtherReason {
-				if app.OtherReasonDetails.Filer == filter {
+				if app.OtherReasonDetails.Filer == teacher.Longname {
 					res = append(res, app)
 				}
 			}
@@ -385,11 +386,11 @@ func GetAllApplications(con *gin.Context) {
 					}
 				}
 			} else if app.Kind == mongo.Training {
-				if app.TrainingDetails.Organizer == teacher.Short {
+				if app.TrainingDetails.Filer == teacher.Longname {
 					res = append(res, app)
 				}
 			} else if app.Kind == mongo.OtherReason {
-				if app.OtherReasonDetails.Filer == teacher.Short {
+				if app.OtherReasonDetails.Filer == teacher.Longname {
 					res = append(res, app)
 				}
 			}
@@ -423,24 +424,24 @@ func GetNews(con *gin.Context) {
 		return
 	}
 	defer db.Close()
-	user := auth.Username
 	applications := db.GetActiveApplications()
+	teacher := db.GetTeacherByShort(auth.Username)
 	res := make([]mongo.Application, 0)
 	for _, app := range applications {
 		if app.Kind == mongo.SchoolEvent {
 			teachers := app.SchoolEventDetails.Teachers
 			for _, t := range teachers {
-				if t.Shortname == user {
+				if t.Shortname == teacher.Short {
 					res = append(res, app)
 					break
 				}
 			}
 		} else if app.Kind == mongo.Training {
-			if app.TrainingDetails.Organizer == user {
+			if app.TrainingDetails.Filer == teacher.Longname {
 				res = append(res, app)
 			}
 		} else if app.Kind == mongo.OtherReason {
-			if app.OtherReasonDetails.Filer == user {
+			if app.OtherReasonDetails.Filer == teacher.Longname {
 				res = append(res, app)
 			}
 		}
@@ -501,11 +502,11 @@ func GetApplication(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -653,11 +654,11 @@ func UpdateApplication(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -715,11 +716,11 @@ func DeleteApplication(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -783,11 +784,11 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -901,11 +902,11 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -985,11 +986,11 @@ func GetCompensationForEducationalSupportForm(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -1078,11 +1079,11 @@ func GetTravelInvoiceForm(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -1212,11 +1213,11 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -1310,11 +1311,11 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -1408,11 +1409,11 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
@@ -1502,11 +1503,11 @@ func SaveBillingReceipt(con *gin.Context) {
 			}
 		}
 	} else if application.Kind == mongo.Training {
-		if application.TrainingDetails.Organizer == requestTeacher.Short {
+		if application.TrainingDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	} else if application.Kind == mongo.OtherReason {
-		if application.OtherReasonDetails.Filer == requestTeacher.Short {
+		if application.OtherReasonDetails.Filer == requestTeacher.Longname {
 			in = true
 		}
 	}
