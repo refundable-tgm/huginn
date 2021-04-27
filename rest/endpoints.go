@@ -910,11 +910,11 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 			in = true
 		}
 	}
-	if !(!applyTeacher && in) {
+	if !(applyTeacher && in) {
 		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
-	if !(applyTeacher && (requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser)) {
+	if !(!applyTeacher && (requestTeacher.Administration || requestTeacher.AV || requestTeacher.PEK || requestTeacher.SuperUser)) {
 		con.JSON(http.StatusUnauthorized, Error{"you have no permission to do this"})
 		return
 	}
