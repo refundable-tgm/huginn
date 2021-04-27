@@ -116,7 +116,7 @@ func (m MongoDatabaseConnector) GetActiveApplications() (applications []Applicat
 	filter := bson.M{
 		"$or": []bson.M{
 			{"$and": []bson.M{
-				{"kind": Training},
+				{"kind": bson.M{"$in": []int{Training, OtherReason}}},
 				{"progress": bson.M{"$in": []int{TRejected, TInProcess, TConfirmed, TRunning, TCostsPending, TCostsInProcess}}},
 			}},
 			{"$and": []bson.M{
