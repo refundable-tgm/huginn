@@ -372,23 +372,24 @@ func GetAllApplications(con *gin.Context) {
 		return
 	}
 	applications := db.GetAllApplications()
+	teacher := db.GetTeacherByShort(filter)
 	if applyFilter {
 		res := make([]mongo.Application, 0)
 		for _, app := range applications {
 			if app.Kind == mongo.SchoolEvent {
 				teachers := app.SchoolEventDetails.Teachers
 				for _, t := range teachers {
-					if t.Shortname == filter {
+					if t.Shortname == teacher.Short {
 						res = append(res, app)
 						break
 					}
 				}
 			} else if app.Kind == mongo.Training {
-				if app.TrainingDetails.Organizer == filter {
+				if app.TrainingDetails.Organizer == teacher.Short {
 					res = append(res, app)
 				}
 			} else if app.Kind == mongo.OtherReason {
-				if app.OtherReasonDetails.Filer == filter {
+				if app.OtherReasonDetails.Filer == teacher.Short {
 					res = append(res, app)
 				}
 			}
