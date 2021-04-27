@@ -740,8 +740,8 @@ func (client Client) sendRequest(method string, params map[string]interface{}) (
 	if err != nil {
 		return nil, -1, err
 	}
-	req.Header.Set("JSESSIONID", client.SessionID)
 	reqClient := http.Client{}
+	req.AddCookie(&http.Cookie{Name: "JSESSIONID", Value: client.SessionID})
 	resp, err := reqClient.Do(req)
 	return resp, id, err
 }
