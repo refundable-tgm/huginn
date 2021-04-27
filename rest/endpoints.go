@@ -136,6 +136,10 @@ func Refresh(con *gin.Context) {
 			con.JSON(http.StatusUnprocessableEntity, Error{"couldn't extract username"})
 			return
 		}
+		if _, ok := activeTokens[uuid]; !ok {
+			con.JSON(http.StatusUnauthorized, Error{"this token isn't valid"})
+			return
+		}
 		DeleteToken(uuid)
 		tok, err := CreateToken(username)
 		if err != nil {
