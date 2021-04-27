@@ -57,7 +57,7 @@ func Login(con *gin.Context) {
 	}
 	token, err := CreateToken(u.Username)
 	if err != nil {
-		con.JSON(http.StatusUnprocessableEntity, Error{err.Error()})
+		con.JSON(http.StatusInternalServerError, Error{"couldn't sign token"})
 		return
 	}
 	SaveToken(u.Username, token)
@@ -105,7 +105,7 @@ func Logout(con *gin.Context) {
 func Refresh(con *gin.Context) {
 	body := RefreshToken{}
 	if err := con.ShouldBindJSON(&body); err != nil {
-		con.JSON(http.StatusUnprocessableEntity, Error{err.Error()})
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
 		return
 	}
 	refresh := body.Token
@@ -139,7 +139,7 @@ func Refresh(con *gin.Context) {
 		DeleteToken(uuid)
 		tok, err := CreateToken(username)
 		if err != nil {
-			con.JSON(http.StatusForbidden, Error{err.Error()})
+			con.JSON(http.StatusForbidden, Error{"invalid request structure provided"})
 			return
 		}
 		SaveToken(username, tok)
