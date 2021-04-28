@@ -1249,15 +1249,6 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		return "", err
 	}
 	for _, lesson := range lessons {
-		contains := false
-		for _, t := range lesson.Teachers {
-			if t == untisname[0] {
-				contains = true
-			}
-		}
-		if !contains {
-			continue
-		}
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
 		endLesson := untis.GetLessonNrByEnd(lesson.End)
 		hourString := ""
