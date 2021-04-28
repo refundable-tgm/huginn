@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -564,6 +565,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			}
 			tableStrings = append(tableStrings, row)
 		}
+		sortTableByDate(tableStrings)
 		m.TableList([]string{"H/R/E", "Jahrgang", "Datum", "Stunde", "Saal", "LK Supp.", "LK Entf.", "Paraphe"},
 			tableStrings, props.TableList{
 				Align: consts.Center,
@@ -1265,6 +1267,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		}
 		tableStrings = append(tableStrings, row)
 	}
+	sortTableByDate(tableStrings)
 	m.TableList([]string{"H/R/E", "Jahrgang", "Datum", "Stunde", "Saal", "LK Supp.", "LK Entf.", "Paraphe"},
 		tableStrings, props.TableList{
 			Align: consts.Center,
@@ -3006,4 +3009,34 @@ func getURL() string {
 	}
 	url := strings.TrimSuffix(string(file), "\n")
 	return url + "/viewer?uuid="
+}
+
+// sortTableByDate sorts the Supplier-table table by date and lesson
+func sortTableByDate(table [][]string) {
+	sort.Slice(table, func(i, j int) bool {
+		xDate, err := time.Parse("02.01.2006", table[i][2])
+		if err != nil {
+			return false
+		}
+		yDate, err := time.Parse("02.01.2006", table[j][2])
+		if err != nil {
+			return false
+		}
+		if xDate == yDate {
+			xLessonString := table[i][3]
+			xSplit := strings.Split(xLessonString, ".")
+			xLesson, err := strconv.Atoi(xSplit[0])
+			if err != nil {
+				return false
+			}
+			yLessonString := table[j][3]
+			ySplit := strings.Split(yLessonString, ".")
+			yLesson, err := strconv.Atoi(ySplit[0])
+			if err != nil {
+				return false
+			}
+			return xLesson > yLesson
+		}
+		return xDate.After(yDate)
+	})
 }
