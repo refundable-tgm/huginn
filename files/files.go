@@ -915,7 +915,13 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 					Align: consts.Left,
 				})
 			})
-			m.Text(username, props.Text{
+			mongo := db.MongoDatabaseConnector{}
+			name := username
+			if mongo.Connect() {
+				name = mongo.GetTeacherByShort(username).Longname
+				mongo.Close()
+			}
+			m.Text(name, props.Text{
 				Top:   2.5,
 				Align: consts.Center,
 				Style: consts.Italic,
