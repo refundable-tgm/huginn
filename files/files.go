@@ -2633,7 +2633,7 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	}
 	for i, row := range app.Calculation.Rows {
 		rowNumber := strconv.Itoa(i + TIFirstConstantRow)
-		err = excel.SetCellValue(Sheet, TICalcNrColumn+rowNumber, row.NR)
+		err = excel.SetCellValue(Sheet, TICalcNrColumn+rowNumber, strconv.Itoa(row.NR))
 		if err != nil {
 			return "", err
 		}
