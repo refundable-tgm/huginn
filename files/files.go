@@ -3058,8 +3058,8 @@ func sortTableByDate(table [][]string) {
 			if err != nil {
 				return false
 			}
-			return xLesson > yLesson
+			return xLesson < yLesson
 		}
-		return xDate.After(yDate)
+		return xDate.Before(yDate)
 	})
 }
