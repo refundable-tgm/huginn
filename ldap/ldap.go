@@ -33,12 +33,12 @@ func AuthenticateUserCredentials(username, password string) bool {
 		return false
 	}
 	defer mongo.Close()
-	longname, err := GetLongName(username, password)
+	longname, err := GetLongName(username, password, username)
 	if err != nil {
 		return false
 	}
 	if !mongo.DoesTeacherExistsByShort(username) {
-		mongo.CreateTeacher(db.Teacher{
+		return mongo.CreateTeacher(db.Teacher{
 			UUID:           uuid.NewString(),
 			Short:          username,
 			Longname:       longname,
@@ -51,10 +51,10 @@ func AuthenticateUserCredentials(username, password string) bool {
 	return true
 }
 
-// GetLongName will find out the full name (name + surname) of a teacher through their saved file on the active directory
+// GetLongName will find out the full name (name + surname) of a teacher identified by key through their saved file on the active directory
 // ldap server. If the search operation was successful the full name is returned. Otherwise any error occurred will be
 // returned.
-func GetLongName(username, password string) (string, error) {
+func GetLongName(username, password, key string) (string, error) {
 	cred := username + "@tgm.ac.at"
 	l, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", URL, Port))
 	if err != nil {
@@ -70,7 +70,7 @@ func GetLongName(username, password string) (string, error) {
 		0,
 		0,
 		false,
-		fmt.Sprintf("(&(mailNickname=%s))", username),
+		fmt.Sprintf("(&(mailNickname=%s))", key),
 		[]string{"dn"},
 		nil,
 	)

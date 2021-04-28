@@ -182,7 +182,7 @@ func Refresh(con *gin.Context) {
 // @Failure 500 {object} Error
 // @Router /getTeacherByShort [get]
 func GetTeacherByShort(con *gin.Context) {
-	_, err := ExtractTokenMeta(con.Request)
+	auth, err := ExtractTokenMeta(con.Request)
 	if err != nil {
 		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
 		return
@@ -199,8 +199,29 @@ func GetTeacherByShort(con *gin.Context) {
 		return
 	}
 	defer db.Close()
-	teacher := db.GetTeacherByShort(name)
-	con.JSON(http.StatusOK, teacher)
+	if db.DoesTeacherExistsByShort(name) {
+		teacher := db.GetTeacherByShort(name)
+		con.JSON(http.StatusOK, teacher)
+		return
+	} else {
+		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, name)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+			return
+		}
+		if !db.CreateTeacher(mongo.Teacher{
+			UUID:           uuidG.NewString(),
+			Short:          name,
+			Longname:       longname,
+			SuperUser:      false,
+			AV:             false,
+			Administration: false,
+			PEK:            false,
+		}) {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
+			return
+		}
+	}
 }
 
 // GetTeacher represents the get teacher endpoint
@@ -326,7 +347,30 @@ func GetActiveApplications(con *gin.Context) {
 		return
 	}
 	applications := db.GetActiveApplications()
-	teacher := db.GetTeacherByShort(filter)
+	teacher := mongo.Teacher{}
+	if db.DoesTeacherExists(filter) {
+		teacher = db.GetTeacherByShort(filter)
+	} else {
+		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, filter)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+			return
+		}
+		teacher = mongo.Teacher{
+			UUID:           uuidG.NewString(),
+			Short:          filter,
+			Longname:       longname,
+			SuperUser:      false,
+			AV:             false,
+			Administration: false,
+			PEK:            false,
+		}
+		if !db.CreateTeacher(teacher) {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
+			return
+		}
+	}
+
 	if applyFilter {
 		res := make([]mongo.Application, 0)
 		for _, app := range applications {
@@ -388,7 +432,29 @@ func GetAllApplications(con *gin.Context) {
 		return
 	}
 	applications := db.GetAllApplications()
-	teacher := db.GetTeacherByShort(filter)
+	teacher := mongo.Teacher{}
+	if db.DoesTeacherExists(filter) {
+		teacher = db.GetTeacherByShort(filter)
+	} else {
+		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, filter)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+			return
+		}
+		teacher = mongo.Teacher{
+			UUID:           uuidG.NewString(),
+			Short:          filter,
+			Longname:       longname,
+			SuperUser:      false,
+			AV:             false,
+			Administration: false,
+			PEK:            false,
+		}
+		if !db.CreateTeacher(teacher) {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
+			return
+		}
+	}
 	if applyFilter {
 		res := make([]mongo.Application, 0)
 		for _, app := range applications {

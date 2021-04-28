@@ -214,6 +214,18 @@ func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) 
 	return teacher
 }
 
+// DoesTeacherExists searches the database for a Teacher identified by a uuid
+// and checks whether a teacher can be found whilst performing this search.
+// It will return true if the teacher was found, false if an error occurred or none was found.
+func (m MongoDatabaseConnector) DoesTeacherExists(uuid string) bool {
+	teacher := Teacher{}
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&teacher); err != nil {
+		return false
+	}
+	return true
+}
+
 // UpdateTeacher updates a teacher with the matching uuid and updates it with the data in the update struct
 // returns true whether one Teacher was modified, false if an error occurred or no Teacher was modified
 func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool {

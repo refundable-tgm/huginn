@@ -3,10 +3,12 @@ package files
 import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"github.com/google/uuid"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	"github.com/refundable-tgm/huginn/db"
+	"github.com/refundable-tgm/huginn/ldap"
 	"github.com/refundable-tgm/huginn/untis"
 	"io"
 	"io/ioutil"
@@ -955,7 +957,24 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			mongo := db.MongoDatabaseConnector{}
 			name := username
 			if mongo.Connect() {
-				name = mongo.GetTeacherByShort(username).Longname
+				if mongo.DoesTeacherExistsByShort(username) {
+					name = mongo.GetTeacherByShort(username).Longname
+				} else {
+					name, err = ldap.GetLongName(client.Username, client.Password, username)
+					if err != nil {
+						name = username
+					} else {
+						mongo.CreateTeacher(db.Teacher{
+							UUID:           uuid.NewString(),
+							Short:          username,
+							Longname:       name,
+							SuperUser:      false,
+							AV:             false,
+							Administration: false,
+							PEK:            false,
+						})
+					}
+				}
 				mongo.Close()
 			}
 			m.Text(name, props.Text{
