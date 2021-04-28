@@ -760,7 +760,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 	m.Row(10, func() {
 		m.Col(6, func() {
 			m.Col(3, func() {
-				m.Text("Leitung:", props.Text{
+				m.Text("Leitung (2.):", props.Text{
 					Top:   2.5,
 					Align: consts.Left,
 				})
@@ -822,7 +822,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 	m.Row(3, func() {})
 	m.Row(10, func() {
 		m.Col(12, func() {
-			m.Text("Pädagogisch-inhaltliche Betreuung:", props.Text{
+			m.Text("Pädagogisch-inhaltliche Betreuung: (1.)", props.Text{
 				Top:   3,
 				Align: consts.Left,
 				Style: consts.Bold,
