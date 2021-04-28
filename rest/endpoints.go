@@ -1205,7 +1205,7 @@ func GetTravelInvoiceForm(con *gin.Context) {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't save merged pdf"})
 			return
 		}
-		err = api.OptimizeFile(created, created, pdfcpu.NewDefaultConfiguration())
+		err = api.OptimizeFile(created, "", nil)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't optimize merged pdf"})
 			return
