@@ -37,7 +37,7 @@ func AuthenticateUserCredentials(username, password string) bool {
 	if err != nil {
 		return false
 	}
-	if !mongo.DoesTeacherExistsByShort(username) {
+	if !mongo.DoesTeacherExistByShort(username) {
 		return mongo.CreateTeacher(db.Teacher{
 			UUID:           uuid.NewString(),
 			Short:          username,

@@ -199,7 +199,7 @@ func GetTeacherByShort(con *gin.Context) {
 		return
 	}
 	defer db.Close()
-	if db.DoesTeacherExistsByShort(name) {
+	if db.DoesTeacherExistByShort(name) {
 		teacher := db.GetTeacherByShort(name)
 		con.JSON(http.StatusOK, teacher)
 		return
@@ -347,7 +347,7 @@ func GetActiveApplications(con *gin.Context) {
 	}
 	applications := db.GetActiveApplications()
 	teacher := mongo.Teacher{}
-	if db.DoesTeacherExists(filter) {
+	if db.DoesTeacherExistByShort(filter) {
 		teacher = db.GetTeacherByShort(filter)
 	} else {
 		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, filter)
@@ -432,7 +432,7 @@ func GetAllApplications(con *gin.Context) {
 	}
 	applications := db.GetAllApplications()
 	teacher := mongo.Teacher{}
-	if db.DoesTeacherExists(filter) {
+	if db.DoesTeacherExistByShort(filter) {
 		teacher = db.GetTeacherByShort(filter)
 	} else {
 		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, filter)

@@ -192,10 +192,10 @@ func (m MongoDatabaseConnector) GetTeacherByShort(short string) (teacher Teacher
 	return teacher
 }
 
-// DoesTeacherExistsByShort searches the database for a Teacher identified by a shortname
+// DoesTeacherExistByShort searches the database for a Teacher identified by a shortname
 // and checks whether a teacher can be found whilst performing this search.
 // It will return true if the teacher was found, false if an error occurred or none was found.
-func (m MongoDatabaseConnector) DoesTeacherExistsByShort(short string) bool {
+func (m MongoDatabaseConnector) DoesTeacherExistByShort(short string) bool {
 	teacher := Teacher{}
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	if err := collection.FindOne(m.context, bson.M{"short": short}).Decode(&teacher); err != nil {
@@ -214,10 +214,10 @@ func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) 
 	return teacher
 }
 
-// DoesTeacherExists searches the database for a Teacher identified by a uuid
+// DoesTeacherExist searches the database for a Teacher identified by a uuid
 // and checks whether a teacher can be found whilst performing this search.
 // It will return true if the teacher was found, false if an error occurred or none was found.
-func (m MongoDatabaseConnector) DoesTeacherExists(uuid string) bool {
+func (m MongoDatabaseConnector) DoesTeacherExist(uuid string) bool {
 	teacher := Teacher{}
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&teacher); err != nil {

@@ -957,7 +957,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			mongo := db.MongoDatabaseConnector{}
 			name := username
 			if mongo.Connect() {
-				if mongo.DoesTeacherExistsByShort(username) {
+				if mongo.DoesTeacherExistByShort(username) {
 					name = mongo.GetTeacherByShort(username).Longname
 				} else {
 					name, err = ldap.GetLongName(client.Username, client.Password, username)
