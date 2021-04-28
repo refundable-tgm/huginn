@@ -2439,7 +2439,7 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TITravelCostsGrant, app.TravelCostsPreGrant)
+	err = excel.SetCellValue(Sheet, TITravelCostsGrant, strconv.FormatFloat(float64(app.TravelCostsPreGrant), 'f', 2, 32))
 	if err != nil {
 		return "", err
 	}
@@ -2558,15 +2558,15 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIBreakfasts, app.Breakfasts)
+	err = excel.SetCellValue(Sheet, TIBreakfasts, strconv.Itoa(app.Breakfasts))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TILunches, app.Lunches)
+	err = excel.SetCellValue(Sheet, TILunches, strconv.Itoa(app.Lunches))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIDinners, app.Dinners)
+	err = excel.SetCellValue(Sheet, TIDinners, strconv.Itoa(app.Dinners))
 	if err != nil {
 		return "", err
 	}
@@ -2599,7 +2599,7 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 		if err != nil {
 			return "", err
 		}
-		err = excel.SetCellValue(Sheet, TIKilometreAmount, app.KilometreAmount)
+		err = excel.SetCellValue(Sheet, TIKilometreAmount, strconv.FormatFloat(float64(app.KilometreAmount), 'f', 2, 32))
 		if err != nil {
 			return "", err
 		}
@@ -2989,11 +2989,11 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAOtherCosts, app.OtherCosts)
+	err = excel.SetCellValue(Sheet, BTAOtherCosts, strconv.FormatFloat(float64(app.OtherCosts), 'f', 2, 32))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAEstimatedCosts, app.EstimatedCosts)
+	err = excel.SetCellValue(Sheet, BTAEstimatedCosts, strconv.FormatFloat(float64(app.EstimatedCosts), 'f', 2, 32))
 	if err != nil {
 		return "", err
 	}
