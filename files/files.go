@@ -245,6 +245,10 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 	if app.Kind != db.SchoolEvent {
 		return nil, fmt.Errorf("this pdf can only be generated for school events")
 	}
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return nil, fmt.Errorf("couldn't load timezone")
+	}
 	for _, class := range app.SchoolEventDetails.Classes {
 		m := pdf.NewMaroto(consts.Portrait, consts.A4)
 		m.SetPageMargins(10, 15, 10)
@@ -373,7 +377,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 					})
 				})
 				weekday := getWeekday(int(app.StartTime.Weekday()))
-				m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.Format("02. 01. 2006 15:04")),
+				m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.In(loc).Format("02. 01. 2006 15:04")),
 					props.Text{
 						Top:   2.5,
 						Align: consts.Center,
@@ -388,7 +392,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 					})
 				})
 				weekday := getWeekday(int(app.EndTime.Weekday()))
-				m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.Format("02. 01. 2006 15:04")),
+				m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.In(loc).Format("02. 01. 2006 15:04")),
 					props.Text{
 						Top:   2.5,
 						Align: consts.Center,
@@ -465,7 +469,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				m.Text(app.StartTime.Format("15:04"), props.Text{
+				m.Text(app.StartTime.In(loc).Format("15:04"), props.Text{
 					Top:   2.5,
 					Align: consts.Center,
 					Style: consts.Italic,
@@ -551,7 +555,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			}
 
 			row := []string{"", classes,
-				date.Format("02.01.2006"),
+				date.In(loc).Format("02.01.2006"),
 				fmt.Sprintf(hourString),
 				rooms,
 				leader + ", " + companion,
@@ -616,6 +620,10 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 func GenerateCompensationForEducationalSupport(path string, app db.Application) (string, error) {
 	if app.Kind != db.SchoolEvent {
 		return "", fmt.Errorf("this pdf can only be generated for school events")
+	}
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return "", fmt.Errorf("couldn't load timezone")
 	}
 	var leader db.SchoolEventTeacherDetails
 	companions := make([]db.SchoolEventTeacherDetails, 0)
@@ -711,8 +719,8 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 			eweekday := getWeekday(int(app.EndTime.Weekday()))
 
 			m.Text(fmt.Sprintf("%v, %v - %v, %v",
-				sweekday, app.StartTime.Format("02. 01. 2006 15:04"),
-				eweekday, app.EndTime.Format("02. 01. 2006 15:04")),
+				sweekday, app.StartTime.In(loc).Format("02. 01. 2006 15:04"),
+				eweekday, app.EndTime.In(loc).Format("02. 01. 2006 15:04")),
 				props.Text{
 					Top:   2.5,
 					Align: consts.Center,
@@ -760,7 +768,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 				})
 			})
 			weekday := getWeekday(int(leader.AttendanceFrom.Weekday()))
-			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceFrom.Format("02.01.2006 15:04")),
+			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceFrom.In(loc).Format("02.01.2006 15:04")),
 				props.Text{
 					Top:   2.5,
 					Align: consts.Center,
@@ -775,7 +783,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 				})
 			})
 			weekday := getWeekday(int(leader.AttendanceTill.Weekday()))
-			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceTill.Format("02.01.2006 15:04")),
+			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceTill.In(loc).Format("02.01.2006 15:04")),
 				props.Text{
 					Top:   2.5,
 					Align: consts.Center,
@@ -802,8 +810,8 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 		row := []string{
 			teacher.Name,
 			fmt.Sprintf("L%d", teacher.Group),
-			fmt.Sprintf("%v, %v", sweekday, app.StartTime.Format("02.01.2006 15:04")),
-			fmt.Sprintf("%v, %v", eweekday, app.EndTime.Format("02.01.2006 15:04")),
+			fmt.Sprintf("%v, %v", sweekday, app.StartTime.In(loc).Format("02.01.2006 15:04")),
+			fmt.Sprintf("%v, %v", eweekday, app.EndTime.In(loc).Format("02.01.2006 15:04")),
 		}
 		tableString = append(tableString, row)
 	}
@@ -843,7 +851,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 		})
 	})
 	savePath := filepath.Join(path, CompensationForEducationalSupportFileName)
-	err := m.OutputFileAndClose(savePath)
+	err = m.OutputFileAndClose(savePath)
 	if err != nil {
 		return "", fmt.Errorf("could not save pdf: %v", err)
 	}
@@ -857,6 +865,10 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Application) (string, error) {
 	client := untis.GetClient(username)
 	defer client.Close()
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return "", fmt.Errorf("couldn't load timezone")
+	}
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
 	m.SetPageMargins(10, 15, 10)
 
@@ -938,7 +950,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 				})
 			})
 			weekday := getWeekday(int(app.StartTime.Weekday()))
-			m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.Format("02.01.2006 15:04")),
+			m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.In(loc).Format("02.01.2006 15:04")),
 				props.Text{
 					Top:   2.5,
 					Align: consts.Center,
@@ -953,7 +965,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 				})
 			})
 			weekday := getWeekday(int(app.EndTime.Weekday()))
-			m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.Format("02.01.2006 15:04")), props.Text{
+			m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.In(loc).Format("02.01.2006 15:04")), props.Text{
 				Top:   2.5,
 				Align: consts.Center,
 				Style: consts.Italic,
@@ -1234,7 +1246,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			teachers = teachers[0 : len(teachers)-2]
 		}
 		row := []string{"", classes,
-			fmt.Sprintf("%v", lesson.Start.Format("02.01.2006")),
+			fmt.Sprintf("%v", lesson.Start.In(loc).Format("02.01.2006")),
 			fmt.Sprintf(hourString),
 			rooms,
 			"",
@@ -1282,7 +1294,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 	})
 
 	savePath := filepath.Join(path, fmt.Sprintf(TeacherAbsenceFormFileName, username))
-	err := m.OutputFileAndClose(savePath)
+	err = m.OutputFileAndClose(savePath)
 	if err != nil {
 		return "", fmt.Errorf("could not save pdf: %v", err)
 	}
@@ -1293,6 +1305,10 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 // It will be saved under path, and the given short name will be used in the form. The uuid is the uuid
 // of the parent db.Application, so a QR Code can be generated
 func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string) (string, error) {
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return "", fmt.Errorf("couldn't load timezone")
+	}
 	m := pdf.NewMaroto(consts.Landscape, consts.A4)
 	m.SetPageMargins(10, 15, 10)
 	m.SetDefaultFontFamily(consts.Helvetica)
@@ -1390,7 +1406,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 			})
 		})
 		m.Col(2, func() {
-			m.Text(app.TripBeginTime.Format("02. 01. 2006 15:04"), props.Text{
+			m.Text(app.TripBeginTime.In(loc).Format("02. 01. 2006 15:04"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1403,7 +1419,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 			})
 		})
 		m.Col(2, func() {
-			m.Text(app.TripEndTime.Format("02. 01. 2006 15:04"), props.Text{
+			m.Text(app.TripEndTime.In(loc).Format("02. 01. 2006 15:04"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1484,7 +1500,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 			})
 		})
 		m.Col(2, func() {
-			m.Text(app.FilingDate.Format("02. 01. 2006 15:04"), props.Text{
+			m.Text(app.FilingDate.In(loc).Format("02. 01. 2006 15:04"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1641,9 +1657,9 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	for _, r := range app.Calculation.Rows {
 		row := make([]string, len(header))
 		row[0] = strconv.Itoa(r.NR)
-		row[1] = r.Date.Format("02.01")
-		row[2] = r.Begin.Format("15:04")
-		row[3] = r.End.Format("15:04")
+		row[1] = r.Date.In(loc).Format("02.01")
+		row[2] = r.Begin.In(loc).Format("15:04")
+		row[3] = r.End.In(loc).Format("15:04")
 		geb := ""
 		for _, kind := range r.KindsOfCost {
 			switch kind {
@@ -1726,7 +1742,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 	})
 
 	savePath := filepath.Join(path, fmt.Sprintf(TravelInvoicePDFFileName, short))
-	err := m.OutputFileAndClose(savePath)
+	err = m.OutputFileAndClose(savePath)
 	if err != nil {
 		return "", fmt.Errorf("could not save pdf: %v", err)
 	}
@@ -1737,6 +1753,10 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 // It will be saved under path, and the given short name will be used in the form. The uuid is the uuid
 // of the parent db.Application, so a QR Code can be generated
 func GenerateBusinessTripApplication(path, short string, app db.BusinessTripApplication, uuid string) (string, error) {
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return "", fmt.Errorf("couldn't load timezone")
+	}
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
 	m.SetPageMargins(10, 15, 10)
 	m.RegisterHeader(func() {
@@ -1859,7 +1879,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			})
 		})
 		m.Col(3, func() {
-			m.Text(app.TripBeginTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
+			m.Text(app.TripBeginTime.In(loc).Format("02. 01. 2006 15:04 Uhr"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1872,7 +1892,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			})
 		})
 		m.Col(3, func() {
-			m.Text(app.TripEndTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
+			m.Text(app.TripEndTime.In(loc).Format("02. 01. 2006 15:04 Uhr"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1894,7 +1914,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			})
 		})
 		m.Col(3, func() {
-			m.Text(app.ServiceBeginTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
+			m.Text(app.ServiceBeginTime.In(loc).Format("02. 01. 2006 15:04 Uhr"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -1907,7 +1927,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			})
 		})
 		m.Col(3, func() {
-			m.Text(app.ServiceEndTime.Format("02. 01. 2006 15:04 Uhr"), props.Text{
+			m.Text(app.ServiceEndTime.In(loc).Format("02. 01. 2006 15:04 Uhr"), props.Text{
 				Top:   2.5,
 				Align: consts.Left,
 				Style: consts.Italic,
@@ -2150,7 +2170,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Line(10.0)
 	m.Row(10, func() {
 		m.Text("Die vorstehend beantragte Dienstreise wird mit "+
-			app.DateApplicationApproved.Format("02. 01. 2006")+" genehmigt.", props.Text{
+			app.DateApplicationApproved.In(loc).Format("02. 01. 2006")+" genehmigt.", props.Text{
 			Top:   2.5,
 			Align: consts.Left,
 		})
@@ -2178,7 +2198,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	m.Row(10, func() {
 		m.ColSpace(8)
 		m.Col(4, func() {
-			m.Text("Eingabedatum: "+app.DateApplicationFiled.Format("02. 01. 2006"), props.Text{
+			m.Text("Eingabedatum: "+app.DateApplicationFiled.In(loc).Format("02. 01. 2006"), props.Text{
 				Top:   2.5,
 				Align: consts.Right,
 			})
@@ -2213,7 +2233,7 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 		})
 	}
 	savePath := filepath.Join(path, fmt.Sprintf(BusinessTripApplicationPDFFileName, short))
-	err := m.OutputFileAndClose(savePath)
+	err = m.OutputFileAndClose(savePath)
 	if err != nil {
 		return "", fmt.Errorf("could not save pdf: %v", err)
 	}
@@ -2245,6 +2265,10 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return "", fmt.Errorf("couldn't load timezone")
+	}
 	excel, err := excelize.OpenFile(newPath)
 	if err != nil {
 		return "", err
@@ -2253,11 +2277,11 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
-	byear := app.TripBeginTime.Format("2006")
-	bmonth := app.TripBeginTime.Format("01")
-	bday := app.TripBeginTime.Format("02")
-	bhour := app.TripBeginTime.Format("15")
-	bminute := app.TripBeginTime.Format("04")
+	byear := app.TripBeginTime.In(loc).Format("2006")
+	bmonth := app.TripBeginTime.In(loc).Format("01")
+	bday := app.TripBeginTime.In(loc).Format("02")
+	bhour := app.TripBeginTime.In(loc).Format("15")
+	bminute := app.TripBeginTime.In(loc).Format("04")
 	err = excel.SetCellValue(Sheet, TITripBeginYear1, string(byear[0]))
 	if err != nil {
 		return "", err
@@ -2306,11 +2330,11 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
-	eyear := app.TripEndTime.Format("2006")
-	emonth := app.TripEndTime.Format("01")
-	eday := app.TripEndTime.Format("02")
-	ehour := app.TripEndTime.Format("15")
-	eminute := app.TripEndTime.Format("04")
+	eyear := app.TripEndTime.In(loc).Format("2006")
+	emonth := app.TripEndTime.In(loc).Format("01")
+	eday := app.TripEndTime.In(loc).Format("02")
+	ehour := app.TripEndTime.In(loc).Format("15")
+	eminute := app.TripEndTime.In(loc).Format("04")
 	err = excel.SetCellValue(Sheet, TITripEndYear1, string(eyear[0]))
 	if err != nil {
 		return "", err
@@ -2372,7 +2396,7 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, TIFilingDate, app.FilingDate.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, TIFilingDate, app.FilingDate.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
@@ -2557,15 +2581,15 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 		if err != nil {
 			return "", err
 		}
-		err = excel.SetCellValue(Sheet, TICalcDayColumn+rowNumber, row.Date.Format("02.01"))
+		err = excel.SetCellValue(Sheet, TICalcDayColumn+rowNumber, row.Date.In(loc).Format("02.01"))
 		if err != nil {
 			return "", err
 		}
-		err = excel.SetCellValue(Sheet, TICalcBeginColumn+rowNumber, row.Begin.Format("15:04"))
+		err = excel.SetCellValue(Sheet, TICalcBeginColumn+rowNumber, row.Begin.In(loc).Format("15:04"))
 		if err != nil {
 			return "", err
 		}
-		err = excel.SetCellValue(Sheet, TICalcEndColumn+rowNumber, row.End.Format("15:04"))
+		err = excel.SetCellValue(Sheet, TICalcEndColumn+rowNumber, row.End.In(loc).Format("15:04"))
 		if err != nil {
 			return "", err
 		}
@@ -2671,6 +2695,10 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	if err != nil {
 		return "", err
 	}
+	loc, err := time.LoadLocation("Europe/Vienna")
+	if err != nil {
+		return "", fmt.Errorf("couldn't load timezone")
+	}
 	excel, err := excelize.OpenFile(newPath)
 	if err != nil {
 		return "", err
@@ -2738,35 +2766,35 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	//excel.SetCellValue(Sheet, BTAGSt, app.GSt)
 	//excel.SetCellValue(Sheet, BTAESt, app.ESt)
 	//excel.SetCellValue(Sheet, BTAFeeLevel, app.FeeLevel)
-	err = excel.SetCellValue(Sheet, BTATripBeginDate, app.TripBeginTime.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, BTATripBeginDate, app.TripBeginTime.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTATripBeginTime, app.TripBeginTime.Format("15:04"))
+	err = excel.SetCellValue(Sheet, BTATripBeginTime, app.TripBeginTime.In(loc).Format("15:04"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTATripEndDate, app.TripEndTime.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, BTATripEndDate, app.TripEndTime.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTATripEndTime, app.TripEndTime.Format("15:04"))
+	err = excel.SetCellValue(Sheet, BTATripEndTime, app.TripEndTime.In(loc).Format("15:04"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAServiceBeginDate, app.ServiceBeginTime.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, BTAServiceBeginDate, app.ServiceBeginTime.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAServiceBeginTime, app.ServiceBeginTime.Format("15:04"))
+	err = excel.SetCellValue(Sheet, BTAServiceBeginTime, app.ServiceBeginTime.In(loc).Format("15:04"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAServiceEndDate, app.ServiceEndTime.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, BTAServiceEndDate, app.ServiceEndTime.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAServiceEndTime, app.ServiceEndTime.Format("15:04"))
+	err = excel.SetCellValue(Sheet, BTAServiceEndTime, app.ServiceEndTime.In(loc).Format("15:04"))
 	if err != nil {
 		return "", err
 	}
@@ -2911,11 +2939,11 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAFilingDate, app.DateApplicationFiled.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, BTAFilingDate, app.DateApplicationFiled.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAApprovalDate, app.DateApplicationApproved.Format("02.01.2006"))
+	err = excel.SetCellValue(Sheet, BTAApprovalDate, app.DateApplicationApproved.In(loc).Format("02.01.2006"))
 	if err != nil {
 		return "", err
 	}
