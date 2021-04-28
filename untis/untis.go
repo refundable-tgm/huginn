@@ -111,8 +111,8 @@ func (client *Client) Authenticate() error {
 		return err
 	}
 	r := struct {
-		JSONRPC string            `json:"jsonrpc"`
-		ID      string            `json:"id"`
+		JSONRPC string                 `json:"jsonrpc"`
+		ID      string                 `json:"id"`
 		Result  map[string]interface{} `json:"result"`
 	}{}
 	err = json.Unmarshal(respBody, &r)
@@ -203,10 +203,10 @@ func (client Client) GetTimetableOfTeacher(start, end time.Time) ([]Lesson, erro
 			month, _ := strconv.Atoi(date[4:6])
 			day, _ := strconv.Atoi(date[6:8])
 			startTime := strconv.Itoa(l.StartTime)
-			startHour, _ := strconv.Atoi(startTime[0:len(startTime)-2])
+			startHour, _ := strconv.Atoi(startTime[0 : len(startTime)-2])
 			startMinute, _ := strconv.Atoi(startTime[len(startTime)-2:])
 			endTime := strconv.Itoa(l.EndTime)
-			endHour, _ := strconv.Atoi(endTime[0:len(endTime)-2])
+			endHour, _ := strconv.Atoi(endTime[0 : len(endTime)-2])
 			endMinute, _ := strconv.Atoi(endTime[len(endTime)-2:])
 			classIDArr := make([]int, 0)
 			for _, kls := range l.Kl {
@@ -320,10 +320,10 @@ func (client Client) GetTimetableOfClass(start, end time.Time, class string) ([]
 			month, _ := strconv.Atoi(date[4:6])
 			day, _ := strconv.Atoi(date[6:8])
 			startTime := strconv.Itoa(l.StartTime)
-			startHour, _ := strconv.Atoi(startTime[0:len(startTime)-2])
+			startHour, _ := strconv.Atoi(startTime[0 : len(startTime)-2])
 			startMinute, _ := strconv.Atoi(startTime[len(startTime)-2:])
 			endTime := strconv.Itoa(l.EndTime)
-			endHour, _ := strconv.Atoi(endTime[0:len(endTime)-2])
+			endHour, _ := strconv.Atoi(endTime[0 : len(endTime)-2])
 			endMinute, _ := strconv.Atoi(endTime[len(endTime)-2:])
 			classIDArr := make([]int, 0)
 			for _, kls := range l.Kl {
@@ -440,10 +440,10 @@ func (client Client) GetTimetableOfSpecificTeacher(start, end time.Time, teacher
 			month, _ := strconv.Atoi(date[4:6])
 			day, _ := strconv.Atoi(date[6:8])
 			startTime := strconv.Itoa(l.StartTime)
-			startHour, _ := strconv.Atoi(startTime[0:len(startTime)-2])
+			startHour, _ := strconv.Atoi(startTime[0 : len(startTime)-2])
 			startMinute, _ := strconv.Atoi(startTime[len(startTime)-2:])
 			endTime := strconv.Itoa(l.EndTime)
-			endHour, _ := strconv.Atoi(endTime[0:len(endTime)-2])
+			endHour, _ := strconv.Atoi(endTime[0 : len(endTime)-2])
 			endMinute, _ := strconv.Atoi(endTime[len(endTime)-2:])
 			classIDArr := make([]int, 0)
 			for _, kls := range l.Kl {

@@ -203,24 +203,23 @@ func GetTeacherByShort(con *gin.Context) {
 		teacher := db.GetTeacherByShort(name)
 		con.JSON(http.StatusOK, teacher)
 		return
-	} else {
-		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, name)
-		if err != nil {
-			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
-			return
-		}
-		if !db.CreateTeacher(mongo.Teacher{
-			UUID:           uuidG.NewString(),
-			Short:          name,
-			Longname:       longname,
-			SuperUser:      false,
-			AV:             false,
-			Administration: false,
-			PEK:            false,
-		}) {
-			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
-			return
-		}
+	}
+	longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, name)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+		return
+	}
+	if !db.CreateTeacher(mongo.Teacher{
+		UUID:           uuidG.NewString(),
+		Short:          name,
+		Longname:       longname,
+		SuperUser:      false,
+		AV:             false,
+		Administration: false,
+		PEK:            false,
+	}) {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
+		return
 	}
 }
 

@@ -1237,7 +1237,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		})
 	})
 	tableStrings := make([][]string, 0)
-	lessons := make([]untis.Lesson, 0)
+	var lessons []untis.Lesson
 	if teacher == "self" {
 		var err error
 		err = client.Authenticate()
