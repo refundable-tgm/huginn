@@ -1215,7 +1215,24 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			return "", err
 		}
 	}
+	id, err := client.ResolveTeacherID(teacher)
+	if err != nil {
+		return "", err
+	}
+	untisname, err := client.ResolveTeachers([]int{id})
+	if err != nil {
+		return "", err
+	}
 	for _, lesson := range lessons {
+		contains := false
+		for _, t := range lesson.Teachers {
+			if t == untisname[0] {
+				contains = true
+			}
+		}
+		if !contains {
+			continue
+		}
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
 		endLesson := untis.GetLessonNrByEnd(lesson.End)
 		hourString := ""
@@ -1238,19 +1255,12 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		if len(classes) != 0 {
 			classes = classes[0 : len(classes)-2]
 		}
-		teachers := ""
-		for _, t := range lesson.Teachers {
-			teachers = teachers + t + ", "
-		}
-		if len(teachers) != 0 {
-			teachers = teachers[0 : len(teachers)-2]
-		}
 		row := []string{"", classes,
 			fmt.Sprintf("%v", lesson.Start.In(loc).Format("02.01.2006")),
 			fmt.Sprintf(hourString),
 			rooms,
 			"",
-			teachers,
+			untisname[0],
 			"",
 		}
 		tableStrings = append(tableStrings, row)
