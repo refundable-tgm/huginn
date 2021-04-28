@@ -1490,7 +1490,7 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 				Align: consts.Left,
 			})
 		})
-		extras, _ := ioutil.ReadDir(filepath.Join(path, UploadFolderName, short))
+		extras, _ := ioutil.ReadDir(filepath.Join(path, UploadFolderName))
 		m.Col(1, func() {
 			m.Text(strconv.Itoa(len(extras)), props.Text{
 				Top:   2.5,
@@ -2443,8 +2443,8 @@ func GenerateTravelInvoiceExcel(path, short string, app db.TravelInvoice) (strin
 	if err != nil {
 		return "", err
 	}
-	extras, _ := ioutil.ReadDir(filepath.Join(path, UploadFolderName, short))
-	err = excel.SetCellValue(Sheet, TIExtraAmount, len(extras))
+	extras, _ := ioutil.ReadDir(filepath.Join(path, UploadFolderName))
+	err = excel.SetCellValue(Sheet, TIExtraAmount, strconv.Itoa(len(extras)))
 	if err != nil {
 		return "", err
 	}
