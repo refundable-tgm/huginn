@@ -2095,7 +2095,9 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 			for _, t := range app.OtherParticipants {
 				part = part + t + ", "
 			}
-			part = part[0 : len(part)-2]
+			if len(part) != 0 {
+				part = part[0 : len(part)-2]
+			}
 			m.Text(part, props.Text{
 				Top:   2.5,
 				Align: consts.Left,
@@ -2898,7 +2900,9 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	for _, part := range app.OtherParticipants {
 		participants = participants + part + ", "
 	}
-	participants = participants[0 : len(participants)-2]
+	if len(participants) != 0 {
+		participants = participants[0 : len(participants)-2]
+	}
 	err = excel.SetCellValue(Sheet, BTAOtherParticipants, participants)
 	if err != nil {
 		return "", err
