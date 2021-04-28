@@ -377,7 +377,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				weekday := getWeekday(int(app.StartTime.Weekday()))
+				weekday := getWeekday(int(app.StartTime.In(loc).Weekday()))
 				m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.In(loc).Format("02. 01. 2006 15:04")),
 					props.Text{
 						Top:   2.5,
@@ -392,7 +392,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				weekday := getWeekday(int(app.EndTime.Weekday()))
+				weekday := getWeekday(int(app.EndTime.In(loc).Weekday()))
 				m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.In(loc).Format("02. 01. 2006 15:04")),
 					props.Text{
 						Top:   2.5,
@@ -519,7 +519,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		if err != nil {
 			return nil, err
 		}
-		lessons, err := client.GetTimetableOfClass(app.StartTime, app.EndTime, class)
+		lessons, err := client.GetTimetableOfClass(app.StartTime.In(loc), app.EndTime.In(loc), class)
 		if err != nil {
 			return nil, err
 		}
@@ -580,7 +580,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 
 			row := []string{"", classes,
 				date.In(loc).Format("02.01.2006"),
-				fmt.Sprintf(hourString),
+				hourString,
 				rooms,
 				untisnames,
 				teachers,
@@ -740,8 +740,8 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 					Align: consts.Left,
 				})
 			})
-			sweekday := getWeekday(int(app.StartTime.Weekday()))
-			eweekday := getWeekday(int(app.EndTime.Weekday()))
+			sweekday := getWeekday(int(app.StartTime.In(loc).Weekday()))
+			eweekday := getWeekday(int(app.EndTime.In(loc).Weekday()))
 
 			m.Text(fmt.Sprintf("%v, %v - %v, %v",
 				sweekday, app.StartTime.In(loc).Format("02. 01. 2006 15:04"),
@@ -792,7 +792,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 					Align: consts.Left,
 				})
 			})
-			weekday := getWeekday(int(leader.AttendanceFrom.Weekday()))
+			weekday := getWeekday(int(leader.AttendanceFrom.In(loc).Weekday()))
 			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceFrom.In(loc).Format("02.01.2006 15:04")),
 				props.Text{
 					Top:   2.5,
@@ -807,7 +807,7 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 					Align: consts.Left,
 				})
 			})
-			weekday := getWeekday(int(leader.AttendanceTill.Weekday()))
+			weekday := getWeekday(int(leader.AttendanceTill.In(loc).Weekday()))
 			m.Text(fmt.Sprintf("%v, %v", weekday, leader.AttendanceTill.In(loc).Format("02.01.2006 15:04")),
 				props.Text{
 					Top:   2.5,
@@ -830,8 +830,8 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 
 	tableString := make([][]string, 0)
 	for _, teacher := range teachers {
-		sweekday := getWeekday(int(app.StartTime.Weekday()))
-		eweekday := getWeekday(int(app.EndTime.Weekday()))
+		sweekday := getWeekday(int(app.StartTime.In(loc).Weekday()))
+		eweekday := getWeekday(int(app.EndTime.In(loc).Weekday()))
 		row := []string{
 			teacher.Name,
 			fmt.Sprintf("L%d", teacher.Group),
@@ -974,7 +974,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 					Align: consts.Left,
 				})
 			})
-			weekday := getWeekday(int(app.StartTime.Weekday()))
+			weekday := getWeekday(int(app.StartTime.In(loc).Weekday()))
 			m.Text(fmt.Sprintf("%v, %v", weekday, app.StartTime.In(loc).Format("02.01.2006 15:04")),
 				props.Text{
 					Top:   2.5,
@@ -989,7 +989,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 					Align: consts.Left,
 				})
 			})
-			weekday := getWeekday(int(app.EndTime.Weekday()))
+			weekday := getWeekday(int(app.EndTime.In(loc).Weekday()))
 			m.Text(fmt.Sprintf("%v, %v", weekday, app.EndTime.In(loc).Format("02.01.2006 15:04")), props.Text{
 				Top:   2.5,
 				Align: consts.Center,
@@ -1225,7 +1225,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		if err != nil {
 			return "", err
 		}
-		lessons, err = client.GetTimetableOfTeacher(app.StartTime, app.EndTime)
+		lessons, err = client.GetTimetableOfTeacher(app.StartTime.In(loc), app.EndTime.In(loc))
 		if err != nil {
 			return "", err
 		}
@@ -1235,7 +1235,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		if err != nil {
 			return "", err
 		}
-		lessons, err = client.GetTimetableOfSpecificTeacher(app.StartTime, app.EndTime, teacher)
+		lessons, err = client.GetTimetableOfSpecificTeacher(app.StartTime.In(loc), app.EndTime.In(loc), teacher)
 		if err != nil {
 			return "", err
 		}
@@ -1282,7 +1282,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		}
 		row := []string{"", classes,
 			fmt.Sprintf("%v", lesson.Start.In(loc).Format("02.01.2006")),
-			fmt.Sprintf(hourString),
+			hourString,
 			rooms,
 			"",
 			untisname[0],
