@@ -918,6 +918,11 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't save merged pdf"})
 		return
 	}
+	err = api.OptimizeFile(created, "", nil)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't optimize pdf"})
+		return
+	}
 	file, err := ioutil.ReadFile(created)
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't read merged pdf"})
@@ -1009,6 +1014,11 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdf"})
 		return
 	}
+	err = api.OptimizeFile(path, "", nil)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't optimize pdf"})
+		return
+	}
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
@@ -1082,6 +1092,11 @@ func GetCompensationForEducationalSupportForm(con *gin.Context) {
 	path, err = files.GenerateCompensationForEducationalSupport(path, application)
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdfs"})
+		return
+	}
+	err = api.OptimizeFile(path, "", nil)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't optimize pdf"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
@@ -1224,6 +1239,11 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		}
 		con.JSON(http.StatusOK, res)
 	} else {
+		err = api.OptimizeFile(path, "", nil)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't optimize pdf"})
+			return
+		}
 		file, err := ioutil.ReadFile(path)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't read generated pdf"})
@@ -1321,6 +1341,11 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 	path, err = files.GenerateBusinessTripApplication(path, short, bta, application.UUID)
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create pdf"})
+		return
+	}
+	err = api.OptimizeFile(path, "", nil)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't optimize pdf"})
 		return
 	}
 	file, err := ioutil.ReadFile(path)
