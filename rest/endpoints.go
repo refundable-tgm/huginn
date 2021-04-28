@@ -1615,7 +1615,7 @@ func SaveBillingReceipt(con *gin.Context) {
 			con.JSON(http.StatusInternalServerError, Error{fmt.Sprintf("couldn't decode the pdf file: %v", name)})
 			return
 		}
-		file, err := os.Create(filepath.Join(files.BasePath, files.UploadFolderName, name))
+		file, err := os.Create(filepath.Join(path, files.UploadFolderName, name))
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{fmt.Sprintf("couldn't create the pdf file: %v", name)})
 			return
