@@ -523,6 +523,29 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		if err != nil {
 			return nil, err
 		}
+		convert := make([]string, 0)
+		convert = append(convert, leader)
+		companions := strings.Split(companion, ", ")
+		convert = append(convert, companions...)
+		ids := make([]int, len(convert))
+		for _, conv := range convert {
+			id, err := client.ResolveTeacherID(conv)
+			if err != nil {
+				return nil, err
+			}
+			ids = append(ids, id)
+		}
+		untiscomps, err := client.ResolveTeachers(ids)
+		untisnames := ""
+		for _, t := range untiscomps {
+			untisnames = untisnames + t + ", "
+		}
+		if len(untisnames) != 0 {
+			untisnames = untisnames[0 : len(untisnames)-2]
+		}
+		if err != nil {
+			return nil, err
+		}
 		for _, lesson := range lessons {
 			date := lesson.Start
 			beginLesson := untis.GetLessonNrByStart(lesson.Start)
@@ -559,7 +582,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 				date.In(loc).Format("02.01.2006"),
 				fmt.Sprintf(hourString),
 				rooms,
-				leader + ", " + companion,
+				untisnames,
 				teachers,
 				"",
 			}
