@@ -3007,19 +3007,19 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 func getWeekday(weekday int) string {
 	switch weekday {
 	case int(time.Monday):
-		return "Montag"
+		return "Mo"
 	case int(time.Tuesday):
-		return "Dienstag"
+		return "Di"
 	case int(time.Wednesday):
-		return "Mittwoch"
+		return "Mi"
 	case int(time.Thursday):
-		return "Donnerstag"
+		return "Do"
 	case int(time.Friday):
-		return "Freitag"
+		return "Fr"
 	case int(time.Saturday):
-		return "Samstag"
+		return "Sa"
 	case int(time.Sunday):
-		return "Sonntag"
+		return "So"
 	}
 	return ""
 }
