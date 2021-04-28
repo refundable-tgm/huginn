@@ -529,8 +529,10 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		}
 		convert := make([]string, 0)
 		convert = append(convert, leader)
-		companions := strings.Split(companion, ", ")
-		convert = append(convert, companions...)
+		if len(companion) != 0 {
+			companions := strings.Split(companion, ", ")
+			convert = append(convert, companions...)
+		}
 		ids := make([]int, len(convert))
 		for _, conv := range convert {
 			id, err := client.ResolveTeacherID(conv)
