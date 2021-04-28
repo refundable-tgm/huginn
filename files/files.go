@@ -311,7 +311,9 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 				companion = companion + teacher.Name + ", "
 			}
 		}
-		companion = companion[0 : len(companion)-2]
+		if len(companion) != 0 {
+			companion = companion[0 : len(companion)-2]
+		}
 
 		m.Row(10, func() {
 			m.Col(6, func() {
