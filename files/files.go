@@ -233,8 +233,8 @@ func GenerateFileEnvironment(app db.Application) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	path = filepath.Join(path, UploadFolderName)
-	err = os.MkdirAll(path, os.ModePerm)
+	uploadpath := filepath.Join(path, UploadFolderName)
+	err = os.MkdirAll(uploadpath, os.ModePerm)
 	return path, err
 }
 
