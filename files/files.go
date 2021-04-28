@@ -2198,11 +2198,19 @@ func GenerateBusinessTripApplication(path, short string, app db.BusinessTripAppl
 	})
 	m.Line(10.0)
 	m.Row(10, func() {
-		m.Text("Die vorstehend beantragte Dienstreise wird mit "+
-			app.DateApplicationApproved.In(loc).Format("02. 01. 2006")+" genehmigt.", props.Text{
-			Top:   2.5,
-			Align: consts.Left,
-		})
+		t := time.Time{}
+		if app.DateApplicationApproved == t {
+			m.Text("Die vorstehend beantragte Dienstreise wurde noch nicht genehmigt.", props.Text{
+				Top:   2.5,
+				Align: consts.Left,
+			})
+		} else {
+			m.Text("Die vorstehend beantragte Dienstreise wird mit "+
+				app.DateApplicationApproved.In(loc).Format("02. 01. 2006")+" genehmigt.", props.Text{
+				Top:   2.5,
+				Align: consts.Left,
+			})
+		}
 	})
 	m.Row(15, func() {})
 	m.Line(1.0)
@@ -2974,9 +2982,12 @@ func GenerateBusinessTripApplicationExcel(path, short string, app db.BusinessTri
 	if err != nil {
 		return "", err
 	}
-	err = excel.SetCellValue(Sheet, BTAApprovalDate, app.DateApplicationApproved.In(loc).Format("02.01.2006"))
-	if err != nil {
-		return "", err
+	t := time.Time{}
+	if app.DateApplicationApproved != t {
+		err = excel.SetCellValue(Sheet, BTAApprovalDate, app.DateApplicationApproved.In(loc).Format("02.01.2006"))
+		if err != nil {
+			return "", err
+		}
 	}
 	if app.BusinessCardEmittedOutward {
 		err = excel.SetCellValue(Sheet, BTACheckBusinessCardEmittedOutward, CheckedCheckBox)
