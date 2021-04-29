@@ -555,6 +555,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		if len(untisnames) != 0 {
 			untisnames = untisnames[0 : len(untisnames)-2]
 		}
+		lessons = mergeLessons(lessons)
 		lessons = groupLessons(lessons)
 		for _, lesson := range lessons {
 			date := lesson.Start
@@ -1275,6 +1276,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		}
 		untisname = untisnameArr[0]
 	}
+	lessons = mergeLessons(lessons)
 	lessons = groupLessons(lessons)
 	for _, lesson := range lessons {
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
@@ -3098,8 +3100,8 @@ func sortTableByDate(table [][]string) {
 	})
 }
 
-// groupLessons groups lessons based on the beginning and end start times and merges the information in them
-func groupLessons(lessons []untis.Lesson) []untis.Lesson {
+// mergeLessons merges parallel lessons based on the beginning and end start times and merges the information in them
+func mergeLessons(lessons []untis.Lesson) []untis.Lesson {
 	dis := make([]untis.Lesson, 0)
 	for _, lesson := range lessons {
 		contains := false
@@ -3119,6 +3121,45 @@ func groupLessons(lessons []untis.Lesson) []untis.Lesson {
 		}
 	}
 	return dis
+}
+
+// groupLessons groups consecutive lessons which should can be summaried
+func groupLessons(lessons []untis.Lesson) []untis.Lesson {
+	sort.Slice(lessons, func(i, j int) bool {
+		if lessons[i].Start == lessons[j].Start {
+			return untis.GetLessonNrByStart(lessons[i].Start) < untis.GetLessonNrByStart(lessons[j].Start)
+		}
+		return lessons[i].Start.Before(lessons[j].Start)
+	})
+	groups := make([]untis.Lesson, 0)
+	for _, lesson := range lessons {
+		grouped := false
+		for _, n := range groups {
+			if lesson.Start.Year() == n.Start.Year() &&
+				lesson.Start.Month() == n.Start.Month() &&
+				lesson.Start.Day() == n.Start.Day() &&
+				lesson.End.Year() == n.End.Year() &&
+				lesson.End.Month() == n.End.Month() &&
+				lesson.End.Day() == n.End.Day() {
+				if untis.GetLessonNrByStart(lesson.Start) + 1 == untis.GetLessonNrByStart(n.Start) {
+					if compareString(lesson.Teachers, n.Teachers) &&
+						compareString(lesson.Rooms, n.Rooms) &&
+						compareString(lesson.Classes, n.Classes) &&
+						compareInt(lesson.TeacherIDs, n.TeacherIDs) &&
+						compareInt(lesson.RoomIDs, n.RoomIDs) &&
+						compareInt(lesson.ClassIDs, n.ClassIDs) {
+						n.End = lesson.End
+						grouped = true
+						break
+					}
+				}
+			}
+		}
+		if !grouped {
+			groups = append(groups, lesson)
+		}
+	}
+	return groups
 }
 
 // lessonsAreEqual checks whether two lessons start and end at the same time
@@ -3167,4 +3208,42 @@ func distinctInt(arr []int) []int {
 		}
 	}
 	return tmp
+}
+
+// compareInt compares two int slices
+func compareInt(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for _, v := range a {
+		contains := false
+		for _, q := range b {
+			if v == q {
+				contains = true
+			}
+		}
+		if !contains {
+			return false
+		}
+	}
+	return true
+}
+
+// compareString compares two string slices
+func compareString(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for _, v := range a {
+		contains := false
+		for _, q := range b {
+			if v == q {
+				contains = true
+			}
+		}
+		if !contains {
+			return false
+		}
+	}
+	return true
 }
