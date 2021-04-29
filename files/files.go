@@ -556,7 +556,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			untisnames = untisnames[0 : len(untisnames)-2]
 		}
 		lessons = mergeLessons(lessons)
-		lessons = groupLessons(lessons)
+		//lessons = groupLessons(lessons)
 		for _, lesson := range lessons {
 			date := lesson.Start
 			beginLesson := untis.GetLessonNrByStart(lesson.Start)
@@ -1277,7 +1277,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		untisname = untisnameArr[0]
 	}
 	lessons = mergeLessons(lessons)
-	lessons = groupLessons(lessons)
+	//lessons = groupLessons(lessons)
 	for _, lesson := range lessons {
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
 		endLesson := untis.GetLessonNrByEnd(lesson.End)
@@ -3124,6 +3124,7 @@ func mergeLessons(lessons []untis.Lesson) []untis.Lesson {
 }
 
 // groupLessons groups consecutive lessons which should can be summaried
+// ToDo fix
 func groupLessons(lessons []untis.Lesson) []untis.Lesson {
 	sort.Slice(lessons, func(i, j int) bool {
 		if lessons[i].Start == lessons[j].Start {

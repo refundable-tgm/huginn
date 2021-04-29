@@ -24,6 +24,8 @@ This backend consists out of multiple components:
 
 ## Future Roadmap
 
+ - [ ] implement file endpoints to just open existing files
+ - [ ] fix group lesson algorithm to group consecutive lessons  
  - [ ] implement sending of mails (when state changes or events occurr)
  - [ ] create logging system to log every event
  - [ ] create simpler data model
