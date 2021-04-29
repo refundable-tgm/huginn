@@ -3142,7 +3142,7 @@ func groupLessons(lessons []untis.Lesson) []untis.Lesson {
 				lesson.End.Year() == n.End.Year() &&
 				lesson.End.Month() == n.End.Month() &&
 				lesson.End.Day() == n.End.Day() {
-				if untis.GetLessonNrByStart(lesson.Start) + 1 == untis.GetLessonNrByStart(n.Start) {
+				if untis.GetLessonNrByStart(lesson.Start)+1 == untis.GetLessonNrByStart(n.Start) {
 					if compareString(lesson.Teachers, n.Teachers) &&
 						compareString(lesson.Rooms, n.Rooms) &&
 						compareString(lesson.Classes, n.Classes) &&
