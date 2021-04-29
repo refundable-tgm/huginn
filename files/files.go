@@ -244,7 +244,6 @@ func GenerateFileEnvironment(app db.Application) (string, error) {
 func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]string, error) {
 	paths := make([]string, 0)
 	client := untis.GetClient(username)
-	defer client.Close()
 	if app.Kind != db.SchoolEvent {
 		return nil, fmt.Errorf("this pdf can only be generated for school events")
 	}
@@ -542,15 +541,19 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			ids = append(ids, id)
 		}
 		untiscomps, err := client.ResolveTeachers(ids)
+		if err != nil {
+			return nil, err
+		}
+		err = client.Close()
+		if err != nil {
+			return nil, err
+		}
 		untisnames := ""
 		for _, t := range untiscomps {
 			untisnames = untisnames + t + ", "
 		}
 		if len(untisnames) != 0 {
 			untisnames = untisnames[0 : len(untisnames)-2]
-		}
-		if err != nil {
-			return nil, err
 		}
 		for _, lesson := range lessons {
 			date := lesson.Start
