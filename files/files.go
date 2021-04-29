@@ -3116,10 +3116,14 @@ func groupLessons(lessons []untis.Lesson) []untis.Lesson {
 
 // lessonsAreEqual checks whether two lessons start and end at the same time
 func lessonsAreEqual(lesson1, lesson2 untis.Lesson) bool {
-	return lesson1.Start.Date() == lesson2.Start.Date() &&
+	return lesson1.Start.Year() == lesson2.Start.Year() &&
+		lesson1.Start.Month() == lesson2.Start.Month() &&
+		lesson1.Start.Day() == lesson2.Start.Day() &&
 		lesson1.Start.Hour() == lesson2.Start.Hour() &&
 		lesson1.Start.Minute() == lesson2.Start.Minute() &&
-		lesson1.End.Date() == lesson2.End.Date() &&
+		lesson1.End.Year() == lesson2.End.Year() &&
+		lesson1.End.Month() == lesson2.End.Month() &&
+		lesson1.End.Day() == lesson2.End.Day() &&
 		lesson1.End.Hour() == lesson2.End.Hour() &&
 		lesson1.End.Minute() == lesson2.End.Minute()
 }
