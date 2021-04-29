@@ -119,12 +119,12 @@ func (client *Client) Authenticate() error {
 	if err != nil {
 		return err
 	}
-	personType, _ := r.Result["personType"].(int)
-	personID, _ := r.Result["personId"].(int)
+	personType, _ := r.Result["personType"].(float64)
+	personID, _ := r.Result["personId"].(float64)
 	if r.ID == strconv.Itoa(id) {
 		client.SessionID = r.Result["sessionId"].(string)
-		client.PersonType = personType
-		client.PersonID = personID
+		client.PersonType = int(personType)
+		client.PersonID = int(personID)
 		client.Authenticated = true
 		client.Closed = false
 		return nil
