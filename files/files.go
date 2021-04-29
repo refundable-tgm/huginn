@@ -572,13 +572,6 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			if len(rooms) != 0 {
 				rooms = rooms[0 : len(rooms)-2]
 			}
-			classes := ""
-			for _, c := range lesson.Classes {
-				classes = classes + c + ", "
-			}
-			if len(classes) != 0 {
-				classes = classes[0 : len(classes)-2]
-			}
 			teachers := ""
 			for _, t := range lesson.Teachers {
 				teachers = teachers + t + ", "
@@ -587,7 +580,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 				teachers = teachers[0 : len(teachers)-2]
 			}
 
-			row := []string{"", classes,
+			row := []string{"", class,
 				date.In(loc).Format("02.01.2006"),
 				hourString,
 				rooms,
