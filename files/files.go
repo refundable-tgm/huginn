@@ -555,6 +555,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		if len(untisnames) != 0 {
 			untisnames = untisnames[0 : len(untisnames)-2]
 		}
+		lessons = groupLessons(lessons)
 		for _, lesson := range lessons {
 			date := lesson.Start
 			beginLesson := untis.GetLessonNrByStart(lesson.Start)
@@ -1267,6 +1268,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 	if err != nil {
 		return "", err
 	}
+	lessons = groupLessons(lessons)
 	for _, lesson := range lessons {
 		beginLesson := untis.GetLessonNrByStart(lesson.Start)
 		endLesson := untis.GetLessonNrByEnd(lesson.End)
@@ -3087,4 +3089,71 @@ func sortTableByDate(table [][]string) {
 		}
 		return xDate.Before(yDate)
 	})
+}
+
+// groupLessons groups lessons based on the beginning and end start times and merges the information in them
+func groupLessons(lessons []untis.Lesson) []untis.Lesson {
+	dis := make([]untis.Lesson, 0)
+	for _, lesson := range lessons {
+		contains := false
+		for _, n := range dis {
+			if lessonsAreEqual(n, lesson) {
+				contains = true
+				n.Teachers = distinctString(append(n.Teachers, lesson.Teachers...))
+				n.Rooms = distinctString(append(n.Rooms, lesson.Rooms...))
+				n.Classes = distinctString(append(n.Classes, lesson.Classes...))
+				n.TeacherIDs = distinctInt(append(n.TeacherIDs, lesson.TeacherIDs...))
+				n.RoomIDs = distinctInt(append(n.RoomIDs, lesson.RoomIDs...))
+				n.ClassIDs = distinctInt(append(n.ClassIDs, lesson.ClassIDs...))
+			}
+		}
+		if !contains {
+			dis = append(dis, lesson)
+		}
+	}
+	return dis
+}
+
+// lessonsAreEqual checks whether two lessons start and end at the same time
+func lessonsAreEqual(lesson1, lesson2 untis.Lesson) bool {
+	return lesson1.Start.Date() == lesson2.Start.Date() &&
+		lesson1.Start.Hour() == lesson2.Start.Hour() &&
+		lesson1.Start.Minute() == lesson2.Start.Minute() &&
+		lesson1.End.Date() == lesson2.End.Date() &&
+		lesson1.End.Hour() == lesson2.End.Hour() &&
+		lesson1.End.Minute() == lesson2.End.Minute()
+}
+
+// distinctString removes duplicate entries out of a string array
+func distinctString(arr []string) []string {
+	tmp := make([]string, 0)
+	for _, a := range arr {
+		eq := false
+		for _, b := range arr {
+			if a == b {
+				eq = true
+			}
+		}
+		if !eq {
+			tmp = append(tmp, a)
+		}
+	}
+	return tmp
+}
+
+// distinctInt removes duplicate entries out of an int array
+func distinctInt(arr []int) []int {
+	tmp := make([]int, 0)
+	for _, a := range arr {
+		eq := false
+		for _, b := range arr {
+			if a == b {
+				eq = true
+			}
+		}
+		if !eq {
+			tmp = append(tmp, a)
+		}
+	}
+	return tmp
 }
