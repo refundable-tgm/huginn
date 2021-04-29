@@ -209,7 +209,7 @@ func GetTeacherByShort(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
 		return
 	}
-	if !db.CreateTeacher(mongo.Teacher{
+	teacher := mongo.Teacher{
 		UUID:           uuidG.NewString(),
 		Short:          name,
 		Longname:       longname,
@@ -217,10 +217,12 @@ func GetTeacherByShort(con *gin.Context) {
 		AV:             false,
 		Administration: false,
 		PEK:            false,
-	}) {
+	}
+	if !db.CreateTeacher(teacher) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
 		return
 	}
+	con.JSON(http.StatusOK, teacher)
 }
 
 // GetTeacher represents the get teacher endpoint
