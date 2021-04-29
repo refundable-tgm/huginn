@@ -1239,6 +1239,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 	})
 	tableStrings := make([][]string, 0)
 	var lessons []untis.Lesson
+	var untisname string
 	if teacher == "self" {
 		var err error
 		err = client.Authenticate()
@@ -1249,6 +1250,11 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		if err != nil {
 			return "", err
 		}
+		untisnameArr, err := client.ResolveTeachers([]int{client.PersonID})
+		if err != nil {
+			return "", err
+		}
+		untisname = untisnameArr[0]
 	} else {
 		var err error
 		err = client.Authenticate()
@@ -1259,14 +1265,15 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		if err != nil {
 			return "", err
 		}
-	}
-	id, err := client.ResolveTeacherID(teacher)
-	if err != nil {
-		return "", err
-	}
-	untisname, err := client.ResolveTeachers([]int{id})
-	if err != nil {
-		return "", err
+		id, err := client.ResolveTeacherID(teacher)
+		if err != nil {
+			return "", err
+		}
+		untisnameArr, err := client.ResolveTeachers([]int{id})
+		if err != nil {
+			return "", err
+		}
+		untisname = untisnameArr[0]
 	}
 	lessons = groupLessons(lessons)
 	for _, lesson := range lessons {
@@ -1297,7 +1304,7 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			hourString,
 			rooms,
 			"",
-			untisname[0],
+			untisname,
 			"",
 		}
 		tableStrings = append(tableStrings, row)
