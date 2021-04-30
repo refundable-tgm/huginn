@@ -167,7 +167,6 @@ func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 // CreateTeacher creates a new application in the system
 // it will return true if this operation was successful and false if not
 func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
-	teacher.UUID = uuid.New().String()
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	if teacher.Short == getInitUserName() {
 		teacher.SuperUser = true
