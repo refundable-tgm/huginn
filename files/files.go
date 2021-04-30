@@ -308,12 +308,12 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			if teacher.Role == db.Leader {
 				leader = teacher.Name
 			} else if teacher.Role == db.Companion {
-				companion = companion + teacher.Name + ", "
+				companion = companion + teacher.Name + ", \n"
 				compcount++
 			}
 		}
 		if len(companion) != 0 {
-			companion = companion[0 : len(companion)-2]
+			companion = companion[0 : len(companion)-3]
 		}
 
 		m.Row(10 + 7 * compcount, func() {
@@ -531,7 +531,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		convert := make([]string, 0)
 		convert = append(convert, leader)
 		if len(companion) != 0 {
-			companions := strings.Split(companion, ", ")
+			companions := strings.Split(companion, ", \n")
 			convert = append(convert, companions...)
 		}
 		ids := make([]int, len(convert))
