@@ -417,6 +417,10 @@ definitions:
         items:
           type: string
         type: array
+      untis:
+        description: The Untis abbrevation of the teacher
+        example: ZAKS
+        type: string
       uuid:
         description: the uuid of this Teacher
         example: 3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4
@@ -693,6 +697,10 @@ definitions:
         items:
           type: string
         type: array
+      untis:
+        description: The Untis abbrevation of the teacher
+        example: ZAKS
+        type: string
     type: object
   rest.TokenPair:
     properties:
@@ -797,6 +805,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -842,6 +854,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -883,6 +899,10 @@ paths:
             $ref: '#/definitions/rest.PDF'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/rest.Error'
         "422":
@@ -1024,6 +1044,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -1071,6 +1095,10 @@ paths:
             $ref: '#/definitions/rest.Excel'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/rest.Error'
         "422":
@@ -1122,6 +1150,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -1159,6 +1191,10 @@ paths:
             $ref: '#/definitions/rest.PDF'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/rest.Error'
         "422":
@@ -1231,6 +1267,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -1279,6 +1319,49 @@ paths:
           schema:
             $ref: '#/definitions/rest.Error'
       summary: Returns a teacher with the specified short name
+  /getTeacherByUntis:
+    get:
+      consumes:
+      - application/json
+      description: Searches for the Teacher with the specified untis abbrevation and
+        returns the data
+      operationId: get-teacher-by-untis
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Untis abbrevation of Teacher
+        in: query
+        name: untis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Teacher'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Returns a teacher with the specified untis abbrevation
   /getTravelInvoiceExcel:
     get:
       consumes:
@@ -1316,6 +1399,10 @@ paths:
             $ref: '#/definitions/rest.Excel'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/rest.Error'
         "422":
@@ -1368,6 +1455,10 @@ paths:
             $ref: '#/definitions/rest.PDF'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/rest.Error'
         "422":
@@ -1506,6 +1597,10 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.Error'
         "422":
           description: Unprocessable Entity
           schema:
@@ -1593,6 +1688,10 @@ paths:
             $ref: '#/definitions/rest.Information'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/rest.Error'
         "422":
