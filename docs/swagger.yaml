@@ -164,6 +164,7 @@ definitions:
         type: string
       title:
         description: Title of the Teacher
+        example: Prof
         type: string
       travel_costs_paid_by_someone:
         description: whether the travel costs are paid by someone else
@@ -359,6 +360,22 @@ definitions:
         description: whether this Teacher as av rights
         example: true
         type: boolean
+      degree:
+        description: Degree of the Teacher
+        example: DI
+        type: string
+      departments:
+        description: The Departments this teacher belongs to
+        example:
+        - HIT
+        - ' HBG'
+        items:
+          type: string
+        type: array
+      group:
+        description: The Group number
+        example: 1
+        type: integer
       longname:
         description: the longname (firstname + sirname) of the Teacher
         example: Stefan Zakall
@@ -371,10 +388,35 @@ definitions:
         description: the short name of the Teacher
         example: szakall
         type: string
+      staffnr:
+        description: The Staffnr of the regarding teacher
+        example: 938503154
+        type: integer
+      starting_addresses:
+        description: The StartingAddresses of the teacher
+        example:
+        - Zuhause 1
+        - ' Zuhause 2'
+        items:
+          type: string
+        type: array
       super_user:
         description: Superuser (total admin) of this software
         example: true
         type: boolean
+      title:
+        description: Title of the Teacher
+        example: Prof
+        type: string
+      trip_goals:
+        description: The TripGoals the teacher visited before
+        example:
+        - Karl Hönck Heim
+        - ' PH Wien'
+        - ' Landesgericht St. Pölten'
+        items:
+          type: string
+        type: array
       uuid:
         description: the uuid of this Teacher
         example: 3fcf7f67-e0ed-4339-99b4-a6765aaa3dc4
@@ -399,7 +441,7 @@ definitions:
         example: Accenture
         type: string
       ph:
-        description: the personnel number of the teacher
+        description: the ph number of the teacher
         example: 938503154
         type: integer
     type: object
@@ -607,6 +649,50 @@ definitions:
         description: Token is the refresh token
         example: <jwt-token>
         type: string
+    type: object
+  rest.TeacherInformation:
+    properties:
+      degree:
+        description: Degree of the Teacher
+        example: DI
+        type: string
+      departments:
+        description: The Departments this teacher belongs to
+        example:
+        - HIT
+        - ' HBG'
+        items:
+          type: string
+        type: array
+      group:
+        description: The Group number
+        example: 1
+        type: integer
+      staffnr:
+        description: The Staffnr of the regarding teacher
+        example: 938503154
+        type: integer
+      starting_addresses:
+        description: The StartingAddresses of the teacher
+        example:
+        - Zuhause 1
+        - ' Zuhause 2'
+        items:
+          type: string
+        type: array
+      title:
+        description: Title of the Teacher
+        example: Prof
+        type: string
+      trip_goals:
+        description: The TripGoals the teacher visited before
+        example:
+        - Karl Hönck Heim
+        - ' PH Wien'
+        - ' Landesgericht St. Pölten'
+        items:
+          type: string
+        type: array
     type: object
   rest.TokenPair:
     properties:
@@ -1518,6 +1604,51 @@ paths:
           schema:
             $ref: '#/definitions/rest.Error'
       summary: Updates an existing application
+  /updateTeacherInformation:
+    put:
+      consumes:
+      - application/json
+      description: Updates a teacher identified by a uuid with the data in the body
+        in the system
+      operationId: update-teacher-information
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: The teacher information data to set
+        in: body
+        name: teacher_information
+        required: true
+        schema:
+          $ref: '#/definitions/rest.TeacherInformation'
+      - description: Identifier of the teacher to update
+        in: query
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.Information'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/rest.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/rest.Error'
+      summary: Updates the information of an existing teacher
 securityDefinitions:
   ApiKeyAuth:
     in: header

@@ -314,6 +314,63 @@ func SetTeacherPermissions(con *gin.Context) {
 	}
 }
 
+// UpdateTeacherInformation represents the update teacher information endpoint
+// @Summary Updates the information of an existing teacher
+// @Description Updates a teacher identified by a uuid with the data in the body in the system
+// @ID update-teacher-information
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param teacher_information body rest.TeacherInformation true "The teacher information data to set"
+// @Param uuid query string true "Identifier of the teacher to update"
+// @Success 200 {object} Information
+// @Failure 401 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /updateTeacherInformation [put]
+func UpdateTeacherInformation(con *gin.Context) {
+	ti := TeacherInformation{}
+	if err := con.ShouldBindJSON(&ti); err != nil {
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
+		return
+	}
+	auth, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
+		return
+	}
+	db := mongo.MongoDatabaseConnector{}
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
+		return
+	}
+	defer db.Close()
+	query := con.Request.URL.Query()
+	uuid := query.Get("uuid")
+	if query.Get("uuid") == "" {
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
+		return
+	}
+	requestTeacher := db.GetTeacherByShort(auth.Username)
+	teacherToUpdate := db.GetTeacherByUUID(uuid)
+	if !(requestTeacher.UUID == teacherToUpdate.UUID) {
+		con.JSON(http.StatusUnauthorized, Error{"teacher are only allowed to update themselves"})
+		return
+	}
+	teacherToUpdate.Degree = ti.Degree
+	teacherToUpdate.Title = ti.Title
+	teacherToUpdate.Departments = ti.Departments
+	teacherToUpdate.Group = ti.Group
+	teacherToUpdate.Staffnr = ti.Staffnr
+	teacherToUpdate.StartingAddresses = ti.StartingAddresses
+	teacherToUpdate.TripGoals = ti.TripGoals
+	if db.UpdateTeacher(uuid, teacherToUpdate) {
+		con.JSON(http.StatusOK, Information{"success; teacher updated"})
+	} else {
+		con.JSON(http.StatusInternalServerError, Error{"error; teacher not updated"})
+	}
+}
+
 // GetActiveApplications represents the get active applications endpoint
 // @Summary Returns all active applications
 // @Description Returns all active applications as a list of applications

@@ -1297,6 +1297,71 @@
                     }
                 }
             }
+        },
+        "/updateTeacherInformation": {
+            "put": {
+                "description": "Updates a teacher identified by a uuid with the data in the body in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Updates the information of an existing teacher",
+                "operationId": "update-teacher-information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "The teacher information data to set",
+                        "name": "teacher_information",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rest.TeacherInformation"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Identifier of the teacher to update",
+                        "name": "uuid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Information"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/rest.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1499,7 +1564,8 @@
                 },
                 "title": {
                     "description": "Title of the Teacher",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Prof"
                 },
                 "travel_costs_paid_by_someone": {
                     "description": "whether the travel costs are paid by someone else",
@@ -1757,6 +1823,27 @@
                     "type": "boolean",
                     "example": true
                 },
+                "degree": {
+                    "description": "Degree of the Teacher",
+                    "type": "string",
+                    "example": "DI"
+                },
+                "departments": {
+                    "description": "The Departments this teacher belongs to",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "HIT",
+                        " HBG"
+                    ]
+                },
+                "group": {
+                    "description": "The Group number",
+                    "type": "integer",
+                    "example": 1
+                },
                 "longname": {
                     "description": "the longname (firstname + sirname) of the Teacher",
                     "type": "string",
@@ -1772,10 +1859,43 @@
                     "type": "string",
                     "example": "szakall"
                 },
+                "staffnr": {
+                    "description": "The Staffnr of the regarding teacher",
+                    "type": "integer",
+                    "example": 938503154
+                },
+                "starting_addresses": {
+                    "description": "The StartingAddresses of the teacher",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Zuhause 1",
+                        " Zuhause 2"
+                    ]
+                },
                 "super_user": {
                     "description": "Superuser (total admin) of this software",
                     "type": "boolean",
                     "example": true
+                },
+                "title": {
+                    "description": "Title of the Teacher",
+                    "type": "string",
+                    "example": "Prof"
+                },
+                "trip_goals": {
+                    "description": "The TripGoals the teacher visited before",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Karl Hönck Heim",
+                        " PH Wien",
+                        " Landesgericht St. Pölten"
+                    ]
                 },
                 "uuid": {
                     "description": "the uuid of this Teacher",
@@ -1808,7 +1928,7 @@
                     "example": "Accenture"
                 },
                 "ph": {
-                    "description": "the personnel number of the teacher",
+                    "description": "the ph number of the teacher",
                     "type": "integer",
                     "example": 938503154
                 }
@@ -2078,6 +2198,65 @@
                     "description": "Token is the refresh token",
                     "type": "string",
                     "example": "\u003cjwt-token\u003e"
+                }
+            }
+        },
+        "rest.TeacherInformation": {
+            "type": "object",
+            "properties": {
+                "degree": {
+                    "description": "Degree of the Teacher",
+                    "type": "string",
+                    "example": "DI"
+                },
+                "departments": {
+                    "description": "The Departments this teacher belongs to",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "HIT",
+                        " HBG"
+                    ]
+                },
+                "group": {
+                    "description": "The Group number",
+                    "type": "integer",
+                    "example": 1
+                },
+                "staffnr": {
+                    "description": "The Staffnr of the regarding teacher",
+                    "type": "integer",
+                    "example": 938503154
+                },
+                "starting_addresses": {
+                    "description": "The StartingAddresses of the teacher",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Zuhause 1",
+                        " Zuhause 2"
+                    ]
+                },
+                "title": {
+                    "description": "Title of the Teacher",
+                    "type": "string",
+                    "example": "Prof"
+                },
+                "trip_goals": {
+                    "description": "The TripGoals the teacher visited before",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "Karl Hönck Heim",
+                        " PH Wien",
+                        " Landesgericht St. Pölten"
+                    ]
                 }
             }
         },

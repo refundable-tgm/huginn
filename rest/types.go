@@ -28,6 +28,24 @@ type Information struct {
 	Message string `json:"info" example:"updated teacher successfully"`
 }
 
+// TeacherInformation contains changeable information of the teacher
+type TeacherInformation struct {
+	// Degree of the Teacher
+	Degree string `json:"degree" example:"DI"`
+	// Title of the Teacher
+	Title string `json:"title" example:"Prof"`
+	// The Staffnr of the regarding teacher
+	Staffnr int `json:"staffnr" example:"938503154"`
+	// The Group number
+	Group int `json:"group" example:"1"`
+	// The StartingAddresses of the teacher
+	StartingAddresses []string `json:"starting_addresses" example:"Zuhause 1, Zuhause 2"`
+	// The TripGoals the teacher visited before
+	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim, PH Wien, Landesgericht St. Pölten"`
+	// The Departments this teacher belongs to
+	Departments []string `json:"departments" example:"HIT, HBG"`
+}
+
 // RefreshToken maps an refresh token
 type RefreshToken struct {
 	// Token is the refresh token

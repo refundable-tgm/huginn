@@ -164,7 +164,7 @@ type TrainingDetails struct {
 	Kind int `json:"kind" example:"2"`
 	// if its miscellaneous a reasoning for the Training
 	MiscellaneousReason string `json:"miscellaneous_reason" example:"Ein sonstiger Grund"`
-	// the personnel number of the teacher
+	// the ph number of the teacher
 	PH int `json:"ph" example:"938503154"`
 	// The company who organizes the Training
 	Organizer string `json:"organizer" example:"Accenture"`
@@ -197,7 +197,7 @@ type BusinessTripApplication struct {
 	// Degree of the Teacher
 	Degree string `json:"degree" example:"DI"`
 	// Title of the Teacher
-	Title string `json:"title" example:""`
+	Title string `json:"title" example:"Prof"`
 	// The staffnr of the regarding teacher
 	Staffnr int `json:"staffnr" example:"938503154"`
 	// The time the trip begins
@@ -376,4 +376,18 @@ type Teacher struct {
 	Administration bool `json:"administration" example:"true"`
 	// whether this Teacher as pek rights
 	PEK bool `json:"pek" example:"true"`
+	// Degree of the Teacher
+	Degree string `json:"degree" example:"DI"`
+	// Title of the Teacher
+	Title string `json:"title" example:"Prof"`
+	// The Staffnr of the regarding teacher
+	Staffnr int `json:"staffnr" example:"938503154"`
+	// The Group number
+	Group int `json:"group" example:"1"`
+	// The StartingAddresses of the teacher
+	StartingAddresses []string `json:"starting_addresses" example:"Zuhause 1, Zuhause 2"`
+	// The TripGoals the teacher visited before
+	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim, PH Wien, Landesgericht St. Pölten"`
+	// The Departments this teacher belongs to
+	Departments []string `json:"departments" example:"HIT, HBG"`
 }
