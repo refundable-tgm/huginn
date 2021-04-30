@@ -5,6 +5,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/google/uuid"
 	"github.com/refundable-tgm/huginn/db"
+	"github.com/refundable-tgm/huginn/untis"
 	"strings"
 )
 
@@ -38,7 +39,21 @@ func AuthenticateUserCredentials(username, password string) bool {
 		return false
 	}
 	if !mongo.DoesTeacherExistByShort(username) {
-		return mongo.CreateTeacher(db.Teacher{
+		client := untis.GetClient(username)
+		err = client.Authenticate()
+		if err != nil {
+			_ = client.Close()
+			return false
+		}
+		id, err := client.ResolveTeacherID(longname)
+		if err != nil {
+			return false
+		}
+		untisAb, err := client.ResolveTeachers([]int{id})
+		if err != nil {
+			return false
+		}
+		if !mongo.CreateTeacher(db.Teacher{
 			UUID:           uuid.NewString(),
 			Short:          username,
 			Longname:       longname,
@@ -46,7 +61,15 @@ func AuthenticateUserCredentials(username, password string) bool {
 			AV:             false,
 			Administration: false,
 			PEK:            false,
-		})
+			Untis:          untisAb[0],
+		}) {
+			_ = client.Close()
+			return false
+		}
+		err = client.Close()
+		if err != nil {
+			return false
+		}
 	}
 	return true
 }
