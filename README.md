@@ -24,7 +24,7 @@ This backend consists out of multiple components:
 
 ## Future Roadmap
 
- - [ ] implement file endpoints to just open existing files
+ - [ ] implement file endpoints to just open existing files or just handle the pdf inside the application using byte slices
  - [ ] fix group lesson algorithm to group consecutive lessons  
  - [ ] implement sending of mails (when state changes or events occurr)
  - [ ] create logging system to log every event
