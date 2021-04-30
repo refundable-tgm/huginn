@@ -616,19 +616,19 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 			})
 		})
 		ackStrings := make([][]string, 6)
-		ackStrings[0] = []string{"AV", "", ""}
-		ackStrings[1] = []string{"AV", "", ""}
-		ackStrings[2] = []string{"WL", "", ""}
-		ackStrings[3] = []string{"Begleitperson", "", ""}
-		ackStrings[4] = []string{"Ersteller/in", "", ""}
-		ackStrings[5] = []string{"UNTIS Eintragung", "", ""}
+		ackStrings[0] = []string{"AV", "\n", "\n"}
+		ackStrings[1] = []string{"AV", "\n", "\n"}
+		ackStrings[2] = []string{"WL", "\n", "\n"}
+		ackStrings[3] = []string{"Begleitperson", "\n", "\n"}
+		ackStrings[4] = []string{"Ersteller/in", "\n", "\n"}
+		ackStrings[5] = []string{"UNTIS Eintragung", "\n", "\n"}
 		m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings, props.TableList{
 			Align: consts.Center,
 			HeaderProp: props.TableListContent{
-				GridSizes: []uint{4, 4, 4},
+				GridSizes: []uint{2, 5, 5},
 			},
 			ContentProp: props.TableListContent{
-				GridSizes: []uint{4, 4, 4},
+				GridSizes: []uint{2, 5, 5},
 			},
 			Line: true,
 		})
@@ -839,8 +839,8 @@ func GenerateCompensationForEducationalSupport(path string, app db.Application) 
 		row := []string{
 			teacher.Name,
 			fmt.Sprintf("L%d", teacher.Group),
-			fmt.Sprintf("%v, %v", sweekday, app.StartTime.In(loc).Format("02.01.2006 15:04")),
-			fmt.Sprintf("%v, %v", eweekday, app.EndTime.In(loc).Format("02.01.2006 15:04")),
+			fmt.Sprintf("%v, %v", sweekday, teacher.AttendanceFrom.In(loc).Format("02.01.2006 15:04")),
+			fmt.Sprintf("%v, %v", eweekday, teacher.AttendanceTill.In(loc).Format("02.01.2006 15:04")),
 		}
 		tableString = append(tableString, row)
 	}
@@ -1335,17 +1335,17 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 		})
 	})
 	ackStrings := make([][]string, 4)
-	ackStrings[0] = []string{"AV", "", ""}
-	ackStrings[1] = []string{"WL", "", ""}
-	ackStrings[2] = []string{"Ersteller/in", "", ""}
-	ackStrings[3] = []string{"UNTIS Eintragung", "", ""}
+	ackStrings[0] = []string{"AV", "\n", "\n"}
+	ackStrings[1] = []string{"WL", "\n", "\n"}
+	ackStrings[2] = []string{"Ersteller/in", "\n", "\n"}
+	ackStrings[3] = []string{"UNTIS Eintragung", "\n", "\n"}
 	m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings, props.TableList{
 		Align: consts.Center,
 		HeaderProp: props.TableListContent{
-			GridSizes: []uint{4, 4, 4},
+			GridSizes: []uint{2, 5, 5},
 		},
 		ContentProp: props.TableListContent{
-			GridSizes: []uint{4, 4, 4},
+			GridSizes: []uint{2, 5, 5},
 		},
 		Line: true,
 	})
