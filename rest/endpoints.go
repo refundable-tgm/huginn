@@ -228,7 +228,7 @@ func GetTeacherByShort(con *gin.Context) {
 		AV:             false,
 		Administration: false,
 		PEK:            false,
-		Untis: 			untisAb[0],
+		Untis:          untisAb[0],
 	}
 	if !db.CreateTeacher(teacher) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
@@ -491,7 +491,7 @@ func GetActiveApplications(con *gin.Context) {
 			AV:             false,
 			Administration: false,
 			PEK:            false,
-			Untis: 			untisAb[0],
+			Untis:          untisAb[0],
 		}
 		if !db.CreateTeacher(teacher) {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
@@ -588,7 +588,7 @@ func GetAllApplications(con *gin.Context) {
 			AV:             false,
 			Administration: false,
 			PEK:            false,
-			Untis:			untisAb[0],
+			Untis:          untisAb[0],
 		}
 		if !db.CreateTeacher(teacher) {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
