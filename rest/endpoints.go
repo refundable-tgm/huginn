@@ -608,6 +608,7 @@ func GetNews(con *gin.Context) {
 // @Param uuid query string true "The UUID of the specifying Application"
 // @Success 200 {object} db.Application
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getApplication [get]
@@ -630,6 +631,10 @@ func GetApplication(con *gin.Context) {
 		return
 	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
+	}
 	application := db.GetApplication(uuid)
 	var in bool
 	if application.Kind == mongo.SchoolEvent {
@@ -755,6 +760,7 @@ func CreateApplication(con *gin.Context) {
 // @Param uuid query string true "Identifier of the application to update"
 // @Success 200 {object} Information
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /updateApplication [put]
@@ -782,6 +788,10 @@ func UpdateApplication(con *gin.Context) {
 		return
 	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
+	}
 	application := db.GetApplication(uuid)
 	var in bool
 	if application.Kind == mongo.SchoolEvent {
@@ -822,6 +832,7 @@ func UpdateApplication(con *gin.Context) {
 // @Param uuid query string true "Identifier of the application to delete"
 // @Success 200 {object} Information
 // @Failure 401 {object} Error
+// @Failure 404 {object Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /deleteApplication [delete]
@@ -844,6 +855,10 @@ func DeleteApplication(con *gin.Context) {
 		return
 	}
 	requestTeacher := db.GetTeacherByShort(auth.Username)
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
+	}
 	application := db.GetApplication(uuid)
 	var in bool
 	if application.Kind == mongo.SchoolEvent {
@@ -885,6 +900,7 @@ func DeleteApplication(con *gin.Context) {
 // @Param classes query []string false "Filter for classes"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getAbsenceFormForClasses [get]
@@ -910,6 +926,10 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 	classes := make([]string, 0)
 	if applyClassFilter {
 		classes = query["classes"]
+	}
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
 	}
 	application := db.GetApplication(uuid)
 	requestTeacher := db.GetTeacherByShort(auth.Username)
@@ -1008,6 +1028,7 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 // @Param teacher query string false "untis name of the teacher, if not provided logged in teacher will be used"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getAbsenceFormForTeacher [get]
@@ -1033,6 +1054,10 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 	teacher := ""
 	if applyTeacher {
 		teacher = query.Get("teacher")
+	}
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
 	}
 	application := db.GetApplication(uuid)
 	requestTeacher := db.GetTeacherByShort(auth.Username)
@@ -1098,6 +1123,7 @@ func GetAbsenceFormForTeacher(con *gin.Context) {
 // @Param uuid query string true "Identifier of the application to generate the pdf from"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getCompensationForEducationalSupportForm [get]
@@ -1119,6 +1145,10 @@ func GetCompensationForEducationalSupportForm(con *gin.Context) {
 		return
 	}
 	uuid := query.Get("uuid")
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
+	}
 	application := db.GetApplication(uuid)
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	var in bool
@@ -1181,6 +1211,7 @@ func GetCompensationForEducationalSupportForm(con *gin.Context) {
 // @Param receipts query bool false "If provided the pdf will include all receipt"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getTravelInvoiceForm [get]
@@ -1217,6 +1248,10 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		return
 	}
 	_, applyMergeReceipts := con.Request.Form["receipts"]
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
+	}
 	application := db.GetApplication(uuid)
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	var in bool
@@ -1326,6 +1361,7 @@ func GetTravelInvoiceForm(con *gin.Context) {
 // @Param bta_id query int true "ID of the Business Trip Application data"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getBusinessTripApplicationForm [get]
@@ -1359,6 +1395,10 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 	btaID, err := strconv.Atoi(query.Get("bta_id"))
 	if err != nil {
 		con.JSON(http.StatusUnprocessableEntity, Error{"invalid bta_id provided"})
+		return
+	}
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
 		return
 	}
 	application := db.GetApplication(uuid)
@@ -1429,6 +1469,7 @@ func GetBusinessTripApplicationForm(con *gin.Context) {
 // @Param ti_id query int true "ID of the Travel Invoice data"
 // @Success 200 {object} Excel
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getTravelInvoiceExcel [get]
@@ -1462,6 +1503,10 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 	tiID, err := strconv.Atoi(query.Get("ti_id"))
 	if err != nil {
 		con.JSON(http.StatusUnprocessableEntity, Error{"invalid ti_id provided"})
+		return
+	}
+	if db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
 		return
 	}
 	application := db.GetApplication(uuid)
@@ -1527,6 +1572,7 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 // @Param bta_id query int true "ID of the Business Trip Application data"
 // @Success 200 {object} Excel
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getBusinessTripApplicationExcel [get]
@@ -1560,6 +1606,10 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 	btaID, err := strconv.Atoi(query.Get("bta_id"))
 	if err != nil {
 		con.JSON(http.StatusUnprocessableEntity, Error{"invalid bta_id provided"})
+		return
+	}
+	if db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
 		return
 	}
 	application := db.GetApplication(uuid)
@@ -1625,6 +1675,7 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 // @Param files body PDFs true "The files to save as an array of the base64 decoded file contents"
 // @Success 200 {object} Information
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /saveBillingReceipt [post]
@@ -1656,6 +1707,10 @@ func SaveBillingReceipt(con *gin.Context) {
 		return
 	}
 	short := query.Get("short")
+	if !db.DoesApplicationExist(uuid) {
+		con.JSON(http.StatusNotFound, Error{"application not found"})
+		return
+	}
 	application := db.GetApplication(uuid)
 	requestTeacher := db.GetTeacherByShort(auth.Username)
 	var in bool

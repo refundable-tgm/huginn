@@ -164,6 +164,18 @@ func (m MongoDatabaseConnector) DeleteApplication(uuid string) bool {
 	return result.DeletedCount == 1
 }
 
+// DoesApplicationExist searches the database for a Application identified by a given UUID
+// and checks whether an Application can be found whilst performing this search.
+// It will return true if the Application was found, false if an error occurred or none was found.
+func (m MongoDatabaseConnector) DoesApplicationExist(uuid string) bool {
+	application := Application{}
+	collection := m.client.Database(m.database).Collection(ApplicationCollection)
+	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&application); err != nil {
+		return false
+	}
+	return true
+}
+
 // CreateTeacher creates a new application in the system
 // it will return true if this operation was successful and false if not
 func (m MongoDatabaseConnector) CreateTeacher(teacher Teacher) bool {
@@ -213,10 +225,10 @@ func (m MongoDatabaseConnector) GetTeacherByUUID(uuid string) (teacher Teacher) 
 	return teacher
 }
 
-// DoesTeacherExist searches the database for a Teacher identified by a uuid
+// DoesTeacherExistByUUID searches the database for a Teacher identified by a uuid
 // and checks whether a teacher can be found whilst performing this search.
 // It will return true if the teacher was found, false if an error occurred or none was found.
-func (m MongoDatabaseConnector) DoesTeacherExist(uuid string) bool {
+func (m MongoDatabaseConnector) DoesTeacherExistByUUID(uuid string) bool {
 	teacher := Teacher{}
 	collection := m.client.Database(m.database).Collection(TeacherCollection)
 	if err := collection.FindOne(m.context, bson.M{"uuid": uuid}).Decode(&teacher); err != nil {
