@@ -64,6 +64,7 @@ func StartService() {
 		api.GET("/getTeacherByShort", AuthWall(), GetTeacherByShort)
 		api.GET("/getTeacher", AuthWall(), GetTeacher)
 		api.POST("/setTeacherPermissions", AuthWall(), SetTeacherPermissions)
+		api.PUT("/updateTeacherInformation", AuthWall(), UpdateTeacherInformation)
 		api.GET("/getActiveApplications", AuthWall(), GetActiveApplications)
 		api.GET("/getAllApplications", AuthWall(), GetAllApplications)
 		api.GET("/getNews", AuthWall(), GetNews)
