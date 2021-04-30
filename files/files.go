@@ -303,18 +303,20 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		})
 		leader := ""
 		companion := ""
+		compcount := 0.0
 		for _, teacher := range app.SchoolEventDetails.Teachers {
 			if teacher.Role == db.Leader {
 				leader = teacher.Name
 			} else if teacher.Role == db.Companion {
 				companion = companion + teacher.Name + ", "
+				compcount++
 			}
 		}
 		if len(companion) != 0 {
 			companion = companion[0 : len(companion)-2]
 		}
 
-		m.Row(10, func() {
+		m.Row(10 + 7 * compcount, func() {
 			m.Col(6, func() {
 				m.Col(3, func() {
 					m.Text("Jahrgang:", props.Text{
