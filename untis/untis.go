@@ -566,7 +566,8 @@ func (client Client) ResolveTeacherID(teacher string) (int, error) {
 		forename := split[0]
 		longname := strings.ToUpper(split[1])
 		for _, res := range r.Result {
-			if forename == res.ForeName && longname == res.LongName {
+			surname := strings.Split(res.LongName, " ")[0]
+			if forename == res.ForeName && longname == surname {
 				return res.ID, nil
 			}
 		}
