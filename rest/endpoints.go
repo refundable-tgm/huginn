@@ -204,9 +204,20 @@ func GetTeacherByShort(con *gin.Context) {
 		con.JSON(http.StatusOK, teacher)
 		return
 	}
-	longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, name)
+	client := untis.GetClient(auth.Username)
+	longname, err := ldap.GetLongName(client.Username, client.Password, name)
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+		return
+	}
+	id, err := client.ResolveTeacherID(longname)
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis id of new teacher"})
+		return
+	}
+	untisAb, err := client.ResolveTeachers([]int{id})
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis abbrevation of new teacher"})
 		return
 	}
 	teacher := mongo.Teacher{
@@ -217,6 +228,7 @@ func GetTeacherByShort(con *gin.Context) {
 		AV:             false,
 		Administration: false,
 		PEK:            false,
+		Untis: 			untisAb[0],
 	}
 	if !db.CreateTeacher(teacher) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
@@ -235,6 +247,7 @@ func GetTeacherByShort(con *gin.Context) {
 // @Param uuid query string true "UUID of Teacher"
 // @Success 200 {object} db.Teacher
 // @Failure 401 {object} Error
+// @Failure 404 {object} Error
 // @Failure 422 {object} Error
 // @Failure 500 {object} Error
 // @Router /getTeacher [get]
@@ -256,7 +269,51 @@ func GetTeacher(con *gin.Context) {
 		return
 	}
 	defer db.Close()
+	if !db.DoesTeacherExistByUUID(uuid) {
+		con.JSON(http.StatusNotFound, Error{"teacher not found"})
+		return
+	}
 	teacher := db.GetTeacherByUUID(uuid)
+	con.JSON(http.StatusOK, teacher)
+}
+
+// GetTeacherByUntis represents the get teacher by untis endpoint
+// @Summary Returns a teacher with the specified untis abbrevation
+// @Description Searches for the Teacher with the specified untis abbrevation and returns the data
+// @ID get-teacher-by-untis
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
+// @Param untis query string true "Untis abbrevation of Teacher"
+// @Success 200 {object} db.Teacher
+// @Failure 401 {object} Error
+// @Failure 404 {object} Error
+// @Failure 422 {object} Error
+// @Failure 500 {object} Error
+// @Router /getTeacherByUntis [get]
+func GetTeacherByUntis(con *gin.Context) {
+	_, err := ExtractTokenMeta(con.Request)
+	if err != nil {
+		con.JSON(http.StatusUnauthorized, Error{"you are not logged in"})
+		return
+	}
+	query := con.Request.URL.Query()
+	if query.Get("untis") == "" {
+		con.JSON(http.StatusUnprocessableEntity, Error{"invalid request structure provided"})
+		return
+	}
+	untisAb := query.Get("untis")
+	db := mongo.MongoDatabaseConnector{}
+	if !db.Connect() {
+		con.JSON(http.StatusInternalServerError, Error{"database didn't respond"})
+		return
+	}
+	defer db.Close()
+	if !db.DoesTeacherExistByUntis(untisAb) {
+		con.JSON(http.StatusNotFound, Error{"teacher not found"})
+		return
+	}
+	teacher := db.GetTeacherByUntis(untisAb)
 	con.JSON(http.StatusOK, teacher)
 }
 
@@ -364,6 +421,7 @@ func UpdateTeacherInformation(con *gin.Context) {
 	teacherToUpdate.Staffnr = ti.Staffnr
 	teacherToUpdate.StartingAddresses = ti.StartingAddresses
 	teacherToUpdate.TripGoals = ti.TripGoals
+	teacherToUpdate.Untis = ti.Untis
 	if db.UpdateTeacher(uuid, teacherToUpdate) {
 		con.JSON(http.StatusOK, Information{"success; teacher updated"})
 	} else {
@@ -405,13 +463,24 @@ func GetActiveApplications(con *gin.Context) {
 		return
 	}
 	applications := db.GetActiveApplications()
-	teacher := mongo.Teacher{}
+	var teacher mongo.Teacher
 	if db.DoesTeacherExistByShort(filter) {
 		teacher = db.GetTeacherByShort(filter)
 	} else {
-		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, filter)
+		client := untis.GetClient(auth.Username)
+		longname, err := ldap.GetLongName(client.Username, client.Password, filter)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+			return
+		}
+		id, err := client.ResolveTeacherID(longname)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis id of new teacher"})
+			return
+		}
+		untisAb, err := client.ResolveTeachers([]int{id})
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis abbrevation of new teacher"})
 			return
 		}
 		teacher = mongo.Teacher{
@@ -422,6 +491,7 @@ func GetActiveApplications(con *gin.Context) {
 			AV:             false,
 			Administration: false,
 			PEK:            false,
+			Untis: 			untisAb[0],
 		}
 		if !db.CreateTeacher(teacher) {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})
@@ -490,13 +560,24 @@ func GetAllApplications(con *gin.Context) {
 		return
 	}
 	applications := db.GetAllApplications()
-	teacher := mongo.Teacher{}
+	var teacher mongo.Teacher
 	if db.DoesTeacherExistByShort(filter) {
 		teacher = db.GetTeacherByShort(filter)
 	} else {
-		longname, err := ldap.GetLongName(auth.Username, untis.GetClient(auth.Username).Password, filter)
+		client := untis.GetClient(auth.Username)
+		longname, err := ldap.GetLongName(client.Username, client.Password, filter)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+			return
+		}
+		id, err := client.ResolveTeacherID(longname)
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis id of new teacher"})
+			return
+		}
+		untisAb, err := client.ResolveTeachers([]int{id})
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis abbrevation of new teacher"})
 			return
 		}
 		teacher = mongo.Teacher{
@@ -507,6 +588,7 @@ func GetAllApplications(con *gin.Context) {
 			AV:             false,
 			Administration: false,
 			PEK:            false,
+			Untis:			untisAb[0],
 		}
 		if !db.CreateTeacher(teacher) {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't create new teacher based on this"})

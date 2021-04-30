@@ -237,6 +237,28 @@ func (m MongoDatabaseConnector) DoesTeacherExistByUUID(uuid string) bool {
 	return true
 }
 
+// DoesTeacherExistByUntis searches the database for a Teacher identified by an untis abbrevation
+// and checks whether a teacher can be found whilst performing this search.
+// It will return true if the teacher was found, false if an error occurred or none was found.
+func (m MongoDatabaseConnector) DoesTeacherExistByUntis(untis string) bool {
+	teacher := Teacher{}
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if err := collection.FindOne(m.context, bson.M{"untis": untis}).Decode(&teacher); err != nil {
+		return false
+	}
+	return true
+}
+
+// GetTeacherByUntis returns a teacher identified by a given untis abbrevation
+func (m MongoDatabaseConnector) GetTeacherByUntis(untis string) (teacher Teacher) {
+	collection := m.client.Database(m.database).Collection(TeacherCollection)
+	if err := collection.FindOne(m.context, bson.M{"untis": untis}).Decode(&teacher); err != nil {
+		log.Println(err)
+		return
+	}
+	return teacher
+}
+
 // UpdateTeacher updates a teacher with the matching uuid and updates it with the data in the update struct
 // returns true whether one Teacher was modified, false if an error occurred or no Teacher was modified
 func (m MongoDatabaseConnector) UpdateTeacher(uuid string, update Teacher) bool {

@@ -44,6 +44,8 @@ type TeacherInformation struct {
 	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim,PH Wien,Landesgericht St. Pölten"`
 	// The Departments this teacher belongs to
 	Departments []string `json:"departments" example:"HIT,HBG"`
+	// The Untis abbrevation of the teacher
+	Untis string `json:"untis" example:"ZAKS"`
 }
 
 // RefreshToken maps an refresh token
