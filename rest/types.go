@@ -39,11 +39,11 @@ type TeacherInformation struct {
 	// The Group number
 	Group int `json:"group" example:"1"`
 	// The StartingAddresses of the teacher
-	StartingAddresses []string `json:"starting_addresses" example:"Zuhause 1, Zuhause 2"`
+	StartingAddresses []string `json:"starting_addresses" example:"Zuhause 1,Zuhause 2"`
 	// The TripGoals the teacher visited before
-	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim, PH Wien, Landesgericht St. Pölten"`
+	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim,PH Wien,Landesgericht St. Pölten"`
 	// The Departments this teacher belongs to
-	Departments []string `json:"departments" example:"HIT, HBG"`
+	Departments []string `json:"departments" example:"HIT,HBG"`
 }
 
 // RefreshToken maps an refresh token

@@ -124,7 +124,7 @@ definitions:
         description: The name of other participants of this trip
         example:
         - Markus Schabel
-        - ' Gottfried Koppensteiner'
+        - Gottfried Koppensteiner
         items:
           type: string
         type: array
@@ -301,9 +301,9 @@ definitions:
         description: The participating classes
         example:
         - 5BHIT
-        - ' 5AHIT'
-        - ' 5CHIT'
-        - ' 5DHIT'
+        - 5AHIT
+        - 5CHIT
+        - 5DHIT
         items:
           type: string
         type: array
@@ -368,7 +368,7 @@ definitions:
         description: The Departments this teacher belongs to
         example:
         - HIT
-        - ' HBG'
+        - HBG
         items:
           type: string
         type: array
@@ -396,7 +396,7 @@ definitions:
         description: The StartingAddresses of the teacher
         example:
         - Zuhause 1
-        - ' Zuhause 2'
+        - Zuhause 2
         items:
           type: string
         type: array
@@ -412,8 +412,8 @@ definitions:
         description: The TripGoals the teacher visited before
         example:
         - Karl Hönck Heim
-        - ' PH Wien'
-        - ' Landesgericht St. Pölten'
+        - PH Wien
+        - Landesgericht St. Pölten
         items:
           type: string
         type: array
@@ -660,7 +660,7 @@ definitions:
         description: The Departments this teacher belongs to
         example:
         - HIT
-        - ' HBG'
+        - HBG
         items:
           type: string
         type: array
@@ -676,7 +676,7 @@ definitions:
         description: The StartingAddresses of the teacher
         example:
         - Zuhause 1
-        - ' Zuhause 2'
+        - Zuhause 2
         items:
           type: string
         type: array
@@ -688,8 +688,8 @@ definitions:
         description: The TripGoals the teacher visited before
         example:
         - Karl Hönck Heim
-        - ' PH Wien'
-        - ' Landesgericht St. Pölten'
+        - PH Wien
+        - Landesgericht St. Pölten
         items:
           type: string
         type: array

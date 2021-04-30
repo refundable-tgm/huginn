@@ -127,7 +127,7 @@ type Application struct {
 // SchoolEventDetails are details an Application has if it is of the kind of SchoolEvent
 type SchoolEventDetails struct {
 	// The participating classes
-	Classes []string `json:"classes" example:"5BHIT, 5AHIT, 5CHIT, 5DHIT"`
+	Classes []string `json:"classes" example:"5BHIT,5AHIT,5CHIT,5DHIT"`
 	// The amount of male students
 	AmountMaleStudents int `json:"amount_male_students" example:"17"`
 	// The amount of female students
@@ -221,7 +221,7 @@ type BusinessTripApplication struct {
 	// The reasoing behind the trip application
 	Reasoning string `json:"reasoning" example:"Lehrausgang ins technische Museum"`
 	// The name of other participants of this trip
-	OtherParticipants []string `json:"other_participants" example:"Markus Schabel, Gottfried Koppensteiner"`
+	OtherParticipants []string `json:"other_participants" example:"Markus Schabel,Gottfried Koppensteiner"`
 	// the confirmation of the first bonus mile clause
 	BonusMileConfirmation1 bool `json:"bonus_mile_confirmation_1" example:"true"`
 	// the confirmation of the second bonus mile clause
@@ -385,9 +385,9 @@ type Teacher struct {
 	// The Group number
 	Group int `json:"group" example:"1"`
 	// The StartingAddresses of the teacher
-	StartingAddresses []string `json:"starting_addresses" example:"Zuhause 1, Zuhause 2"`
+	StartingAddresses []string `json:"starting_addresses" example:"Zuhause 1,Zuhause 2"`
 	// The TripGoals the teacher visited before
-	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim, PH Wien, Landesgericht St. Pölten"`
+	TripGoals []string `json:"trip_goals" example:"Karl Hönck Heim,PH Wien,Landesgericht St. Pölten"`
 	// The Departments this teacher belongs to
-	Departments []string `json:"departments" example:"HIT, HBG"`
+	Departments []string `json:"departments" example:"HIT,HBG"`
 }

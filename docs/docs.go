@@ -1532,7 +1532,7 @@ var doc = `{
                     },
                     "example": [
                         "Markus Schabel",
-                        " Gottfried Koppensteiner"
+                        "Gottfried Koppensteiner"
                     ]
                 },
                 "paid_by_whom": {
@@ -1763,9 +1763,9 @@ var doc = `{
                     },
                     "example": [
                         "5BHIT",
-                        " 5AHIT",
-                        " 5CHIT",
-                        " 5DHIT"
+                        "5AHIT",
+                        "5CHIT",
+                        "5DHIT"
                     ]
                 },
                 "duration_in_days": {
@@ -1851,7 +1851,7 @@ var doc = `{
                     },
                     "example": [
                         "HIT",
-                        " HBG"
+                        "HBG"
                     ]
                 },
                 "group": {
@@ -1887,7 +1887,7 @@ var doc = `{
                     },
                     "example": [
                         "Zuhause 1",
-                        " Zuhause 2"
+                        "Zuhause 2"
                     ]
                 },
                 "super_user": {
@@ -1908,8 +1908,8 @@ var doc = `{
                     },
                     "example": [
                         "Karl Hönck Heim",
-                        " PH Wien",
-                        " Landesgericht St. Pölten"
+                        "PH Wien",
+                        "Landesgericht St. Pölten"
                     ]
                 },
                 "uuid": {
@@ -2232,7 +2232,7 @@ var doc = `{
                     },
                     "example": [
                         "HIT",
-                        " HBG"
+                        "HBG"
                     ]
                 },
                 "group": {
@@ -2253,7 +2253,7 @@ var doc = `{
                     },
                     "example": [
                         "Zuhause 1",
-                        " Zuhause 2"
+                        "Zuhause 2"
                     ]
                 },
                 "title": {
@@ -2269,8 +2269,8 @@ var doc = `{
                     },
                     "example": [
                         "Karl Hönck Heim",
-                        " PH Wien",
-                        " Landesgericht St. Pölten"
+                        "PH Wien",
+                        "Landesgericht St. Pölten"
                     ]
                 }
             }
