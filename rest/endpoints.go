@@ -210,6 +210,17 @@ func GetTeacherByShort(con *gin.Context) {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
 		return
 	}
+	err = client.Authenticate()
+	defer func() {
+		err = client.Close()
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't logout out off untis API"})
+		}
+	}()
+	if err != nil {
+		con.JSON(http.StatusInternalServerError, Error{"couldn't authenticate with untis API"})
+		return
+	}
 	id, err := client.ResolveTeacherID(longname)
 	if err != nil {
 		con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis id of new teacher"})
@@ -473,6 +484,17 @@ func GetActiveApplications(con *gin.Context) {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
 			return
 		}
+		err = client.Authenticate()
+		defer func() {
+			err = client.Close()
+			if err != nil {
+				con.JSON(http.StatusInternalServerError, Error{"couldn't logout out off untis API"})
+			}
+		}()
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't authenticate with untis API"})
+			return
+		}
 		id, err := client.ResolveTeacherID(longname)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't resolve untis id of new teacher"})
@@ -568,6 +590,17 @@ func GetAllApplications(con *gin.Context) {
 		longname, err := ldap.GetLongName(client.Username, client.Password, filter)
 		if err != nil {
 			con.JSON(http.StatusInternalServerError, Error{"couldn't read longname of new teacher"})
+			return
+		}
+		err = client.Authenticate()
+		defer func() {
+			err = client.Close()
+			if err != nil {
+				con.JSON(http.StatusInternalServerError, Error{"couldn't logout out off untis API"})
+			}
+		}()
+		if err != nil {
+			con.JSON(http.StatusInternalServerError, Error{"couldn't authenticate with untis API"})
 			return
 		}
 		id, err := client.ResolveTeacherID(longname)
