@@ -28,6 +28,7 @@ This backend consists out of multiple components:
  - [ ] fix group lesson algorithm to group consecutive lessons  
  - [ ] implement sending of mails (when state changes or events occurr)
  - [ ] create logging system to log every event
+ - [ ] implement the usage of existing applications as templates for new ones  
  - [ ] create simpler data model
  - [ ] change the design of the pdf templates to a more beautiful and easier to understand one
  - [ ] implement more control features as endpoints to be able to further interact with the data model instead of having to update it
