@@ -346,7 +346,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 		})
 		m.Line(1.0)
 
-		m.Row(10+7*compcount, func() {
+		m.Row(10 + 3 * compcount, func() {
 			m.Col(6, func() {
 				m.Col(3, func() {
 					m.Text("Anzahl m/w Schüler/innen:", props.Text{
