@@ -114,15 +114,16 @@ func (m MongoDatabaseConnector) GetAllApplications() (applications []Application
 // GetActiveApplications returns all currently active applications stored in the database
 func (m MongoDatabaseConnector) GetActiveApplications() (applications []Application) {
 	filter := bson.M{
-		"$or": []bson.M{
-			{"$and": []bson.M{
-				{"kind": bson.M{"$in": []int{Training, OtherReason}}},
-				{"progress": bson.M{"$in": []int{TRejected, TInProcess, TConfirmed, TRunning, TCostsPending, TCostsInProcess}}},
-			}},
-			{"$and": []bson.M{
-				{"kind": SchoolEvent},
-				{"progress": bson.M{"$in": []int{SERejected, SEInSubmission, SEInProcess, SEConfirmed, SERunning, SECostsPending, SECostsInProcess}}},
-			}},
+		"progress": bson.M{
+			"$in": []int{
+				Rejected,
+				InSubmission,
+				InProcess,
+				Confirmed,
+				Running,
+				CostsPending,
+				CostsInProcess,
+			},
 		},
 	}
 	collection := m.client.Database(m.database).Collection(ApplicationCollection)

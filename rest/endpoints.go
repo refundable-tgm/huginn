@@ -774,20 +774,11 @@ func GetAdminApplications(con *gin.Context) {
 	applications := db.GetAllApplications()
 	res := make([]mongo.Application, 0)
 	for _, app := range applications {
-		if app.Kind == mongo.SchoolEvent {
-			if app.Progress == mongo.SEInProcess && (teacher.Administration || teacher.AV || teacher.SuperUser) {
-				res = append(res, app)
-			}
-			if app.Progress == mongo.SECostsInProcess {
-				res = append(res, app)
-			}
-		} else if app.Kind == mongo.Training || app.Kind == mongo.OtherReason {
-			if app.Progress == mongo.TInProcess && (teacher.Administration || teacher.AV || teacher.SuperUser) {
-				res = append(res, app)
-			}
-			if app.Progress == mongo.TCostsInProcess {
-				res = append(res, app)
-			}
+		if app.Progress == mongo.InProcess && (teacher.Administration || teacher.AV || teacher.SuperUser) {
+			res = append(res, app)
+		}
+		if app.Progress == mongo.CostsInProcess {
+			res = append(res, app)
 		}
 	}
 	con.JSON(http.StatusOK, res)

@@ -2,27 +2,16 @@ package db
 
 import "time"
 
-// Enum for different progress states of a school event
+// Enum for different progress states of an application
 const (
-	SERejected = iota
-	SEInSubmission
-	SEInProcess
-	SEConfirmed
-	SERunning
-	SECostsPending
-	SECostsInProcess
-	SEDone
-)
-
-// Enum for different progress states of a training
-const (
-	TRejected = iota
-	TInProcess
-	TConfirmed
-	TRunning
-	TCostsPending
-	TCostsInProcess
-	TDone
+	Rejected = iota
+	InSubmission
+	InProcess
+	Confirmed
+	Running
+	CostsPending
+	CostsInProcess
+	Done
 )
 
 // Enum for different kinds of applications
