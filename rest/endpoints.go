@@ -1611,7 +1611,7 @@ func GetTravelInvoiceExcel(con *gin.Context) {
 		con.JSON(http.StatusUnprocessableEntity, Error{"invalid ti_id provided"})
 		return
 	}
-	if db.DoesApplicationExist(uuid) {
+	if !db.DoesApplicationExist(uuid) {
 		con.JSON(http.StatusNotFound, Error{"application not found"})
 		return
 	}
@@ -1714,7 +1714,7 @@ func GetBusinessTripApplicationExcel(con *gin.Context) {
 		con.JSON(http.StatusUnprocessableEntity, Error{"invalid bta_id provided"})
 		return
 	}
-	if db.DoesApplicationExist(uuid) {
+	if !db.DoesApplicationExist(uuid) {
 		con.JSON(http.StatusNotFound, Error{"application not found"})
 		return
 	}
