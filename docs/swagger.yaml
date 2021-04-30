@@ -885,7 +885,7 @@ paths:
         name: uuid
         required: true
         type: string
-      - description: untis name of the teacher, if not provided logged in teacher
+      - description: short name of the teacher, if not provided logged in teacher
           will be used
         in: query
         name: teacher

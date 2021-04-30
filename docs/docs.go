@@ -253,7 +253,7 @@ var doc = `{
                     },
                     {
                         "type": "string",
-                        "description": "untis name of the teacher, if not provided logged in teacher will be used",
+                        "description": "short name of the teacher, if not provided logged in teacher will be used",
                         "name": "teacher",
                         "in": "query"
                     }

@@ -1098,7 +1098,7 @@ func GetAbsenceFormForClasses(con *gin.Context) {
 // @Produce json
 // @Param Authorization header string true "Access Token" default(Bearer <Add access token here>)
 // @Param uuid query string true "Identifier of the application to generate the pdf from"
-// @Param teacher query string false "untis name of the teacher, if not provided logged in teacher will be used"
+// @Param teacher query string false "short name of the teacher, if not provided logged in teacher will be used"
 // @Success 200 {object} PDF
 // @Failure 401 {object} Error
 // @Failure 404 {object} Error
