@@ -1417,7 +1417,7 @@ func GetTravelInvoiceForm(con *gin.Context) {
 		created := filepath.Join(filepath.Dir(path), fmt.Sprintf(files.TravelInvoicePDFFileName, short+"_merge"))
 		err = api.MergeCreateFile(pp, created, pdfcpu.NewDefaultConfiguration())
 		if err != nil {
-			con.JSON(http.StatusInternalServerError, Error{"couldn't save merged pdf"})
+			con.JSON(http.StatusInternalServerError, Error{"couldn't save merged pdf; the uploaded files might be corrupted"})
 			return
 		}
 		err = api.OptimizeFile(created, "", nil)
