@@ -72,7 +72,6 @@ func Login(con *gin.Context) {
 		return
 	}
 	SaveToken(u.Username, token)
-	untis.CreateClient(u.Username, u.Password)
 	out := TokenPair{
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
