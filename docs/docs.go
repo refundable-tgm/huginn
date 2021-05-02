@@ -1880,14 +1880,30 @@ var doc = `{
             "type": "object",
             "properties": {
                 "amount_female_students": {
-                    "description": "The amount of female students",
-                    "type": "integer",
-                    "example": 0
+                    "description": "The amount of female students per class (same order as Classes)",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        2,
+                        0,
+                        0,
+                        5
+                    ]
                 },
                 "amount_male_students": {
-                    "description": "The amount of male students",
-                    "type": "integer",
-                    "example": 17
+                    "description": "The amount of male students per class (same order as Classes)",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        17,
+                        20,
+                        19,
+                        18
+                    ]
                 },
                 "classes": {
                     "description": "The participating classes",

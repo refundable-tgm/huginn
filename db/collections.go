@@ -117,10 +117,10 @@ type Application struct {
 type SchoolEventDetails struct {
 	// The participating classes
 	Classes []string `json:"classes" example:"5BHIT,5AHIT,5CHIT,5DHIT"`
-	// The amount of male students
-	AmountMaleStudents int `json:"amount_male_students" example:"17"`
-	// The amount of female students
-	AmountFemaleStudents int `json:"amount_female_students" example:"0"`
+	// The amount of male students per class (same order as Classes)
+	AmountMaleStudents []int `json:"amount_male_students" example:"17,20,19,18"`
+	// The amount of female students per class (same order as Classes)
+	AmountFemaleStudents []int `json:"amount_female_students" example:"2,0,0,5"`
 	// The duration of the event in days
 	DurationInDays int `json:"duration_in_days" example:"2"`
 	// Details of each teacher participating in the SchoolEvent

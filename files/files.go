@@ -251,7 +251,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 	if err != nil {
 		return nil, fmt.Errorf("couldn't load timezone")
 	}
-	for _, class := range app.SchoolEventDetails.Classes {
+	for i, class := range app.SchoolEventDetails.Classes {
 		m := pdf.NewMaroto(consts.Portrait, consts.A4)
 		m.SetPageMargins(10, 15, 10)
 
@@ -354,7 +354,7 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 						Align: consts.Left,
 					})
 				})
-				m.Text(strconv.Itoa(app.SchoolEventDetails.AmountMaleStudents)+" / "+strconv.Itoa(app.SchoolEventDetails.AmountFemaleStudents), props.Text{
+				m.Text(strconv.Itoa(app.SchoolEventDetails.AmountMaleStudents[i])+" / "+strconv.Itoa(app.SchoolEventDetails.AmountFemaleStudents[i]), props.Text{
 					Top:   2.5,
 					Align: consts.Center,
 				})

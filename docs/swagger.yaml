@@ -290,13 +290,25 @@ definitions:
   db.SchoolEventDetails:
     properties:
       amount_female_students:
-        description: The amount of female students
-        example: 0
-        type: integer
+        description: The amount of female students per class (same order as Classes)
+        example:
+        - 2
+        - 0
+        - 0
+        - 5
+        items:
+          type: integer
+        type: array
       amount_male_students:
-        description: The amount of male students
-        example: 17
-        type: integer
+        description: The amount of male students per class (same order as Classes)
+        example:
+        - 17
+        - 20
+        - 19
+        - 18
+        items:
+          type: integer
+        type: array
       classes:
         description: The participating classes
         example:
