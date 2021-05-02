@@ -617,13 +617,17 @@ func GenerateAbsenceFormForClass(path, username string, app db.Application) ([]s
 				})
 			})
 		})
+		spacer := ""
+		for j := 0; j < 50; j++ {
+			spacer += " "
+		}
 		ackStrings := make([][]string, 6)
-		ackStrings[0] = []string{"AV", "\n", "\n"}
-		ackStrings[1] = []string{"AV", "\n", "\n"}
-		ackStrings[2] = []string{"WL", "\n", "\n"}
-		ackStrings[3] = []string{"Begleitperson", "\n", "\n"}
-		ackStrings[4] = []string{"Ersteller/in", "\n", "\n"}
-		ackStrings[5] = []string{"UNTIS Eintragung", "\n", "\n"}
+		ackStrings[0] = []string{"AV", spacer, spacer}
+		ackStrings[1] = []string{"AV", spacer, spacer}
+		ackStrings[2] = []string{"WL", spacer, spacer}
+		ackStrings[3] = []string{"Begleitperson", spacer, spacer}
+		ackStrings[4] = []string{"Ersteller/in", spacer, spacer}
+		ackStrings[5] = []string{"UNTIS Eintragung", spacer, spacer}
 		m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings, props.TableList{
 			Align: consts.Center,
 			HeaderProp: props.TableListContent{
@@ -1336,11 +1340,15 @@ func GenerateAbsenceFormForTeacher(path, username, teacher string, app db.Applic
 			})
 		})
 	})
+	spacer := ""
+	for j := 0; j < 50; j++ {
+		spacer += " "
+	}
 	ackStrings := make([][]string, 4)
-	ackStrings[0] = []string{"AV", "\n", "\n"}
-	ackStrings[1] = []string{"WL", "\n", "\n"}
-	ackStrings[2] = []string{"Ersteller/in", "\n", "\n"}
-	ackStrings[3] = []string{"UNTIS Eintragung", "\n", "\n"}
+	ackStrings[0] = []string{"AV", spacer, spacer}
+	ackStrings[1] = []string{"WL", spacer, spacer}
+	ackStrings[2] = []string{"Ersteller/in", spacer, spacer}
+	ackStrings[3] = []string{"UNTIS Eintragung", spacer, spacer}
 	m.TableList([]string{"Stelle", "Datum", "Paraphe"}, ackStrings, props.TableList{
 		Align: consts.Center,
 		HeaderProp: props.TableListContent{
