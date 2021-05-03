@@ -38,8 +38,8 @@ func AuthenticateUserCredentials(username, password string) bool {
 	if err != nil {
 		return false
 	}
+	client := untis.CreateClient(username, password)
 	if !mongo.DoesTeacherExistByShort(username) {
-		client := untis.CreateClient(username, password)
 		err = client.Authenticate()
 		if err != nil {
 			_ = client.Close()
