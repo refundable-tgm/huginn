@@ -1749,7 +1749,9 @@ func GenerateTravelInvoice(path, short string, app db.TravelInvoice, uuid string
 				break
 			}
 		}
-		geb = geb[0 : len(geb)-2]
+		if len(geb) != 0 {
+			geb = geb[0 : len(geb)-2]
+		}
 		row[4] = geb
 		row[10] = strconv.FormatFloat(float64(r.Sum), 'f', 2, 32)
 		content = append(content, row)
