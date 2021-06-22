@@ -128,6 +128,7 @@ func Refresh(con *gin.Context) {
 
 	if err != nil {
 		con.JSON(http.StatusUnauthorized, Error{"token expired"})
+		return
 	}
 
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
